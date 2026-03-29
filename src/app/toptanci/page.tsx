@@ -1,23 +1,24 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Package, PlusCircle, Image as ImageIcon, Trash2, Eye } from 'lucide-react';
+import { Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 import Link from 'next/link';
 
 export default function ToptanciDashboard() {
   const [products, setProducts] = useState<any[]>([]);
-  const [orders, setOrders] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
-  const [loadingOrders, setLoadingOrders] = useState(true);
   
   // Ürün Form State'leri
   const [name, setName] = useState('');
+  const [gender, setGender] = useState('Unisex');
   const [category, setCategory] = useState('Tişört');
   const [fabricType, setFabricType] = useState('');
+  const [sizes, setSizes] = useState('');
+  const [gsm, setGsm] = useState('');
   const [wholesalePrice, setWholesalePrice] = useState('');
-  const [minOrder, setMinOrder] = useState('5');
+  const [minOrder, setMinOrder] = useState('');
   
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -33,41 +34,10 @@ export default function ToptanciDashboard() {
       if (user) {
         setUser(user);
         fetchMyProducts(user.id);
-        fetchMyOrders(user.id);
       }
     }
     init();
   }, []);
-
-  const fetchMyOrders = async (userId: string) => {
-    setLoadingOrders(true);
-    // Toptancı SQL'den sadece status != 'waiting_payment' olan Siparişlerini çeker (Aksi halde RLS çektirmez zaten)
-    const { data } = await supabase
-      .from('orders')
-      .select('*, product:product_id(name, images)')
-      .eq('wholesaler_id', userId)
-      .order('created_at', { ascending: false });
-    
-    if (data) setOrders(data);
-    setLoadingOrders(false);
-  };
-
-  const handleShipOrder = async (orderId: string) => {
-    const trackingCode = window.prompt("Lütfen kargoya verdiğiniz paketin Geçerli Takip Numarasını (Örn: YK-109232) yazınız:");
-    if (!trackingCode) return;
-    
-    const { error } = await supabase.from('orders').update({
-       status: 'shipped',
-       tracking_number: trackingCode
-    }).eq('id', orderId);
-    
-    if(!error) {
-       alert("Mükemmel! Kargo takip numarası sisteme işlendi ve Müşterinin (Butik) sayfasına SMS tadında yansıtıldı.");
-       fetchMyOrders(user.id);
-    } else {
-       alert("Kargo kodu girilirken hata: " + error.message);
-    }
-  };
 
   const fetchMyProducts = async (userId: string) => {
     setLoadingProducts(true);
@@ -82,7 +52,7 @@ export default function ToptanciDashboard() {
   };
 
   const clearForm = () => {
-     setName(''); setFabricType(''); setWholesalePrice(''); setSelectedFiles([]); setPreviewUrls([]);
+     setName(''); setFabricType(''); setWholesalePrice(''); setSelectedFiles([]); setPreviewUrls([]); setGsm(''); setSizes(''); setMinOrder('');
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +73,6 @@ export default function ToptanciDashboard() {
     
     try {
       const uploadedUrls: string[] = [];
-      
       for (const file of selectedFiles) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
@@ -121,20 +90,22 @@ export default function ToptanciDashboard() {
           wholesaler_id: user.id,
           name,
           category,
+          gender, // YENİ KOLON
+          sizes: sizes || "Standart Paket", // YENİ KOLON
           description: `Toptancı doğrudan satışı: B2B ${category} koleksiyonu.`,
           fabric_type: fabricType,
-          gsm: "160gsm", // Otomatik bıraktık form kalabalıgını azaltmak ıcın
+          gsm: gsm || null, // Dinamikleşti, zorunlu 160gsm kaldırıldı
           images: uploadedUrls,
           base_wholesale_price: Number(wholesalePrice),
-          margin_price: 100, // Demir Dev Payı (Otomatik Eklenir)
+          margin_price: 100, // Demir Dev Payı (Otomatik Eklenir, müşteri fiyatına yansır)
           stock_status: 'In Stock',
           min_order_quantity: Number(minOrder)
         }
       ]);
 
-      if (dbError) throw new Error("Veritabanı kayıt hatası: " + dbError.message);
+      if (dbError) throw new Error("Veritabanı kayıt hatası (SQL yamasını çalıştırdığınızdan emin olun): " + dbError.message);
 
-      alert("Mükemmel Tasarım! Ürün başarıyla Demir Dev Vitrinine eklendi!");
+      alert("Lüks Tasarım! Ürün tüm asorti ve cinsiyet filtreleriyle Müşteri Vitrinine eklendi!");
       clearForm();
       fetchMyProducts(user.id);
 
@@ -151,7 +122,7 @@ export default function ToptanciDashboard() {
     fetchMyProducts(user?.id);
   };
 
-  if (!user) return <div className="p-20 text-center font-bold">Satıcı Yetkiniz Kontrol Ediliyor...</div>;
+  if (!user) return <div className="p-20 text-center font-bold">Oturum Doğrulanıyor...</div>;
 
   return (
     <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen bg-anthracite-50/50">
@@ -159,8 +130,11 @@ export default function ToptanciDashboard() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-anthracite-200 pb-6">
         <div>
           <h1 className="text-4xl font-black tracking-tight text-anthracite-900">Satıcı Üretim Atölyesi</h1>
-          <p className="text-anthracite-500 font-medium mt-1">Stüdyonuzdasınız. Aşağıdaki formdan piyasaya anlık mal sürün ve vitrindeki görünümünüzü ayarlayın.</p>
+          <p className="text-anthracite-500 font-medium mt-1 text-lg">Stüdyonuzdasınız. Aşağıdaki formdan piyasaya anlık mal sürün ve vitrindeki görünümünüzü ayarlayın.</p>
         </div>
+        <Link href="/toptanci/siparisler" className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-4 rounded-3xl font-black text-lg transition-all shadow-xl shadow-emerald-500/30 hover:scale-105 active:scale-95">
+          <Truck className="w-6 h-6" /> Kargo & Sipariş Masasına Geç
+        </Link>
       </div>
 
       <div className="grid xl:grid-cols-12 gap-10">
@@ -170,12 +144,9 @@ export default function ToptanciDashboard() {
            
            {/* Canlı Önizleme Kartı (Live Preview Studio) */}
            <div className="bg-gradient-to-br from-anthracite-900 to-black rounded-[2.5rem] p-8 sm:p-10 text-white shadow-2xl relative overflow-hidden">
-             
-             {/* Şık Arkaplan Deseni */}
              <div className="absolute top-0 right-0 -mt-20 -mr-20 opacity-5">
                 <Package className="w-96 h-96" />
              </div>
-             
              <div className="relative z-10 flex flex-col sm:flex-row gap-8 items-center sm:items-start">
                 {/* Fotoğraf Animasyonu */}
                 <div className="w-48 h-64 shrink-0 bg-white/5 rounded-3xl border border-white/10 overflow-hidden flex items-center justify-center backdrop-blur-xl shadow-[0_0_40px_rgba(255,255,255,0.05)] transition-all">
@@ -199,65 +170,99 @@ export default function ToptanciDashboard() {
                      {name || "Yeni Model Tasarımınız"}
                    </h2>
                    
+                   {/* DİNAMİK ROZETLER (Erkek, Kategori, Beden) */}
                    <div className="flex flex-wrap items-center gap-2 text-white/80 font-bold text-xs uppercase tracking-wider">
-                      <span className="bg-white/10 px-3 py-1.5 rounded-full border border-white/10">{category}</span>
+                      <span className="bg-white/10 px-3 py-1.5 rounded-md border border-white/10 text-emerald-300">{gender || "Unisex"}</span>
+                      <span className="bg-white/10 px-3 py-1.5 rounded-full border border-white/10">{category || "Kategori"}</span>
                       {fabricType && <span className="bg-white/10 px-3 py-1.5 rounded-full border border-white/10">{fabricType}</span>}
                    </div>
                    
                    <div className="pt-6 mt-2 border-t border-white/10 flex flex-wrap items-end justify-between gap-4">
                      <div>
-                       <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-1.5">Müşterinin Göreceği Net Satış (Adet)</p>
+                       <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">Müşteri Vitrin Fiyatı (Adet)</p>
                        <p className="text-4xl font-black text-white drop-shadow-md">
                          {wholesalePrice ? (Number(wholesalePrice) + 100).toLocaleString('tr-TR') : "0"} <span className="text-2xl text-emerald-400">₺</span>
                        </p>
                      </div>
                      <div className="text-right bg-white/5 px-4 py-2 rounded-2xl border border-white/5">
-                       <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mb-1">Seri İçeriği</p>
-                       <p className="font-black text-xl text-white">{minOrder} <span className="text-sm font-medium">Adet</span></p>
+                       <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-1">Paket (Seri) Adedi</p>
+                       <p className="font-black text-xl text-white">{minOrder || "0"} <span className="text-sm font-medium">Parça</span></p>
                      </div>
                    </div>
+
+                   {sizes && (
+                     <div className="bg-emerald-900/40 border border-emerald-500/30 p-3 rounded-xl mt-2">
+                        <p className="text-[10px] text-emerald-300 uppercase tracking-widest font-black mb-1">Paket İçi Beden Asortisi</p>
+                        <p className="text-sm font-bold text-white leading-tight">{sizes}</p>
+                     </div>
+                   )}
                 </div>
              </div>
            </div>
 
            {/* Yükleme Form Masası */}
-           <div className="bg-white border border-anthracite-100 rounded-[2.5rem] p-8 sm:p-10 shadow-xl">
-             <h2 className="text-xl font-bold flex items-center gap-3 mb-6 text-anthracite-900 border-b border-anthracite-100 pb-5">
+           <div className="bg-white border text-left border-anthracite-100 rounded-[2.5rem] p-8 sm:p-10 shadow-xl">
+             <h2 className="text-xl font-bold flex items-center justify-start gap-3 mb-6 text-anthracite-900 border-b border-anthracite-100 pb-5">
                <PlusCircle className="w-6 h-6 text-emerald-600" /> Üretim Verilerini Formüle Et
              </h2>
              
              <form onSubmit={handleAddProduct} className="flex flex-col gap-6">
+               
+               {/* 1. Ürün Adı */}
                <div>
-                 <label className="text-xs font-bold text-anthracite-400 uppercase tracking-widest mb-2 block">Dükkan Koleksiyon Başlığı</label>
-                 <input required type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-anthracite-200 bg-anthracite-50/50 text-base focus:bg-white focus:border-anthracite-900 focus:ring-4 focus:ring-anthracite-100 outline-none transition-all font-black" placeholder="Örn: Nakış Detaylı Salaş Kazak" />
+                 <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Dükkan Koleksiyon Başlığı</label>
+                 <input required type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full px-5 py-4 rounded-xl border border-anthracite-200 bg-anthracite-50 text-lg focus:bg-white focus:border-anthracite-900 focus:ring-4 focus:ring-anthracite-100 outline-none transition-all font-black" placeholder="Örn: Nakış Detaylı Siyah Kışlık Bot" />
                </div>
 
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+               {/* 2. Cinsiyet & Kategori Çizgisi */}
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-5 bg-anthracite-50/50 rounded-2xl border border-anthracite-100">
                  <div>
-                   <label className="text-xs font-bold text-anthracite-400 uppercase tracking-widest mb-2 block">Satış Kategorisi</label>
-                   <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-anthracite-200 bg-anthracite-50/50 text-base font-bold text-anthracite-900 focus:bg-white focus:ring-4 focus:ring-anthracite-100 outline-none transition-all cursor-pointer">
-                     <option>Tişört</option><option>Sweatshirt</option><option>Triko</option><option>Pantolon</option><option>Mont / Kaban</option>
+                   <label className="text-[10px] font-black text-anthracite-500 uppercase tracking-widest mb-2 block">Cinsiyet (Hedef Kitle)</label>
+                   <select value={gender} onChange={e=>setGender(e.target.value)} className="w-full px-5 py-4 rounded-xl border border-anthracite-200 bg-white text-base font-bold text-emerald-900 focus:ring-4 outline-none cursor-pointer">
+                     <option>Kadın</option><option>Erkek</option><option>Kız Çocuk</option><option>Erkek Çocuk</option><option>Unisex</option>
                    </select>
                  </div>
                  <div>
-                   <label className="text-xs font-bold text-anthracite-400 uppercase tracking-widest mb-2 block">Kumaş ve Materyal</label>
-                   <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-5 py-4 rounded-2xl border border-anthracite-200 bg-anthracite-50/50 text-base focus:bg-white focus:ring-4 focus:ring-anthracite-100 outline-none transition-all font-bold text-anthracite-900" placeholder="%100 İhraç Pamuk" />
+                   <label className="text-[10px] font-black text-anthracite-500 uppercase tracking-widest mb-2 block">Ana Kategori</label>
+                   <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-5 py-4 rounded-xl border border-anthracite-200 bg-white text-base font-bold text-anthracite-900 focus:ring-4 outline-none cursor-pointer">
+                     <option>Tişört</option><option>Sweatshirt</option><option>İç Çamaşırı / Pijama</option><option>Ayakkabı / Sneaker</option><option>Triko</option><option>Pantolon / Jean</option><option>Mont / Kaban</option><option>Elbise / Etek</option><option>Aksesuar</option>
+                   </select>
                  </div>
                </div>
 
-               {/* Finans Modülü */}
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 sm:p-8 bg-emerald-50 rounded-3xl border border-emerald-100">
+               {/* 3. Materyal ve Serbest Beden Modülü */}
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                  <div>
-                   <label className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2 block">Sizin Hak Edeceğiniz Fiyat (₺)</label>
-                   <input required type="number" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full px-5 py-4 rounded-2xl border-2 border-emerald-200 bg-white text-emerald-900 text-2xl font-black focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 outline-none transition-all shadow-sm" placeholder="250" />
+                   <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Paket (Asorti) İçeriği *Önemli*</label>
+                   <input required type="text" value={sizes} onChange={e=>setSizes(e.target.value)} className="w-full px-5 py-4 rounded-xl border border-emerald-200 bg-emerald-50 text-base focus:bg-white focus:ring-4 focus:ring-emerald-100 outline-none transition-all font-black text-emerald-900 placeholder:text-emerald-300" placeholder="Örn: 36-37-38-39-40 veya S(2)-M-L-XL" />
+                   <p className="text-[10px] text-anthracite-400 font-bold mt-2">Müşterinin paketten tam olarak hangi bedenden çıkaracağını açıkça yazın.</p>
                  </div>
-                 <div>
-                   <label className="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-2 block">Bir Seride Kaç Adet Var?</label>
-                   <input required type="number" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-5 py-4 rounded-2xl border-2 border-emerald-200 bg-white text-emerald-900 text-2xl font-black focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 outline-none transition-all shadow-sm" placeholder="5" />
+                 
+                 <div className="flex flex-col gap-4">
+                    <div>
+                      <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block">Kumaş / Materyal Türü</label>
+                      <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-5 py-3 rounded-xl border border-anthracite-200 bg-anthracite-50 text-sm font-bold text-anthracite-900 focus:bg-white focus:ring-2 outline-none" placeholder="%100 Deri veya Pamuk" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block">Gramaj / Ağırlık (Varsa)</label>
+                      <input type="text" value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full px-5 py-3 rounded-xl border border-anthracite-200 bg-anthracite-50 text-sm font-bold text-anthracite-900 focus:bg-white focus:ring-2 outline-none" placeholder="Örn: 240gsm (Ayakkabıda boş geçebilirsiniz)" />
+                    </div>
                  </div>
                </div>
 
-               {/* MULTIPLE DOSYA UPLOAD ALANI */}
+               {/* 4. Finans Modülü */}
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-6 sm:p-8 bg-blue-50/50 rounded-3xl border border-blue-100 mt-2">
+                 <div>
+                   <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 block">Sizin Hak Edeceğiniz Sabit Fiyat (₺)</label>
+                   <input required type="number" min="1" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full px-5 py-4 rounded-2xl border-2 border-blue-200 bg-white text-blue-900 text-2xl font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" placeholder="250" />
+                 </div>
+                 <div>
+                   <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 block">Bir Seride Kaç Parça Çıkıyor?</label>
+                   <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-5 py-4 rounded-2xl border-2 border-blue-200 bg-white text-blue-900 text-2xl font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" placeholder="5" />
+                 </div>
+               </div>
+
+               {/* 5. MULTIPLE DOSYA UPLOAD ALANI */}
                <div className="mt-4 text-center group">
                  <div className="relative border-2 border-dashed border-anthracite-300 rounded-[2rem] p-10 hover:bg-emerald-50 hover:border-emerald-400 transition-all cursor-pointer overflow-hidden">
                     <input 
@@ -272,8 +277,8 @@ export default function ToptanciDashboard() {
                       <div className="w-20 h-20 bg-white shadow-sm rounded-full flex flex-col items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white text-anthracite-400 transition-all">
                         <ImageIcon className="w-8 h-8"/>
                       </div>
-                      <h3 className="text-xl font-black text-anthracite-900 mb-2">Bilgisayar veya Galeriden Toplu Fotoğraf Seçin</h3>
-                      <p className="text-sm text-anthracite-500 font-medium max-w-sm px-4">Tüm açıları ve manken pozlarını ekleyin. Butikler vitrinde sağa kaydırarak resmi incelesinler.</p>
+                      <h3 className="text-xl font-black text-anthracite-900 mb-2">Bilgisayar veya Galeriden Fotoğrafları Seçin</h3>
+                      <p className="text-sm text-anthracite-500 font-medium max-w-sm px-4">Tüm açıları ekleyin. Butikler vitrinde sağa kaydırarak resmi incelesinler.</p>
                       
                       {selectedFiles.length > 0 && (
                         <div className="mt-8 flex flex-wrap gap-3 justify-center">
@@ -283,7 +288,7 @@ export default function ToptanciDashboard() {
                              </div>
                            ))}
                            <div className="px-6 h-20 rounded-xl bg-emerald-100 border-2 border-emerald-300 text-emerald-800 font-black text-sm flex items-center shadow-md justify-center">
-                             {selectedFiles.length} DOSYA ALINDI
+                             {selectedFiles.length} ADET DOSYA
                            </div>
                         </div>
                       )}
@@ -291,8 +296,9 @@ export default function ToptanciDashboard() {
                  </div>
                </div>
 
-               <button disabled={isAddingProduct} className="w-full mt-4 bg-anthracite-900 text-white font-black text-xl py-6 rounded-[2rem] hover:bg-black hover:scale-[1.02] shadow-2xl shadow-anthracite-900/30 transition-all disabled:opacity-50">
-                 {isAddingProduct ? "RESİMLER CLOUD SUNUCUSUNA AKTARILIYOR..." : "ÜRETİMİ MÜŞTERİ VİTRİNİNE GÖNDER"}
+               <button disabled={isAddingProduct} className="w-full mt-4 bg-anthracite-900 text-white font-black text-xl py-6 rounded-[2rem] hover:bg-black hover:scale-[1.02] shadow-2xl shadow-anthracite-900/30 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
+                 {isAddingProduct && <Loader2 className="w-6 h-6 animate-spin"/>}
+                 {isAddingProduct ? "GÖRSELLER CLOUD AĞINA AKTARILIYOR..." : "ÜRETİMİ MÜŞTERİ VİTRİNİNE GÖNDER"}
                </button>
              </form>
            </div>
@@ -317,7 +323,7 @@ export default function ToptanciDashboard() {
                 </div>
               ) : (
                 products.map(product => (
-                  <div key={product.id} className="bg-white hover:bg-anthracite-50 rounded-3xl p-4 flex gap-5 items-center border border-anthracite-100 shadow-sm transition-all hover:shadow-lg group text-left">
+                  <div key={product.id} className="bg-white hover:bg-anthracite-50 rounded-3xl p-4 flex gap-5 items-center border border-emerald-100 shadow-sm transition-all hover:shadow-lg group text-left relative overflow-hidden">
                     <div className="relative w-28 h-36 shrink-0 bg-anthracite-100 rounded-2xl overflow-hidden border border-anthracite-200">
                       <Image 
                         src={product.images && product.images.length > 0 ? product.images[0] : ''} 
@@ -329,10 +335,11 @@ export default function ToptanciDashboard() {
                         {product.images?.length || 0}
                       </div>
                     </div>
-                    <div className="flex-1 py-1">
+                    <div className="flex-1 py-1 pr-2">
                       <h3 className="font-black text-xl line-clamp-2 leading-tight mb-2 text-anthracite-900">{product.name}</h3>
-                      <div className="flex items-center gap-2 mb-4">
-                        <span className="text-[10px] uppercase tracking-widest font-black text-anthracite-600 bg-anthracite-100 px-3 py-1 rounded-md">{product.category}</span>
+                      <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                        <span className="text-[9px] uppercase tracking-widest font-black text-emerald-700 bg-emerald-100 px-2 py-1 rounded-md">{product.gender || "Unisex"}</span>
+                        <span className="text-[9px] uppercase tracking-widest font-black text-anthracite-600 bg-anthracite-100 px-2 py-1 rounded-md">{product.category}</span>
                       </div>
                       <div className="flex justify-between items-end border-t border-anthracite-100 pt-3">
                         <div>
@@ -357,59 +364,6 @@ export default function ToptanciDashboard() {
         </div>
         
       </div>
-
-      {/* SİPARİŞ KARŞILAMA VE LOJİSTİK (Kargo) MASASI (FAZ 4) */}
-      <div className="mt-10 bg-white border border-anthracite-200 rounded-[2.5rem] p-8 sm:p-10 shadow-xl">
-        <h2 className="text-2xl font-black flex items-center gap-3 mb-6 border-b border-anthracite-100 pb-5 text-anthracite-900">
-           <Package className="w-8 h-8 text-emerald-500" /> Kargo Bekleyen Siparişleriniz
-        </h2>
-        
-        {loadingOrders ? (
-          <p className="p-4 text-sm font-bold text-anthracite-500 animate-pulse">Merkezdeki siparişleriniz taranıyor...</p>
-        ) : orders.length === 0 ? (
-          <div className="py-16 text-center bg-anthracite-50/50 rounded-3xl border border-dashed border-anthracite-200">
-             <h3 className="text-xl font-black text-anthracite-500 mb-2">Sıfır Sipariş, Temiz İş!</h3>
-             <p className="text-sm font-medium text-anthracite-400">Merkez yönetimi (Demir Dev Studio) ürün satıldığında ödemeyi teyit edip siparişi buraya -kargo onayı için- düşürecektir.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {orders.map(order => (
-               <div key={order.id} className="bg-anthracite-50 border border-anthracite-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:bg-white hover:shadow-lg">
-                  <div>
-                    <div className="flex justify-between items-start mb-4">
-                      <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${order.status === 'shipped' ? 'bg-blue-100 text-blue-600 border border-blue-200' : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'}`}>
-                        {order.status === 'shipped' ? 'KARGOLANDI GİTTİ' : 'YENİ SİPARİŞ - HAZIRLA'}
-                      </span>
-                      <span className="font-black text-anthracite-900 border border-anthracite-200 bg-white px-3 py-1.5 rounded-xl shadow-sm">
-                        {Number(order.quantity)} Adet
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-black text-anthracite-900 mb-1">{order.product_name || "Silinmiş Ürün"}</h3>
-                    <p className="text-xs font-bold text-emerald-600 mb-4 tracking-widest uppercase">Net Cironuz: {Number(order.wholesaler_earning).toLocaleString('tr-TR')} ₺</p>
-                    
-                    <div className="bg-white p-5 rounded-2xl border border-anthracite-100 mb-6 shadow-sm">
-                      <p className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 border-b border-anthracite-50 pb-2">Teslimat Adresi (İrsaliye)</p>
-                      <p className="font-black text-anthracite-900 text-base">{order.buyer_name}</p>
-                      <p className="text-sm font-medium text-anthracite-600 mt-1">{order.shipping_address}</p>
-                      <p className="text-xs font-black text-anthracite-500 mt-3 bg-anthracite-50 p-2 rounded-lg">İletişim: {order.buyer_phone}</p>
-                    </div>
-                  </div>
-
-                  {order.status === 'approved' ? (
-                     <button onClick={() => handleShipOrder(order.id)} className="w-full bg-anthracite-900 hover:bg-black text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all hover:scale-[1.02] active:scale-95">
-                       Kargola ve Takip No Gir
-                     </button>
-                  ) : (
-                     <div className="bg-blue-50 text-blue-800 p-4 rounded-xl border border-blue-100 text-sm font-black text-center tracking-widest">
-                        KOD: {order.tracking_number}
-                     </div>
-                  )}
-               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
     </div>
   );
 }

@@ -81,7 +81,11 @@ export default async function Katalog() {
                     <h3 className="font-semibold text-anthracite-900 dark:text-white line-clamp-1">{product.name}</h3>
                   </div>
                   
-                  <p className="text-sm text-anthracite-500 mb-4">{product.gsm} • M.O.Q: {product.min_order_quantity} Adet seri</p>
+                  <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                     <span className="text-[9px] uppercase tracking-widest font-black text-emerald-700 bg-emerald-100 px-2 py-1 rounded-md">{product.gender || "Unisex"}</span>
+                     <span className="text-[9px] uppercase tracking-widest font-black text-anthracite-600 bg-anthracite-100 px-2 py-1 rounded-md">{product.sizes || "Standart"}</span>
+                  </div>
+                  <p className="text-xs font-bold text-anthracite-400 mb-4 line-clamp-1">{product.gsm ? `${product.gsm} • ` : ''}Paket İçi: {product.min_order_quantity} {product.category}</p>
                   
                   <div className="mt-auto pt-4 border-t border-anthracite-100 dark:border-anthracite-800 flex items-center justify-between">
                     {isApproved ? (

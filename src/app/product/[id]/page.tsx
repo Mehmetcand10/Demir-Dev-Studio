@@ -150,8 +150,10 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
         {/* Sağ: Bilgiler ve Sipariş İşlemleri */}
         <div className="flex flex-col">
-          <div className="mb-2">
-            <span className="text-sm font-semibold tracking-wider text-anthracite-500 uppercase">{product.category}</span>
+          <div className="mb-2 flex flex-wrap gap-2 items-center">
+            <span className="text-xs font-black tracking-widest text-emerald-600 uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">{product.gender || "Unisex"}</span>
+            <span className="text-xs font-black tracking-widest text-anthracite-500 uppercase bg-anthracite-50 px-3 py-1 rounded-full">{product.category}</span>
+            <span className="text-xs font-black tracking-widest text-blue-600 uppercase bg-blue-50 px-3 py-1 rounded-full border border-blue-100">{product.sizes || "Standart Paket"}</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">{product.name}</h1>
 
@@ -170,12 +172,24 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
               <div className="space-y-6 mb-10">
                 <div>
-                  <h3 className="text-sm font-semibold mb-2 flex items-center gap-2"><Package className="w-4 h-4"/> Kumaş ve İçerik</h3>
-                  <p className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed">
-                    {product.description}<br/><br/>
-                    Kumaş Tipi: <strong>{product.fabric_type}</strong><br/>
-                    Gramaj: <strong>{product.gsm}</strong>
-                  </p>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-anthracite-900 border-b border-anthracite-100 pb-2"><Package className="w-5 h-5 text-emerald-500"/> Paket ve Materyal Analizi</h3>
+                  <div className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed bg-white border border-anthracite-200 p-5 rounded-2xl shadow-sm">
+                    <p className="mb-4">{product.description}</p>
+                    <ul className="space-y-2 mt-4">
+                       <li className="flex justify-between items-center bg-anthracite-50 px-4 py-2 rounded-xl">
+                          <span className="font-bold text-anthracite-500 text-xs uppercase tracking-widest">Kumaş / Materyal</span>
+                          <span className="font-black text-anthracite-900">{product.fabric_type}</span>
+                       </li>
+                       <li className="flex justify-between items-center bg-anthracite-50 px-4 py-2 rounded-xl">
+                          <span className="font-bold text-anthracite-500 text-xs uppercase tracking-widest">Ağırlık / Gramaj</span>
+                          <span className="font-black text-anthracite-900">{product.gsm || "Belirtilmemiş"}</span>
+                       </li>
+                       <li className="flex justify-between items-center bg-blue-50 border border-blue-100 px-4 py-3 rounded-xl mt-3 shadow-inner">
+                          <span className="font-bold text-blue-600 text-[10px] uppercase tracking-widest">Paket İçi Beden Asortisi</span>
+                          <span className="font-black text-blue-900 text-lg">{product.sizes || "Standart Parça"}</span>
+                       </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 

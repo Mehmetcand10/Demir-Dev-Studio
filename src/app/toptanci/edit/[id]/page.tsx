@@ -16,8 +16,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   // Ürün Verileri
   const [name, setName] = useState('');
+  const [gender, setGender] = useState('Unisex');
   const [category, setCategory] = useState('');
   const [fabricType, setFabricType] = useState('');
+  const [sizes, setSizes] = useState('');
+  const [gsm, setGsm] = useState('');
   const [wholesalePrice, setWholesalePrice] = useState('');
   const [minOrder, setMinOrder] = useState('');
   const [images, setImages] = useState<string[]>([]);
@@ -36,7 +39,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         .from('products')
         .select('*')
         .eq('id', params.id)
-        .eq('wholesaler_id', user.id) // Güvenlik Kalkanı: Kendine ait olmayan ürünü ÇEKEMEZ.
+        .eq('wholesaler_id', user.id)
         .single();
       
       if (error || !data) {
@@ -46,8 +49,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       }
 
       setName(data.name);
+      setGender(data.gender || 'Unisex');
       setCategory(data.category);
+      setSizes(data.sizes || 'Standart Seri');
       setFabricType(data.fabric_type || '');
+      setGsm(data.gsm || '');
       setWholesalePrice(data.base_wholesale_price?.toString() || '');
       setMinOrder(data.min_order_quantity?.toString() || '');
       setImages(data.images || []);
@@ -64,8 +70,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       .from('products')
       .update({
         name,
+        gender,
         category,
         fabric_type: fabricType,
+        sizes,
+        gsm: gsm || null,
         base_wholesale_price: Number(wholesalePrice),
         min_order_quantity: Number(minOrder)
       })
@@ -106,15 +115,15 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
          {/* Sol: Mevcut Fotolar */}
          <div className="flex flex-col">
             <h3 className="text-lg font-black text-anthracite-900 mb-4 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-emerald-500"/> Ürün Görselleri</h3>
-            <div className="w-full aspect-[3/4] bg-anthracite-50 rounded-3xl overflow-hidden border-2 border-anthracite-100 relative shadow-inner">
+            <div className="w-full aspect-[3/4] bg-emerald-50/50 rounded-3xl overflow-hidden border-2 border-emerald-100 relative shadow-inner">
                {images && images.length > 0 ? (
                  <Image src={images[0]} alt="Ana Gorsel" fill className="object-cover" />
                ) : (
                  <div className="w-full h-full flex items-center justify-center font-bold text-anthracite-400">Görsel Bulunamadı</div>
                )}
-               <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl text-white font-bold text-xs">Şu an Vitrinde ({images.length} Fotoğraf)</div>
+               <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl text-white font-bold text-xs shadow-lg">Şu an Vitrinde ({images.length} Fotoğraf)</div>
             </div>
-            <p className="text-xs text-anthracite-400 mt-4 text-center font-medium">*Fotoğrafları değiştirmek için Mevcut ürünü silip baştan Koleksiyon oluşturmalısınız (Lojistik güvenliği nedeniyle).*</p>
+            <p className="text-xs text-anthracite-500 mt-4 text-center font-medium">*Fotoğrafları değiştirmek için Mevcut ürünü silip baştan Koleksiyon oluşturmalısınız.*</p>
          </div>
 
          {/* Sağ: Düzenleme Formu */}
@@ -128,27 +137,46 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Kategori</label>
-                    <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-anthracite-900 focus:ring-4 outline-none cursor-pointer">
-                      <option>Tişört</option><option>Sweatshirt</option><option>Triko</option><option>Pantolon</option><option>Mont / Kaban</option>
+                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Cinsiyet</label>
+                    <select value={gender} onChange={e=>setGender(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-emerald-900 focus:ring-4 outline-none cursor-pointer">
+                      <option>Kadın</option><option>Erkek</option><option>Kız Çocuk</option><option>Erkek Çocuk</option><option>Unisex</option>
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Kumaş/Materyal</label>
-                    <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-anthracite-900 focus:ring-4 outline-none shadow-sm" />
+                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Kategori</label>
+                    <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-anthracite-900 focus:ring-4 outline-none cursor-pointer">
+                      <option>Tişört</option><option>Sweatshirt</option><option>İç Çamaşırı / Pijama</option><option>Ayakkabı / Sneaker</option><option>Triko</option><option>Pantolon / Jean</option><option>Mont / Kaban</option><option>Elbise / Etek</option><option>Aksesuar</option>
+                    </select>
+                  </div>
+               </div>
+
+               <div>
+                  <label className="text-[10px] font-black uppercase text-emerald-600 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Paket İçi Beden Asortisi</label>
+                  <input required type="text" value={sizes} onChange={e=>setSizes(e.target.value)} className="w-full px-5 py-4 border border-emerald-200 bg-emerald-50 rounded-2xl font-black text-emerald-900 focus:ring-4 outline-none shadow-sm" placeholder="Örn: S-M-L veya 36-40" />
+               </div>
+
+               <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Materyal</label>
+                    <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-5 py-3 border border-anthracite-200 bg-anthracite-50 rounded-xl font-bold text-anthracite-900 focus:ring-2 outline-none shadow-sm" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Ağırlık (Opsiyonel)</label>
+                    <input type="text" value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full px-5 py-3 border border-anthracite-200 bg-anthracite-50 rounded-xl font-bold text-anthracite-900 focus:ring-2 outline-none shadow-sm" placeholder="Örn: 240gsm" />
                   </div>
                </div>
 
                <hr className="border-anthracite-100 my-2" />
 
-               <div>
-                 <label className="text-[10px] font-black uppercase text-emerald-600 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Toptancı Hak Ediş Fiyatı (₺)</label>
-                 <input required type="number" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full px-5 py-5 border-2 border-emerald-200 bg-emerald-50/50 rounded-2xl font-black text-3xl text-emerald-900 focus:ring-4 focus:ring-emerald-100 focus:border-emerald-600 outline-none transition-all shadow-sm" />
-               </div>
-
-               <div>
-                 <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-2 block border-l-2 border-blue-500 pl-2">Seri Sipariş Adedi (MOQ)</label>
-                 <input required type="number" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-5 py-4 border border-blue-200 bg-blue-50/50 rounded-2xl font-black text-2xl text-blue-900 focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all shadow-sm" />
+               <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-2 block border-l-2 border-blue-500 pl-2">Paket (Seri) Adedi</label>
+                    <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-5 py-4 border border-blue-200 bg-blue-50/50 rounded-2xl font-black text-2xl text-blue-900 focus:ring-4 outline-none shadow-sm" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-2 block border-l-2 border-blue-500 pl-2">Sizin Fiyatınız (₺)</label>
+                    <input required type="number" min="1" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full px-5 py-4 border-2 border-blue-200 bg-blue-50/50 rounded-2xl font-black text-2xl text-blue-900 focus:ring-4 outline-none shadow-sm" />
+                  </div>
                </div>
 
                <button disabled={saving} type="submit" className="w-full bg-anthracite-900 text-white font-black text-xl py-6 rounded-2xl shadow-xl hover:bg-black hover:-translate-y-1 transition-all flex items-center justify-center gap-3 mt-4 disabled:opacity-50 border-t-4 border-anthracite-700">
