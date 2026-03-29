@@ -32,7 +32,7 @@ export default function Siparislerim() {
       setLoading(false);
     }
     loadData();
-  }, []);
+  }, [supabase]);
 
   if(!user && !loading) return null;
 

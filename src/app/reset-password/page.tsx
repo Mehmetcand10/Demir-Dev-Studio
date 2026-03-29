@@ -19,7 +19,7 @@ export default function ResetPassword() {
         console.log("Şifre kurtarma moduna geçildi...");
       }
     });
-  }, []);
+  }, [supabase.auth]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();

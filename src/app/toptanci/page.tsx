@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck, Loader2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
@@ -28,18 +28,7 @@ export default function ToptanciDashboard() {
 
   const supabase = createClient();
 
-  useEffect(() => {
-    async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        fetchMyProducts(user.id);
-      }
-    }
-    init();
-  }, []);
-
-  const fetchMyProducts = async (userId: string) => {
+  const fetchMyProducts = useCallback(async (userId: string) => {
     setLoadingProducts(true);
     const { data } = await supabase
       .from('products')
@@ -49,7 +38,18 @@ export default function ToptanciDashboard() {
     
     if (data) setProducts(data);
     setLoadingProducts(false);
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    async function init() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+        fetchMyProducts(user.id);
+      }
+    }
+    init();
+  }, [supabase.auth, fetchMyProducts]);
 
   const clearForm = () => {
      setName(''); setFabricType(''); setWholesalePrice(''); setSelectedFiles([]); setPreviewUrls([]); setGsm(''); setSizes(''); setMinOrder('');

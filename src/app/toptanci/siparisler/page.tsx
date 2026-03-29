@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Package, ArrowLeft, Loader2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
@@ -11,18 +11,7 @@ export default function ToptanciSiparisler() {
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
 
-  useEffect(() => {
-    async function init() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUser(user);
-        fetchMyOrders(user.id);
-      }
-    }
-    init();
-  }, []);
-
-  const fetchMyOrders = async (userId: string) => {
+  const fetchMyOrders = useCallback(async (userId: string) => {
     setLoadingOrders(true);
     const { data } = await supabase
       .from('orders')
@@ -32,7 +21,18 @@ export default function ToptanciSiparisler() {
     
     if (data) setOrders(data);
     setLoadingOrders(false);
-  };
+  }, [supabase]);
+
+  useEffect(() => {
+    async function init() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUser(user);
+        fetchMyOrders(user.id);
+      }
+    }
+    init();
+  }, [supabase.auth, fetchMyOrders]);
 
   const handleShipOrder = async (orderId: string) => {
     const trackingCode = window.prompt("Lütfen kargoya verdiğiniz paketin Geçerli Takip Numarasını (Örn: YK-109232) yazınız:");
