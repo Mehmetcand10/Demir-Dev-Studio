@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Package, PlusCircle, Image as ImageIcon, Trash2, Eye } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function ToptanciDashboard() {
   const [products, setProducts] = useState<any[]>([]);
@@ -338,9 +339,14 @@ export default function ToptanciDashboard() {
                           <p className="text-[10px] font-black text-emerald-600/70 uppercase tracking-widest">Alacağınız Para (Net)</p>
                           <span className="font-black text-emerald-600 text-2xl">{product.base_wholesale_price.toLocaleString('tr-TR')} ₺</span>
                         </div>
-                        <button onClick={()=>handleDelete(product.id)} className="text-red-500 hover:text-white border border-red-100 p-2.5 rounded-xl bg-red-50 hover:bg-red-500 transition-all shadow-sm">
-                          <Trash2 className="w-5 h-5"/>
-                        </button>
+                        <div className="flex gap-2">
+                          <Link href={`/toptanci/edit/${product.id}`} className="flex items-center justify-center w-10 h-10 text-blue-500 hover:text-white border border-blue-100 rounded-xl bg-blue-50 hover:bg-blue-500 transition-all shadow-sm">
+                            <Eye className="w-5 h-5"/>
+                          </Link>
+                          <button onClick={()=>handleDelete(product.id)} className="flex items-center justify-center w-10 h-10 text-red-500 hover:text-white border border-red-100 rounded-xl bg-red-50 hover:bg-red-500 transition-all shadow-sm">
+                            <Trash2 className="w-5 h-5"/>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
