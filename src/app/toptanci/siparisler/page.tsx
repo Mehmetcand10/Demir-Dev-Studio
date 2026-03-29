@@ -81,7 +81,7 @@ export default function ToptanciSiparisler() {
         ) : orders.length === 0 ? (
           <div className="py-24 text-center bg-anthracite-50/50 rounded-3xl border border-dashed border-anthracite-200">
              <h3 className="text-2xl font-black text-anthracite-500 mb-3">Henüz Sipariş Ulaşmadı</h3>
-             <p className="text-base font-medium text-anthracite-400 max-w-lg mx-auto">Admin (Demir Dev Studio) siparişi onaylayıp parayı kasaya güvenceye aldığında ürün buraya "Kargoya Hazır" olarak düşecektir.</p>
+             <p className="text-base font-medium text-anthracite-400 max-w-lg mx-auto">Admin (Demir Dev Studio) siparişi onaylayıp parayı kasaya güvenceye aldığında ürün buraya &quot;Kargoya Hazır&quot; olarak düşecektir.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
