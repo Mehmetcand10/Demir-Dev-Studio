@@ -1,0 +1,84 @@
+﻿
+> b2b-portal@0.1.0 build
+> next build
+
+  Ôû▓ Next.js 14.2.3
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully
+   Linting and checking validity of types ...
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\node
+js/node.exe" "C:\Program F
+iles\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (:  
+  String) [], RemoteExc   
+ eption
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+Failed to compile.
+
+./src/app/admin/page.tsx
+18:6  Warning: React Hook 
+useEffect has a missing de
+pendency: 'checkAdminAcces
+s'. Either include it or r
+emove the dependency array
+.  react-hooks/exhaustive-
+deps
+
+./src/app/page.tsx
+25:140  Error: `'` can be 
+escaped with `&apos;`, `&l
+squo;`, `&#39;`, `&rsquo;`
+.  react/no-unescaped-enti
+ties
+
+./src/app/reset-password/p
+age.tsx
+22:6  Warning: React Hook 
+useEffect has a missing de
+pendency: 'supabase.auth'.
+ Either include it or remo
+ve the dependency array.  
+react-hooks/exhaustive-dep
+s
+
+./src/app/siparislerim/pag
+e.tsx
+35:6  Warning: React Hook 
+useEffect has a missing de
+pendency: 'supabase'. Eith
+er include it or remove th
+e dependency array.  react
+-hooks/exhaustive-deps
+99:201  Error: `'` can be 
+escaped with `&apos;`, `&l
+squo;`, `&#39;`, `&rsquo;`
+.  react/no-unescaped-enti
+ties
+
+./src/app/toptanci/page.ts
+x
+39:6  Warning: React Hook 
+useEffect has missing depe
+ndencies: 'fetchMyOrders',
+ 'fetchMyProducts', and 's
+upabase.auth'. Either incl
+ude them or remove the dep
+endency array.  react-hook
+s/exhaustive-deps
+
+info  - Need to disable so
+me ESLint rules? Learn mor
+e here: https://nextjs.org
+/docs/basic-features/eslin
+t#disabling-rules
