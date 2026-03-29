@@ -2,11 +2,12 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+  try {
+    let supabaseResponse = NextResponse.next({
+      request: {
+        headers: request.headers,
+      },
+    })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -54,7 +55,12 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+    await supabase.auth.getUser()
 
-  return supabaseResponse
+    return supabaseResponse
+  } catch (e) {
+    // Vercel uzerinde Supabase degiskenleri okunamazsa sistemi cokertmesini engeller
+    console.error("Vercel Edge Middleware Hatasi:", e);
+    return NextResponse.next()
+  }
 }
