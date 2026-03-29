@@ -10,21 +10,27 @@ export default async function Katalog() {
   const { data: { user } } = await supabase.auth.getUser();
   
   let isApproved = false;
+  let userRole = 'butik';
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('is_approved')
+      .select('is_approved, role')
       .eq('id', user.id)
       .single();
       
     isApproved = profile?.is_approved || false;
+    userRole = profile?.role || 'butik';
   }
 
   // 2. Gerçek Veritabanından (Supabase) Ürünleri Al
-  const { data: products } = await supabase
-    .from('products')
-    .select('*')
-    .order('created_at', { ascending: false });
+  let productQuery = supabase.from('products').select('*').order('created_at', { ascending: false });
+
+  // Zeka Katmanı: Toptancıların (Satıcıların) vitrinde (katalogda) KENDİ ürünlerini görmesini engelleme kuralı
+  if (user && userRole === 'toptanci') {
+    productQuery = productQuery.neq('wholesaler_id', user.id);
+  }
+
+  const { data: products } = await productQuery;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
