@@ -1,0 +1,24 @@
+{
+  "name": "Demir Dev Studio",
+  "short_name": "DemirTedarik",
+  "description": "Lüks B2B Tekstil Tedarik ve Tasarım Portalı",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

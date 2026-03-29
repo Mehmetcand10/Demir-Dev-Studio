@@ -9,6 +9,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "B2B Tekstil Ağı | Demir Dev Studio",
   description: "Ankara'nın En Hızlı Butik Tedarik Ağı",
+  manifest: "/manifest.json",
+};
+
+export const viewport = {
+  themeColor: "#09090b",
 };
 
 export default async function RootLayout({
@@ -32,6 +37,17 @@ export default async function RootLayout({
   return (
     <html lang="tr">
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
+          }}
+        />
         <nav className="border-b border-anthracite-200 dark:border-anthracite-800 bg-white/80 dark:bg-anthracite-900/80 backdrop-blur-md sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2 text-xl font-semibold tracking-tight">
