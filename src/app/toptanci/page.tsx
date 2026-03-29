@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck } from 'lucide-react';
+import { Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck, Loader2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 import Link from 'next/link';
