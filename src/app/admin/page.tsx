@@ -136,28 +136,28 @@ export default function AdminDashboard() {
     }
   };
 
-  // FİNANSAL HESAPLAMALAR
-  const totalCiro = orders.reduce((acc, order) => acc + Number(order.total_price), 0);
-  const totalKazaniciniz = orders.reduce((acc, order) => acc + Number(order.commission_earned), 0);
-  const toptanciHakedisleri = orders.reduce((acc, order) => acc + Number(order.wholesaler_earning), 0);
+  // FİNANSAL HESAPLAMALAR (useMemo ile optimize edildi)
+  const totalCiro = useMemo(() => orders.reduce((acc, order) => acc + Number(order.total_price), 0), [orders]);
+  const totalKazaniciniz = useMemo(() => orders.reduce((acc, order) => acc + Number(order.commission_earned), 0), [orders]);
+  const toptanciHakedisleri = useMemo(() => orders.reduce((acc, order) => acc + Number(order.wholesaler_earning), 0), [orders]);
   
-  // TOPTANCI BAZLI HAKEDİŞ HESAPLAMA (Grup bazlı)
-  const wholesalerSummary = orders
-    .filter(o => !o.is_archived) // Arşivlenmemiş aktif siparişler üzerinden hakediş takibi
+  // TOPTANCI BAZLI HAKEDİŞ HESAPLAMA (useMemo ile optimize edildi)
+  const wholesalerSummary = useMemo(() => orders
+    .filter(o => !o.is_archived)
     .reduce((acc: any, order) => {
       const name = order.wholesaler?.business_name || 'Bilinmeyen Toptancı';
       if (!acc[name]) acc[name] = { total: 0, count: 0 };
       acc[name].total += Number(order.wholesaler_earning);
       acc[name].count += 1;
       return acc;
-    }, {});
+    }, {}), [orders]);
 
-  const waitingOrders = orders.filter(o => o.status === 'waiting_payment' && !o.is_archived);
-  const activeOrders = orders.filter(o => (o.status === 'approved' || o.status === 'shipped') && !o.is_archived);
-  const archivedOrdersList = orders.filter(o => o.is_archived);
+  const waitingOrders = useMemo(() => orders.filter(o => o.status === 'waiting_payment' && !o.is_archived), [orders]);
+  const activeOrders = useMemo(() => orders.filter(o => (o.status === 'approved' || o.status === 'shipped') && !o.is_archived), [orders]);
+  const archivedOrdersList = useMemo(() => orders.filter(o => o.is_archived), [orders]);
 
-  // GRAFİK VERİSİ HAZIRLAMA (Son 7 Günlük Trend)
-  const chartData = orders
+  // GRAFİK VERİSİ HAZIRLAMA (Son 7 Günlük Trend - useMemo ile optimize edildi)
+  const chartData = useMemo(() => orders
     .filter(o => !o.is_archived)
     .reduce((acc: any[], order) => {
       const date = new Date(order.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
@@ -170,9 +170,9 @@ export default function AdminDashboard() {
       }
       return acc;
     }, [])
-    .slice(-7);
+    .slice(-7), [orders]);
 
-  const categoryData = orders.reduce((acc: any[], order) => {
+  const categoryData = useMemo(() => orders.reduce((acc: any[], order) => {
     const cat = order.product?.category || 'Diğer';
     const existing = acc.find(item => item.name === cat);
     if (existing) {
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
       acc.push({ name: cat, value: 1 });
     }
     return acc;
-  }, []);
+  }, []), [orders]);
 
   const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
