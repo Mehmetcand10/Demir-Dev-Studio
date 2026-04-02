@@ -85,7 +85,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       if(error) throw error;
 
       // 2. WhatsApp Profesyonel Şablonu Oluştur ve Bota Yönlendir
-      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name} (Beden: ${selectedSize})\n🔢 Miktar: ${seriCount} Seri / ${totalItems} Parça\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
+      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name} (Beden: ${selectedSize})\n🔢 Miktar: ${totalItems} Adet (MOQ Şartı Sağlandı)\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
       
       // Demir Dev Studio (Merkez) Resmi WhatsApp Numarası
       const whatsappNumber = "905528323906"; 
@@ -167,14 +167,17 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
           {/* SADECE ONAYLI BUTİKLER GÖREBİLİR (GATEKEEPING) */}
           {isApproved ? (
             <>
-              <div className="mb-8 p-6 bg-anthracite-50 dark:bg-anthracite-800/50 rounded-2xl">
-                <div className="flex items-end gap-4 mb-2">
-                  <span className="text-4xl font-bold tracking-tight">{unitPrice.toLocaleString("tr-TR")} ₺</span>
+              <div className="mb-8 p-6 bg-blue-50 dark:bg-blue-950/20 rounded-2xl border border-blue-100 dark:border-blue-900/30">
+                <div className="flex items-end gap-4 mb-3">
+                  <span className="text-4xl font-bold tracking-tight text-anthracite-900 dark:text-white">{unitPrice.toLocaleString("tr-TR")} ₺</span>
                   <span className="text-sm text-anthracite-500 mb-1">/ adet</span>
                 </div>
-                <p className="text-sm text-anthracite-500">
-                  M.O.Q (Minimum Sipariş): 1 Seri = {product.min_order_quantity} Adet 
-                </p>
+                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+                  <Package className="w-4 h-4" />
+                  <span className="text-xs font-black uppercase tracking-widest">
+                    M.O.Q (Minimum Sipariş): {product.min_order_quantity} Adet 
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-6 mb-10">
@@ -226,11 +229,14 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
               <div className="mt-auto border-t border-anthracite-100 dark:border-anthracite-800 pt-8 flex flex-col gap-6">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Kaç seri almak istiyorsunuz?</span>
-                  <div className="flex items-center gap-4 border border-anthracite-200 dark:border-anthracite-700 rounded-full p-1 bg-white dark:bg-anthracite-900">
-                    <button onClick={() => setSeriCount(Math.max(1, seriCount - 1))} className="w-8 h-8 rounded-full bg-anthracite-50 dark:bg-anthracite-800 flex items-center justify-center font-medium hover:bg-anthracite-200">-</button>
-                    <span className="w-8 text-center font-bold">{seriCount}</span>
-                    <button onClick={() => setSeriCount(seriCount + 1)} className="w-8 h-8 rounded-full bg-anthracite-50 dark:bg-anthracite-800 flex items-center justify-center font-medium hover:bg-anthracite-200">+</button>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-anthracite-900 dark:text-white">Sipariş Miktarı</span>
+                    <span className="text-[10px] text-anthracite-400 font-medium">Minimum {product.min_order_quantity} adet ve katları</span>
+                  </div>
+                  <div className="flex items-center gap-4 border-2 border-anthracite-200 dark:border-anthracite-700 rounded-2xl p-1 bg-white dark:bg-anthracite-900">
+                    <button onClick={() => setSeriCount(Math.max(1, seriCount - 1))} className="w-10 h-10 rounded-xl bg-anthracite-50 dark:bg-anthracite-800 flex items-center justify-center font-black hover:bg-anthracite-200 transition-colors">-</button>
+                    <span className="w-12 text-center font-black text-xl">{seriCount} <span className="text-[10px] block text-anthracite-400">Paket</span></span>
+                    <button onClick={() => setSeriCount(seriCount + 1)} className="w-10 h-10 rounded-xl bg-anthracite-50 dark:bg-anthracite-800 flex items-center justify-center font-black hover:bg-anthracite-200 transition-colors">+</button>
                   </div>
                 </div>
 

@@ -310,8 +310,9 @@ export default function ToptanciDashboard() {
                    <input required type="number" min="1" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full px-5 py-4 rounded-2xl border-2 border-blue-200 bg-white text-blue-900 text-2xl font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" placeholder="250" />
                  </div>
                  <div>
-                   <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 block">Bir Seride Kaç Parça Çıkıyor?</label>
-                   <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-5 py-4 rounded-2xl border-2 border-blue-200 bg-white text-blue-900 text-2xl font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" placeholder="5" />
+                    <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 block">Minimum Sipariş Miktarı (MOQ)</label>
+                    <p className="text-[9px] text-blue-400 font-bold mb-2">Örn: Ürün kolisinde 5 seri/adet varsa &apos;5&apos; girin.</p>
+                    <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-5 py-4 rounded-2xl border-2 border-blue-200 bg-white text-blue-900 text-2xl font-black focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-sm" placeholder="100" />
                  </div>
                </div>
 
