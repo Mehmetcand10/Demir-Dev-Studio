@@ -4,8 +4,9 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { 
   Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck, 
   Loader2, LayoutDashboard, ShoppingBag, Wallet, PieChart as ChartIcon, 
-  ArrowRight, CheckCircle2, QrCode, FileText, MoveRight, Layers
+  ArrowRight, CheckCircle2, QrCode, FileText, MoveRight, Layers, History as HistoryIcon
 } from 'lucide-react';
+import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -399,7 +400,7 @@ export default function ToptanciDashboard() {
                     <div className="lg:col-span-8 space-y-6">
                         <div className="bg-white border border-anthracite-100 rounded-[3rem] p-10 shadow-xl">
                             <h3 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3">
-                                <History className="w-6 h-6 text-emerald-500" /> Son Kazanç Kayıtları
+                                <HistoryIcon className="w-6 h-6 text-emerald-500" /> Son Kazanç Kayıtları
                             </h3>
                             <div className="space-y-4">
                                 {orders.slice(0, 5).map(o => (

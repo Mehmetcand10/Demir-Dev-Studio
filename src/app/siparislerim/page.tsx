@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { 
   PackageSearch, PackageCheck, Clock, Truck, FileText, 
-  Search, ArrowRight, CheckCircle2, History, CreditCard,
+  Search, ArrowRight, CheckCircle2, History as HistoryIcon, CreditCard,
   Package, ShoppingBag, Loader2, Info
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
@@ -85,7 +85,7 @@ export default function Siparislerim() {
               <CreditCard className="w-4 h-4" /> Ödeme Bekleyen ({waitingCount})
           </button>
           <button onClick={() => setActiveTab('archive')} className={`flex items-center gap-2 px-8 py-3.5 rounded-[2rem] font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'archive' ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black'}`}>
-              <History className="w-4 h-4" /> Arşiv
+              <HistoryIcon className="w-4 h-4" /> Arşiv
           </button>
       </div>
 

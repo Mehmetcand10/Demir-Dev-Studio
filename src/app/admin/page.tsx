@@ -5,8 +5,8 @@ import {
   CheckCircle, Users, Store, UserRound, Wallet, 
   TrendingUp, Package, Clock, ShieldCheck, 
   Archive, FolderArchive, Trash2, LayoutDashboard,
-  FileText, History, Info, Printer, Megaphone, Send,
-  ArrowRight, BarChart3, Receipt, UserCheck
+  FileText, History as HistoryIcon, Info, Printer, Megaphone, Send,
+  ArrowRight, BarChart3, Receipt, UserCheck, ShoppingBag, Loader2
 } from 'lucide-react';
 import { 
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
@@ -224,7 +224,7 @@ export default function AdminDashboard() {
       <div className="sticky top-20 z-40 mb-10 overflow-x-auto scrollbar-hide py-2">
           <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 rounded-3xl border border-anthracite-100 shadow-lg w-max mx-auto sm:mx-0">
              {(['overview', 'orders', 'payments', 'approvals', 'announcements', 'archive'] as const).map((tab) => {
-                 const icons = { overview: LayoutDashboard, orders: ShoppingBag, payments: Wallet, approvals: UserCheck, announcements: Megaphone, archive: History };
+                 const icons = { overview: LayoutDashboard, orders: ShoppingBag, payments: Wallet, approvals: UserCheck, announcements: Megaphone, archive: HistoryIcon };
                  const labels = { overview: 'Özet', orders: 'İşlemler', payments: 'Alacaklar', approvals: 'Onaylar', announcements: 'Duyuru', archive: 'Arşiv' };
                  const Icon = icons[tab as keyof typeof icons] || Package;
                  return (
@@ -296,7 +296,7 @@ export default function AdminDashboard() {
                         <h3 className="text-lg font-black mb-1">Toptancı Hakları</h3>
                         <p className="text-xs font-medium text-white/70 mb-6">Tüm üreticilerin alacak bakiyesi:</p>
                         <span className="text-4xl font-black">
-                             {Object.values(wholesalerSummary).reduce((a:any, b:any) => a + b.total, 0).toLocaleString('tr-TR')} ₺
+                             {Object.values(wholesalerSummary).reduce((a: number, b: any) => a + (b.total || 0), 0).toLocaleString('tr-TR')} ₺
                         </span>
                     </div>
                 </div>
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
 
                 <div className="lg:col-span-7 bg-white border border-anthracite-200 rounded-[3rem] p-10 shadow-sm overflow-hidden">
                     <h2 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3 pb-6 border-b border-anthracite-50 text-left">
-                        <History className="w-6 h-6 text-anthracite-400" /> Aktif Yayınlar
+                        <HistoryIcon className="w-6 h-6 text-anthracite-400" /> Aktif Yayınlar
                     </h2>
                     <div className="space-y-4">
                         {announcements.length === 0 ? (
@@ -563,44 +563,4 @@ export default function AdminDashboard() {
     )}
     </>
   );
-}
-
-function ShoppingBag(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-      <path d="M3 6h18" />
-      <path d="M16 10a4 4 0 0 1-8 0" />
-    </svg>
-  )
-}
-
-function Loader2(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
-  )
 }
