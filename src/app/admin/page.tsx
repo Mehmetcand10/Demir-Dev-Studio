@@ -5,7 +5,7 @@ import {
   CheckCircle, Users, Store, UserRound, Wallet, 
   TrendingUp, Package, Clock, ShieldCheck, 
   Archive, FolderArchive, Trash2, LayoutDashboard,
-  FileText, History, Info, Printer
+  FileText, History, Info, Printer, Megaphone, Send
 } from 'lucide-react';
 import { 
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
@@ -18,7 +18,7 @@ import NotificationBell from '@/components/NotificationBell';
 import { notify } from '@/utils/notifications';
 import Link from 'next/link';
 
-type TabType = 'finance' | 'payments' | 'approvals' | 'archive';
+type TabType = 'finance' | 'payments' | 'approvals' | 'archive' | 'announcements';
 
 export default function AdminDashboard() {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -28,6 +28,14 @@ export default function AdminDashboard() {
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>('finance');
   const [mounted, setMounted] = useState(false);
+  
+  // Duyuru State'leri
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [annTitle, setAnnTitle] = useState('');
+  const [annContent, setAnnContent] = useState('');
+  const [annTarget, setAnnTarget] = useState('all');
+  const [annType, setAnnType] = useState('info');
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -48,6 +56,14 @@ export default function AdminDashboard() {
     if (data) setOrders(data);
   }, [supabase]);
 
+  const fetchAnnouncements = useCallback(async () => {
+    const { data } = await supabase
+      .from('announcements')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (data) setAnnouncements(data);
+  }, [supabase]);
+
   const checkAdminAccess = useCallback(async () => {
     setLoading(true);
     const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -62,6 +78,7 @@ export default function AdminDashboard() {
       setIsAdmin(true);
       await fetchPendingUsers();
       await fetchOrders();
+      await fetchAnnouncements();
     }
     setLoading(false);
   }, [supabase, fetchPendingUsers, fetchOrders]);
@@ -134,6 +151,29 @@ export default function AdminDashboard() {
     if (!error) {
       fetchOrders();
     }
+  };
+
+  const handlePublishAnnouncement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsPublishing(true);
+    const { error } = await supabase.from('announcements').insert({
+      title: annTitle,
+      content: annContent,
+      target_role: annTarget,
+      type: annType
+    });
+    if (!error) {
+      alert("Duyuru başarıyla yayınlandı!");
+      setAnnTitle(''); setAnnContent('');
+      fetchAnnouncements();
+    }
+    setIsPublishing(false);
+  };
+
+  const deleteAnnouncement = async (id: string) => {
+    if(!confirm("Bu duyuruyu kaldırmak istiyor musunuz?")) return;
+    await supabase.from('announcements').delete().eq('id', id);
+    fetchAnnouncements();
   };
 
   // FİNANSAL HESAPLAMALAR (useMemo ile optimize edildi)
@@ -232,6 +272,12 @@ export default function AdminDashboard() {
           className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'archive' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
         >
           <History className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Arşiv
+        </button>
+        <button 
+          onClick={() => setActiveTab('announcements')}
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'announcements' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
+        >
+          <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" /> Duyurular
         </button>
       </div>
 
@@ -470,6 +516,75 @@ export default function AdminDashboard() {
                      </div>
                   </div>
                 ))}
+              </div>
+           </div>
+        )}
+
+        {/* TAB: DUYURU YÖNETİMİ */}
+        {activeTab === 'announcements' && (
+           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* SOL: Yeni Duyuru Oluştur */}
+              <div className="lg:col-span-5 bg-white border-2 border-anthracite-100 rounded-[2rem] p-8 shadow-xl h-max text-left">
+                 <h2 className="text-xl font-black text-anthracite-900 mb-6 flex items-center gap-3 border-b border-anthracite-100 pb-4">
+                    <Send className="w-6 h-6 text-emerald-500" /> Yeni Duyuru Yayınla
+                 </h2>
+                 <form onSubmit={handlePublishAnnouncement} className="space-y-4">
+                    <div>
+                        <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Duyuru Başlığı</label>
+                        <input required value={annTitle} onChange={e=>setAnnTitle(e.target.value)} className="w-full px-4 py-3 bg-anthracite-50 rounded-xl font-bold outline-none focus:ring-2 focus:ring-anthracite-900" placeholder="Örn: Yeni Sezon İndirimi Başladı" />
+                    </div>
+                    <div>
+                        <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Mesaj İçeriği</label>
+                        <textarea required value={annContent} onChange={e=>setAnnContent(e.target.value)} rows={4} className="w-full px-4 py-3 bg-anthracite-50 rounded-xl font-bold outline-none focus:ring-2 focus:ring-anthracite-900" placeholder="Duyuru detaylarını buraya yazın..." />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Hedef Kitle</label>
+                            <select value={annTarget} onChange={e=>setAnnTarget(e.target.value)} className="w-full px-4 py-3 bg-anthracite-50 rounded-xl font-bold outline-none">
+                                <option value="all">Herkes</option>
+                                <option value="butik">Sadece Butikler</option>
+                                <option value="toptanci">Sadece Toptancılar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Vurgu Tipi</label>
+                            <select value={annType} onChange={e=>setAnnType(e.target.value)} className="w-full px-4 py-3 bg-anthracite-50 rounded-xl font-bold outline-none">
+                                <option value="info">Bilgi (Mavi)</option>
+                                <option value="warning">Uyarı (Amber)</option>
+                                <option value="success">Başarı (Yeşil)</option>
+                                <option value="error">Hata (Kırmızı)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button disabled={isPublishing} className="w-full py-4 bg-anthracite-900 text-white font-black rounded-2xl shadow-xl hover:bg-black transition-all disabled:opacity-50 mt-4">
+                        {isPublishing ? "YAYINLANIYOR..." : "DUYURUYU ŞİMDİ YAYINLA"}
+                    </button>
+                 </form>
+              </div>
+
+              {/* SAĞ: Aktif Duyurular */}
+              <div className="lg:col-span-7 bg-anthracite-50 border border-anthracite-200 rounded-[2rem] p-8 shadow-sm">
+                 <h2 className="text-xl font-black text-anthracite-900 mb-6 flex items-center gap-3 border-b border-anthracite-200 pb-4 text-left">
+                    <History className="w-6 h-6 text-anthracite-400" /> Yayındaki Duyurular
+                 </h2>
+                 <div className="space-y-4">
+                    {announcements.length === 0 ? (
+                        <p className="text-center py-10 font-bold text-anthracite-400 italic">Şu an yayında duyuru bulunmuyor.</p>
+                    ) : announcements.map(ann => (
+                        <div key={ann.id} className="p-5 bg-white border border-anthracite-200 rounded-[2rem] shadow-sm relative group text-left">
+                            <button onClick={() => deleteAnnouncement(ann.id)} className="absolute top-4 right-4 p-2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all">
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className={`w-2 h-2 rounded-full ${ann.type === 'info' ? 'bg-blue-500' : ann.type === 'warning' ? 'bg-amber-500' : ann.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                                <h3 className="font-black text-anthracite-900">{ann.title}</h3>
+                                <span className="text-[9px] font-black uppercase bg-anthracite-100 px-2 py-0.5 rounded ml-auto">{ann.target_role === 'all' ? 'HERKES' : ann.target_role}</span>
+                            </div>
+                            <p className="text-sm font-medium text-anthracite-500">{ann.content}</p>
+                            <span className="block mt-3 text-[9px] font-bold text-anthracite-300 uppercase">{new Date(ann.created_at).toLocaleString('tr-TR')}</span>
+                        </div>
+                    ))}
+                 </div>
               </div>
            </div>
         )}

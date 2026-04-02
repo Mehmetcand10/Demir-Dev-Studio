@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from 'next/link';
-import { Package } from 'lucide-react';
+import { Package, Heart } from 'lucide-react';
 import { createClient } from '@/utils/supabase/server';
+import AnnouncementBanner from "@/components/AnnouncementBanner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -37,6 +38,7 @@ export default async function RootLayout({
   return (
     <html lang="tr">
       <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
+        <AnnouncementBanner />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -59,9 +61,14 @@ export default async function RootLayout({
                 Tüm Ürünler
               </Link>
               {userRole === 'butik' && user ? (
-                <Link href="/siparislerim" className="text-sm font-bold text-anthracite-400 hover:text-black transition-colors flex items-center h-full tracking-wide">
-                  Siparişlerim (Kargo)
-                </Link>
+                <>
+                  <Link href="/favorites" className="text-sm font-bold text-red-500 hover:text-red-600 transition-colors flex items-center gap-1 h-full tracking-wide">
+                    <Heart className="w-4 h-4 fill-current" /> Favorilerim
+                  </Link>
+                  <Link href="/siparislerim" className="text-sm font-bold text-anthracite-400 hover:text-black transition-colors flex items-center h-full tracking-wide">
+                    Siparişlerim (Kargo)
+                  </Link>
+                </>
               ) : null}
               
               {user ? (
