@@ -220,9 +220,9 @@ export default function AdminDashboard() {
           </div>
       </div>
 
-      {/* STICKY TAB NAVIGATION */}
-      <div className="sticky top-20 z-40 mb-10 overflow-x-auto scrollbar-hide py-2">
-          <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 rounded-3xl border border-anthracite-100 shadow-lg w-max mx-auto sm:mx-0">
+      {/* STICKY TAB NAVIGATION (Bento-Cockpit Stabilized) */}
+      <div className="sticky top-0 z-50 mb-10 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 bg-anthracite-50/80 backdrop-blur-xl border-b border-anthracite-100 transition-all">
+          <div className="flex items-center gap-2 bg-white p-1.5 rounded-[2rem] border border-anthracite-100 shadow-xl w-max mx-auto sm:mx-0">
              {(['overview', 'orders', 'payments', 'approvals', 'announcements', 'archive'] as const).map((tab) => {
                  const icons = { overview: LayoutDashboard, orders: ShoppingBag, payments: Wallet, approvals: UserCheck, announcements: Megaphone, archive: HistoryIcon };
                  const labels = { overview: 'Özet', orders: 'İşlemler', payments: 'Alacaklar', approvals: 'Onaylar', announcements: 'Duyuru', archive: 'Arşiv' };
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
                     <button 
                         key={tab} 
                         onClick={() => setActiveTab(tab)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-tighter transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-[1.5rem] font-black text-xs uppercase tracking-tighter transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-lg' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
                     >
                         <Icon className="w-4 h-4" /> {labels[tab as keyof typeof labels]}
                     </button>

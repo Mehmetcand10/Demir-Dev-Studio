@@ -127,9 +127,9 @@ export default function ToptanciDashboard() {
         </div>
       </div>
 
-      {/* TABS NAVIGATION */}
-      <div className="sticky top-20 z-40 mb-10 overflow-x-auto scrollbar-hide py-2">
-          <div className="flex items-center gap-2 bg-white p-2 rounded-3xl border border-anthracite-100 shadow-xl w-max mx-auto sm:mx-0">
+      {/* STICKY TAB NAVIGATION (Stationary Elite v2) */}
+      <div className="sticky top-0 z-50 mb-10 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 bg-anthracite-50/80 backdrop-blur-xl border-b border-anthracite-100 transition-all">
+          <div className="flex items-center gap-2 bg-white p-1.5 rounded-[2rem] border border-anthracite-100 shadow-xl w-max mx-auto sm:mx-0">
              {(['inventory', 'orders', 'studio', 'finance'] as const).map((tab) => {
                  const icons = { studio: PlusCircle, inventory: LayoutDashboard, orders: ShoppingBag, finance: Wallet };
                  const labels = { studio: 'Yeni Ürün Yükle', inventory: 'Aktif Vitrinim', orders: 'Gelen Siparişler', finance: 'Hakediş & Analiz' };
@@ -138,7 +138,7 @@ export default function ToptanciDashboard() {
                     <button 
                         key={tab} 
                         onClick={() => setActiveTab(tab)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-tighter transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-[1.5rem] font-black text-xs uppercase tracking-tighter transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-lg' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
                     >
                         <Icon className="w-4 h-4" /> {labels[tab as keyof typeof labels]}
                     </button>
@@ -204,117 +204,169 @@ export default function ToptanciDashboard() {
                 </div>
             )}
 
-            {/* STUDIO TAB (YÜKLEME FORMU) */}
+            {/* STUDIO TAB (YÜKLEME FORMU V2 - ELITE EXPERT) */}
             {activeTab === 'studio' && (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 text-left">
-                    {/* ÖNİZLEME */}
-                    <div className="lg:col-span-4 hidden lg:block sticky top-32 h-max">
-                        <div className="bg-anthracite-900 p-8 rounded-[3rem] text-white shadow-2xl relative overflow-hidden">
-                           <div className="absolute top-0 right-0 p-10 opacity-5 rotate-12">
-                              <Layers className="w-64 h-64" />
-                           </div>
-                           <h3 className="text-xl font-black mb-6 flex items-center gap-2 border-b border-white/10 pb-4">
-                               <QrCode className="w-5 h-5 text-emerald-400" /> Vitrin Canlı Simülasyon
-                           </h3>
-                           <div className="aspect-[3/4] bg-white/5 rounded-[2rem] border border-white/10 mb-6 overflow-hidden flex items-center justify-center">
-                              {previewUrls.length > 0 ? (
-                                  <Image src={previewUrls[0]} alt="p" width={400} height={600} className="w-full h-full object-cover" />
-                              ) : <ImageIcon className="w-12 h-12 text-white/10" />}
-                           </div>
-                           <h4 className="text-2xl font-black leading-tight mb-2">{name || "Model Adı"}</h4>
-                           <div className="flex flex-wrap gap-2 mb-6">
-                              <span className="bg-white/10 text-emerald-300 text-[10px] font-black px-3 py-1 rounded-md uppercase">{gender}</span>
-                              <span className="bg-white/10 text-white/60 text-[10px] font-black px-3 py-1 rounded-md uppercase">{category}</span>
-                           </div>
-                           <div className="flex items-center justify-between pt-6 border-t border-white/10">
-                               <div>
-                                   <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-1">Müşteri Fiyatı</p>
-                                   <span className="text-3xl font-black">{wholesalePrice ? (Number(wholesalePrice) * 1.15).toLocaleString('tr-TR') : "0"} ₺</span>
-                               </div>
-                               <button className="bg-white/10 p-3 rounded-2xl"><Eye className="w-5 h-5"/></button>
-                           </div>
-                        </div>
-                    </div>
-
-                    {/* FORM */}
-                    <div className="lg:col-span-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 text-left items-start">
+                    
+                    {/* SOL - VERİ GİRİŞ FORMU */}
+                    <div className="lg:col-span-8 flex flex-col gap-8">
                         <div className="bg-white border border-anthracite-100 rounded-[3rem] p-8 sm:p-12 shadow-xl">
-                            <h2 className="text-3xl font-black text-anthracite-900 mb-2">Model Detaylarını Gir</h2>
-                            <p className="text-sm font-medium text-anthracite-500 mb-10">Üretim bandındaki ürünü ağa sürmek için formülü eksiksiz doldurun.</p>
+                            <div className="flex items-center gap-3 mb-2">
+                               <PlusCircle className="w-6 h-6 text-emerald-600" />
+                               <h2 className="text-3xl font-black text-anthracite-900">Elite Üretim Kaydı</h2>
+                            </div>
+                            <p className="text-sm font-medium text-anthracite-500 mb-10">B2B ağına yeni bir model sürmek için aşağıdaki teknik verileri doldurun.</p>
 
                             <form onSubmit={handleAddProduct} className="space-y-8">
-                                <div className="space-y-6">
-                                    <div>
-                                        <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Model Başlığı</label>
-                                        <input required value={name} onChange={e=>setName(e.target.value)} className="w-full px-6 py-4 bg-anthracite-50 rounded-2xl font-black text-lg shadow-inner outline-none focus:ring-4 focus:ring-emerald-50 focus:bg-white transition-all border-none" placeholder="Örn: 3 İplik Oversize Sweatshirt" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="md:col-span-2">
+                                        <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Model Adı / Koleksiyon Başlığı</label>
+                                        <input required value={name} onChange={e=>setName(e.target.value)} className="w-full px-6 py-5 bg-anthracite-50 rounded-2xl font-black text-xl shadow-inner focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all outline-none border-2 border-transparent focus:border-emerald-500" placeholder="Örn: 24 S/S Double-Face Polo" />
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div className="p-6 bg-anthracite-50 rounded-[2rem] border border-anthracite-100">
-                                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2">Hedef Cinsiyet (Tag)</label>
-                                            <select value={gender} onChange={e=>setGender(e.target.value)} className="w-full bg-white px-4 py-3 rounded-xl font-bold outline-none border-none shadow-sm">
-                                                <option>Erkek</option><option>Kadın</option><option>Çocuk</option><option>Unisex</option>
-                                            </select>
+                                    <div className="space-y-6">
+                                        <div>
+                                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Hedef Cinsiyet</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {['Erkek', 'Kadın', 'Çocuk', 'Unisex'].map((g) => (
+                                                    <button key={g} type="button" onClick={() => setGender(g)} className={`px-4 py-2 rounded-xl text-xs font-black transition-all border-2 ${gender === g ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20' : 'bg-white text-anthracite-400 border-anthracite-100 hover:border-emerald-200'}`}>{g.toUpperCase()}</button>
+                                                ))}
+                                            </div>
                                         </div>
-                                        <div className="p-6 bg-anthracite-50 rounded-[2rem] border border-anthracite-100">
-                                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2">Ana Kategori</label>
-                                            <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full bg-white px-4 py-3 rounded-xl font-bold outline-none border-none shadow-sm">
+                                        <div>
+                                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Ürün Kategorisi</label>
+                                            <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full bg-anthracite-50 px-6 py-4 rounded-2xl font-black text-sm outline-none border-2 border-transparent focus:border-emerald-500 shadow-inner">
                                                 <option>Tişört</option><option>Sweatshirt</option><option>İç Çamaşırı / Pijama</option><option>Ayakkabı / Sneaker</option><option>Triko</option><option>Pantolon / Jean</option><option>Mont / Kaban</option><option>Elbise / Etek</option><option>Aksesuar</option>
                                             </select>
                                         </div>
                                     </div>
 
-                                    <div className="p-8 bg-emerald-500/5 rounded-[3rem] border-2 border-emerald-500/10">
-                                        <div className="flex justify-between items-center mb-6">
-                                            <label className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Asorti & Stok Planı (Beden Bazlı)</label>
-                                            <button type="button" onClick={() => setStockEntries([...stockEntries, { size: '', quantity: 0 }])} className="px-3 py-1 bg-emerald-500 text-white text-[9px] font-black rounded-lg uppercase tracking-widest shadow-lg">+ EKLE</button>
+                                    <div className="space-y-6">
+                                        <div>
+                                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Kumaş / Materyal</label>
+                                            <input required value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-6 py-4 bg-anthracite-50 rounded-2xl font-black text-sm shadow-inner outline-none border-2 border-transparent focus:border-emerald-500" placeholder="%100 Pamuk" />
                                         </div>
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        <div>
+                                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Gramaj / Ağırlık (Opsiyonel)</label>
+                                            <input value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full px-6 py-4 bg-anthracite-50 rounded-2xl font-black text-sm shadow-inner outline-none border-2 border-transparent focus:border-emerald-500" placeholder="280 GSM" />
+                                        </div>
+                                    </div>
+
+                                    {/* STOK TABLOSU (PREMIUM TABLE V2) */}
+                                    <div className="md:col-span-2 bg-emerald-50/50 rounded-[2.5rem] p-8 border border-emerald-100/50">
+                                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                                           <div>
+                                              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest border-l-4 border-emerald-500 pl-3">Asorti Stok Yönetimi (Expert View)</p>
+                                              <p className="text-xs font-medium text-emerald-600/70 mt-1">Her beden için mevcut stok miktarını girin.</p>
+                                           </div>
+                                           <button type="button" onClick={() => setStockEntries([...stockEntries, { size: '', quantity: 0 }])} className="px-5 py-2.5 bg-emerald-600 text-white text-[10px] font-black rounded-xl uppercase shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all">+ YENİ BEDEN EKLE</button>
+                                        </div>
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
                                             {stockEntries.map((entry, idx) => (
-                                                <div key={idx} className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm relative group text-center">
-                                                    <input placeholder="Beden" value={entry.size} onChange={e=> {let n=[...stockEntries]; n[idx].size=e.target.value.toUpperCase(); setStockEntries(n);}} className="w-full text-center font-black text-lg outline-none mb-1 uppercase" />
-                                                    <input type="number" value={entry.quantity} onChange={e=> {let n=[...stockEntries]; n[idx].quantity=Number(e.target.value); setStockEntries(n);}} className="w-full text-center text-[10px] font-bold text-emerald-600 bg-emerald-50 rounded py-1 outline-none" />
-                                                    <button type="button" onClick={()=>setStockEntries(stockEntries.filter((_,i)=>i!==idx))} className="absolute -top-2 -right-2 p-1.5 bg-red-100 text-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-3 h-3"/></button>
+                                                <div key={idx} className="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100 group relative">
+                                                    <input placeholder="Beden" value={entry.size} onChange={e=> {let n=[...stockEntries]; n[idx].size=e.target.value.toUpperCase(); setStockEntries(n);}} className="w-full text-center font-black text-base outline-none mb-1 border-b border-anthracite-50 focus:border-emerald-500 uppercase pb-1" />
+                                                    <input type="number" min="0" value={entry.quantity} onChange={e=> {let n=[...stockEntries]; n[idx].quantity=Number(e.target.value); setStockEntries(n);}} className="w-full text-center text-xs font-black text-emerald-600 outline-none" />
+                                                    <button type="button" onClick={()=>setStockEntries(stockEntries.filter((_,i)=>i!==idx))} className="absolute -top-2 -right-2 p-1.5 bg-red-100 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all border border-red-200"><Trash2 className="w-3 h-3"/></button>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-blue-50 p-8 rounded-[3rem] border-2 border-blue-100">
-                                        <div>
-                                            <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-2">Net Hakediş Fiyatı (₺)</label>
-                                            <input required type="number" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full px-6 py-4 bg-white rounded-2xl font-black text-xl shadow-inner outline-none border-none text-blue-900" placeholder="250" />
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-black text-blue-600 uppercase tracking-widest block mb-2">Min. Paket Miktarı (MOQ)</label>
-                                            <input required type="number" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-6 py-4 bg-white rounded-2xl font-black text-xl shadow-inner outline-none border-none text-blue-900" placeholder="5" />
+                                    {/* FİYATLANDIRMA */}
+                                    <div className="md:col-span-1 bg-anthracite-900 rounded-[2.5rem] p-8 text-white shadow-xl shadow-anthracite-900/20">
+                                        <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block mb-4">Sizin Kazancınız (Birim ₺)</label>
+                                        <div className="flex items-center gap-4">
+                                            <Wallet className="w-8 h-8 text-emerald-400" />
+                                            <input required type="number" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full bg-transparent font-black text-4xl outline-none border-b-2 border-white/10 focus:border-emerald-500 transition-all pb-2" placeholder="0" />
+                                            <span className="text-2xl font-black text-emerald-400">₺</span>
                                         </div>
                                     </div>
-
-                                    <div className="relative border-2 border-dashed border-anthracite-200 rounded-[3rem] p-12 text-center group hover:bg-emerald-50 hover:border-emerald-300 transition-all cursor-pointer">
-                                        <input required type="file" multiple accept="image/*" onChange={(e)=> {let fs=Array.from(e.target.files||[]); setSelectedFiles(fs); setPreviewUrls(fs.map(f=>URL.createObjectURL(f)));}} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="p-6 bg-white shadow-xl rounded-2xl group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                                                <ImageIcon className="w-10 h-10" />
-                                            </div>
-                                            <h4 className="font-black text-xl">Model Fotoğraflarını Bırakın</h4>
-                                            <p className="text-xs font-medium text-anthracite-400">Ürünü her açıdan gösteren en az 1 görsel gereklidir.</p>
+                                    <div className="md:col-span-1 bg-white border border-anthracite-100 rounded-[2.5rem] p-8 shadow-sm">
+                                        <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-4">Paket/Seri Adedi (MOQ)</label>
+                                        <div className="flex items-center gap-4">
+                                            <ShoppingBag className="w-8 h-8 text-anthracite-900" />
+                                            <input required type="number" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full bg-transparent font-black text-4xl outline-none border-b-2 border-anthracite-100 focus:border-anthracite-900 transition-all pb-2" placeholder="0" />
+                                            <span className="text-xl font-bold text-anthracite-400">PÇ</span>
                                         </div>
-                                        {previewUrls.length > 0 && (
-                                            <div className="mt-8 flex flex-wrap gap-2 justify-center">
-                                                {previewUrls.map((u, i) => (
-                                                    <div key={i} className="w-20 h-28 relative rounded-xl overflow-hidden border-2 border-emerald-200 shadow-md transform rotate-2"><Image src={u} alt="p" fill className="object-cover" /></div>
-                                                ))}
+                                    </div>
+                                    
+                                    {/* MEDYA ALANI */}
+                                    <div className="md:col-span-2">
+                                        <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Ürün Fotoğrafları</label>
+                                        <div className="relative border-4 border-dashed border-anthracite-100 rounded-[3rem] p-10 text-center hover:bg-anthracite-50 hover:border-emerald-500/30 transition-all group cursor-pointer">
+                                            <input required type="file" multiple accept="image/*" onChange={(e)=> {let fs=Array.from(e.target.files||[]); setSelectedFiles(fs); setPreviewUrls(fs.map(f=>URL.createObjectURL(f)));}} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
+                                            <div className="flex flex-col items-center gap-3 relative z-10">
+                                                <div className="w-20 h-20 bg-white shadow-xl rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                                    <ImageIcon className="w-10 h-10" />
+                                                </div>
+                                                <h4 className="font-black text-xl text-anthracite-900">Fotoğrafları Sürükleyin</h4>
+                                                <p className="text-xs font-medium text-anthracite-400 max-w-xs mx-auto">En az 1 fotoğraf yükleyin. Net görünümler butiklerin satışını artırır.</p>
                                             </div>
-                                        )}
+                                            {previewUrls.length > 0 && (
+                                                <div className="mt-8 flex flex-wrap gap-3 justify-center relative z-20">
+                                                    {previewUrls.map((u, i) => (
+                                                        <div key={i} className="w-24 h-32 relative rounded-2xl overflow-hidden border-2 border-emerald-200 shadow-xl transform rotate-2 hover:rotate-0 transition-transform"><Image src={u} alt="p" fill className="object-cover" /></div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
-                                <button disabled={isAddingProduct} className="w-full py-6 bg-anthracite-900 text-white font-black text-xl rounded-[2rem] shadow-2xl hover:scale-[1.01] transition-all disabled:opacity-50">
-                                    {isAddingProduct ? "MODERN FABRİKA SİSTEMLERİNE AKTARILIYOR..." : "MODELİ VİTRİNE GÖNDER"}
+                                <button disabled={isAddingProduct} className="w-full py-8 bg-anthracite-900 text-white font-black text-2xl rounded-[3rem] shadow-2xl hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-4">
+                                    {isAddingProduct ? (
+                                        <>
+                                           <Loader2 className="w-8 h-8 animate-spin" />
+                                           SİSTEME KAYDEDİLİYOR...
+                                        </>
+                                    ) : "MODELİ VİTRİNE GÖNDER & YAYINLA"}
                                 </button>
                             </form>
                         </div>
+                    </div>
+
+                    {/* SAĞ - MOBIL SIMULASYON PREVIEW (STICKY) */}
+                    <div className="lg:col-span-4 hidden lg:block sticky top-32 h-max">
+                        <div className="bg-[#121212] p-8 rounded-[3.5rem] border-[8px] border-[#222] shadow-[0_0_100px_rgba(0,0,0,0.5)] relative">
+                            {/* iPhone Speaker / Notch */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-[#222] rounded-b-3xl z-30"></div>
+                            
+                            <h3 className="text-xs font-black text-emerald-500 uppercase tracking-widest text-center mt-2 mb-6">Müşteri Uygulaması Önizleme</h3>
+                            
+                            <div className="space-y-6">
+                                <div className="aspect-[4/5] bg-[#1a1a1a] rounded-[2.5rem] overflow-hidden border border-white/5 relative shadow-inner">
+                                    {previewUrls.length > 0 ? (
+                                        <Image src={previewUrls[0]} alt="p" fill className="object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center opacity-10">
+                                            <ImageIcon className="w-20 h-20 text-white" />
+                                            <p className="text-[10px] font-black uppercase mt-4">GÖRSEL YOK</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="space-y-4 px-2">
+                                    <div className="flex items-center gap-2">
+                                       <span className="bg-emerald-500 text-white text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest">{gender}</span>
+                                       <span className="bg-white/10 text-white/40 text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest">{category}</span>
+                                    </div>
+                                    <h4 className="text-2xl font-black text-white leading-tight break-words">{name || "Model Adı"}</h4>
+                                    
+                                    <div className="pt-6 border-t border-white/5 flex items-center justify-between">
+                                        <div>
+                                            <p className="text-[10px] font-black text-white/30 uppercase tracking-widest mb-1">Butik Satış Fiyatı</p>
+                                            <p className="text-3xl font-black text-white">
+                                                {wholesalePrice ? (Number(wholesalePrice) * 1.15).toLocaleString('tr-TR') : "0"} ₺
+                                            </p>
+                                        </div>
+                                        <button className="bg-white text-black p-4 rounded-3xl shadow-xl hover:scale-110 active:scale-90 transition-all">
+                                            <Eye className="w-6 h-6" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <p className="mt-8 text-center text-anthracite-400 text-xs font-medium italic">Bu alan butiklerin ürününüzü nasıl göreceğini simüle eder.</p>
                     </div>
                 </div>
             )}
