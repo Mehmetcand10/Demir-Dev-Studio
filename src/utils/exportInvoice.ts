@@ -8,9 +8,9 @@ export const exportInvoicePDF = (order: any) => {
 
   // FIRMA BILGILERI
   const companyName = "DEMIR DEV STUDIO";
-  const companyPhone = "+90 5XX XXX XX XX"; // Burayı kullanıcıya daha sonra değiştirmesini söyleyeceğiz
-  const companyEmail = "destek@demirdev.io";
-  const iban = "TRXX XXXX XXXX XXXX XXXX XXXX XX";
+  const companyPhone = "+90 532 000 00 00";
+  const companyEmail = "iletisim@demirdev.io";
+  const iban = "TR00 0000 0000 0000 0000 0000 00";
   const bank = "Ziraat Bankası / Demir Dev Studio";
 
   // HEADER - FIRMA ISMI
@@ -77,7 +77,7 @@ export const exportInvoicePDF = (order: any) => {
   doc.setDrawColor(220, 220, 220);
   doc.setFillColor(245, 245, 245);
   doc.rect(14, finalY + 15, 182, 35, 'F');
-  
+
   doc.setFontSize(10);
   doc.setTextColor(50, 50, 50);
   doc.text("Odeme Bilgileri (Havale/EFT):", 20, finalY + 25);
