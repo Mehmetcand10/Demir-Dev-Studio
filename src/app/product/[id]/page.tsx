@@ -48,7 +48,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   if (!product) return <div className="p-24 text-center text-red-500">Böyle bir ürün veritabanında bulunamadı.</div>;
 
   const totalItems = seriCount * product.min_order_quantity;
-  const unitPrice = Number(product.base_wholesale_price) + Number(product.margin_price || 100);
+  const unitPrice = Number(product.base_wholesale_price) + Number(product.margin_price || 0);
   const totalPrice = totalItems * unitPrice;
 
   // FAZ 4: DROP-SHIPPING SİPARİŞ OLUŞTURMA İŞLEMİ (Veritabanı + WhatsApp)
@@ -59,7 +59,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
     try {
       const fullAddress = `${il} / ${ilce} - ${adres}`;
-      const comm = totalItems * 100; // Standart Komisyon: Parça Başı 100 TL
+      const comm = totalItems * Number(product.margin_price || 0);
       const wholeEarn = totalPrice - comm; // Toptancının Parası (Müşteri Toplam Fiyatı - Demir Dev Komisyonu)
 
       // 1. Sisteme Finansal İşlemi Kaydet (orders tablosu)

@@ -97,7 +97,7 @@ export default function ToptanciDashboard() {
           gsm: gsm || null, // Dinamikleşti, zorunlu 160gsm kaldırıldı
           images: uploadedUrls,
           base_wholesale_price: Number(wholesalePrice),
-          margin_price: 100, // Demir Dev Payı (Otomatik Eklenir, müşteri fiyatına yansır)
+          margin_price: Number(wholesalePrice) * 0.15, // Demir Dev Payı (%15 Otomatik)
           stock_status: 'In Stock',
           min_order_quantity: Number(minOrder)
         }
@@ -181,7 +181,7 @@ export default function ToptanciDashboard() {
                      <div>
                        <p className="text-emerald-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">Müşteri Vitrin Fiyatı (Adet)</p>
                        <p className="text-4xl font-black text-white drop-shadow-md">
-                         {wholesalePrice ? (Number(wholesalePrice) + 100).toLocaleString('tr-TR') : "0"} <span className="text-2xl text-emerald-400">₺</span>
+                         {wholesalePrice ? (Number(wholesalePrice) * 1.15).toLocaleString('tr-TR') : "0"} <span className="text-2xl text-emerald-400">₺</span>
                        </p>
                      </div>
                      <div className="text-right bg-white/5 px-4 py-2 rounded-2xl border border-white/5">

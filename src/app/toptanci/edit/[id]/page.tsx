@@ -76,6 +76,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         sizes,
         gsm: gsm || null,
         base_wholesale_price: Number(wholesalePrice),
+        margin_price: Number(wholesalePrice) * 0.15, // Demir Dev Payı (%15 Otomatik)
         min_order_quantity: Number(minOrder)
       })
       .eq('id', params.id)
