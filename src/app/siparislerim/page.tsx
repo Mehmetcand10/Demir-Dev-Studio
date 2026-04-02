@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { PackageSearch, PackageCheck, Clock, Truck } from 'lucide-react';
+import { PackageSearch, PackageCheck, Clock, Truck, FileText } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { exportInvoicePDF } from '@/utils/exportInvoice';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -110,12 +111,23 @@ export default function Siparislerim() {
                           )}
                        </div>
 
-                       {order.status === 'shipped' && order.tracking_number && (
-                          <div className="text-right shrink-0 bg-white p-4 rounded-xl shadow-sm border border-anthracite-100">
-                             <p className="text-[10px] uppercase font-black text-blue-400 mb-1.5 tracking-widest">RESMİ TAKİP NO</p>
-                             <p className="text-xl font-black text-blue-700 font-mono tracking-wider">{order.tracking_number}</p>
-                          </div>
-                       )}
+                       <div className="flex flex-col sm:flex-row items-center gap-4 shrink-0">
+                          {order.status === 'shipped' && order.tracking_number && (
+                             <div className="text-right bg-white p-4 rounded-xl shadow-sm border border-anthracite-100">
+                                <p className="text-[10px] uppercase font-black text-blue-400 mb-1.5 tracking-widest">RESMİ TAKİP NO</p>
+                                <p className="text-xl font-black text-blue-700 font-mono tracking-wider">{order.tracking_number}</p>
+                             </div>
+                          )}
+                          
+                          {(order.status === 'approved' || order.status === 'shipped') && (
+                             <button 
+                               onClick={() => exportInvoicePDF(order)}
+                               className="flex items-center gap-2 px-6 py-4 bg-anthracite-900 hover:bg-black text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg hover:scale-105"
+                             >
+                               <FileText className="w-4 h-4" /> Fatura İndir
+                             </button>
+                          )}
+                       </div>
                     </div>
                  </div>
               </div>

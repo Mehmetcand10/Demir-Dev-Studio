@@ -5,9 +5,10 @@ import {
   CheckCircle, Users, Store, UserRound, Wallet, 
   TrendingUp, Package, Clock, ShieldCheck, 
   Archive, FolderArchive, Trash2, LayoutDashboard,
-  FileText, History, Info
+  FileText, History, Info, Printer
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { exportInvoicePDF } from '@/utils/exportInvoice';
 import Link from 'next/link';
 
 type TabType = 'finance' | 'payments' | 'approvals' | 'archive';
@@ -215,14 +216,17 @@ export default function AdminDashboard() {
                              <h3 className="font-black text-lg text-anthracite-900 mt-3">{order.buyer_name}</h3>
                              <p className="text-xs font-bold text-anthracite-500">Tedarikçi: {order.wholesaler?.business_name || 'Bilinmiyor'}</p>
                            </div>
-                           <div className="flex flex-col items-end gap-2">
-                             <span className="text-2xl font-black">{order.quantity} Adet</span>
-                             {order.status === 'shipped' && (
-                               <button onClick={() => archiveOrder(order.id)} className="opacity-0 group-hover:opacity-100 bg-anthracite-900 text-white p-2 rounded-xl transition-all hover:bg-emerald-500" title="Arşivle">
-                                 <FolderArchive className="w-4 h-4" />
+                             <div className="flex items-center gap-2">
+                               <span className="text-2xl font-black">{order.quantity} Adet</span>
+                               {order.status === 'shipped' && (
+                                 <button onClick={() => archiveOrder(order.id)} className="opacity-0 group-hover:opacity-100 bg-anthracite-900 text-white p-2 rounded-xl transition-all hover:bg-emerald-500" title="Arşivle">
+                                   <FolderArchive className="w-4 h-4" />
+                                 </button>
+                               )}
+                               <button onClick={() => exportInvoicePDF(order)} className="bg-blue-600 text-white p-2 rounded-xl hover:bg-blue-700 transition-all font-bold text-xs flex items-center gap-1" title="PDF Fatura">
+                                 <FileText className="w-4 h-4" /> PDF
                                </button>
-                             )}
-                           </div>
+                             </div>
                         </div>
                         {order.status === 'shipped' && order.tracking_number && (
                           <div className="mt-2 bg-blue-50 text-blue-800 p-3 rounded-xl border border-blue-100 text-[10px] font-black tracking-widest text-center">
@@ -313,9 +317,14 @@ export default function AdminDashboard() {
                            <p className="text-xs font-medium text-anthracite-500">{order.buyer_name} | {new Date(order.created_at).toLocaleDateString('tr-TR')}</p>
                         </div>
                      </div>
-                     <div className="text-right">
-                        <span className="block font-black text-xl">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
-                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">TAMAMLANDI</span>
+                     <div className="flex items-center gap-3">
+                        <div className="text-right">
+                           <span className="block font-black text-xl">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
+                           <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">Kargolandı</span>
+                        </div>
+                        <button onClick={() => exportInvoicePDF(order)} className="p-3 bg-anthracite-100 rounded-2xl hover:bg-white border hover:border-anthracite-900 transition-all text-anthracite-900" title="PDF Dökümü Al">
+                          <Printer className="w-5 h-5" />
+                        </button>
                      </div>
                   </div>
                 ))}

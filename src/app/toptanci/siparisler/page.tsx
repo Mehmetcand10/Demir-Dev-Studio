@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { Package, ArrowLeft, Loader2 } from 'lucide-react';
+import { Package, ArrowLeft, Loader2, FileText } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { exportInvoicePDF } from '@/utils/exportInvoice';
 import Link from 'next/link';
 
 export default function ToptanciSiparisler() {
@@ -15,7 +16,7 @@ export default function ToptanciSiparisler() {
     setLoadingOrders(true);
     const { data } = await supabase
       .from('orders')
-      .select('*, product:product_id(name, images)')
+      .select('*, product:product_id(name, images), wholesaler:wholesaler_id(business_name)')
       .eq('wholesaler_id', userId)
       .order('created_at', { ascending: false });
     
@@ -108,12 +109,22 @@ export default function ToptanciSiparisler() {
                   </div>
 
                   {order.status === 'approved' ? (
-                     <button onClick={() => handleShipOrder(order.id)} className="w-full bg-anthracite-900 hover:bg-black text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
-                       Kargola ve Takip No Gir
-                     </button>
+                     <div className="flex flex-col gap-2">
+                        <button onClick={() => handleShipOrder(order.id)} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
+                           Kargola ve Takip No Gir
+                        </button>
+                        <button onClick={() => exportInvoicePDF(order)} className="w-full bg-white border-2 border-anthracite-200 text-anthracite-900 font-bold text-xs uppercase tracking-widest py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-anthracite-50 transition-all">
+                           <FileText className="w-4 h-4" /> İrsaliye / Fatura (PDF)
+                        </button>
+                     </div>
                   ) : (
-                     <div className="bg-blue-50 text-blue-800 p-4 rounded-xl border border-blue-200 text-sm font-black text-center tracking-widest flex items-center justify-center gap-2">
-                        <Package className="w-4 h-4"/> KOD: {order.tracking_number || "HATA! NUMARA GİRİLMEDİ"}
+                     <div className="flex flex-col gap-2">
+                        <div className="bg-blue-50 text-blue-800 p-4 rounded-xl border border-blue-200 text-sm font-black text-center tracking-widest flex items-center justify-center gap-2">
+                           <Package className="w-4 h-4"/> KOD: {order.tracking_number || "HATA! NUMARA GİRİLMEDİ"}
+                        </div>
+                        <button onClick={() => exportInvoicePDF(order)} className="w-full border border-anthracite-200 text-anthracite-500 font-bold text-[10px] uppercase tracking-widest py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-white transition-all">
+                           <FileText className="w-3 h-3" /> Fatura Kopyası
+                        </button>
                      </div>
                   )}
                </div>
