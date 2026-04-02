@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, MessageCircle, Package, Search, Lock } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<any>(null);
@@ -23,26 +24,28 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const [adres, setAdres] = useState('');
   const [isOrdering, setIsOrdering] = useState(false);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
+  const [selectedSize, setSelectedSize] = useState<string>('');
+
+  const fetchData = useCallback(async () => {
+    // 1. Ürünü çek
+    const { data: p } = await supabase.from('products').select('*').eq('id', params.id).single();
+    if (p) setProduct(p);
+
+    // 2. O anki kullacıyı oturumdan çek
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      if (profile) {
+         setIsApproved(profile.is_approved || false);
+         setCurrentUserProfile(profile);
+      }
+    }
+    setLoading(false);
+  }, [params.id, supabase]);
 
   useEffect(() => {
-    async function fetchData() {
-      // 1. Ürünü çek
-      const { data: p } = await supabase.from('products').select('*').eq('id', params.id).single();
-      if (p) setProduct(p);
-
-      // 2. O anki kullacıyı oturumdan çek
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (profile) {
-           setIsApproved(profile.is_approved || false);
-           setCurrentUserProfile(profile);
-        }
-      }
-      setLoading(false);
-    }
     fetchData();
-  }, [params.id, supabase]);
+  }, [fetchData]);
 
   if (loading) return <div className="p-24 text-center font-bold">Vitrin Hazırlanıyor...</div>;
   if (!product) return <div className="p-24 text-center text-red-500">Böyle bir ürün veritabanında bulunamadı.</div>;
@@ -75,13 +78,14 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
            buyer_phone: currentUserProfile.phone_number,
            buyer_name: currentUserProfile.business_name || currentUserProfile.full_name,
            product_name: product.name,
+           selected_size: selectedSize,
            status: 'waiting_payment'
       });
 
       if(error) throw error;
 
       // 2. WhatsApp Profesyonel Şablonu Oluştur ve Bota Yönlendir
-      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name} (SKU: ${product.id.slice(0,5)})\n🔢 Miktar: ${seriCount} Seri / ${totalItems} Parça\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
+      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name} (Beden: ${selectedSize})\n🔢 Miktar: ${seriCount} Seri / ${totalItems} Parça\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
       
       // Demir Dev Studio (Merkez) Resmi WhatsApp Numarası
       const whatsappNumber = "905528323906"; 
@@ -102,9 +106,12 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-anthracite-500 hover:text-anthracite-900 dark:hover:text-white mb-8 transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Kataloğa Dön
-      </Link>
+      <div className="flex justify-between items-center mb-8">
+        <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-anthracite-500 hover:text-anthracite-900 dark:hover:text-white transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Kataloğa Dön
+        </Link>
+        {currentUserProfile && <NotificationBell userId={currentUserProfile.id} />}
+      </div>
 
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
         {/* Sol: ÇOKLU FOTOĞRAF GALERİSİ & TEXTURE ZOOM */}
@@ -172,8 +179,36 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
               <div className="space-y-6 mb-10">
                 <div>
-                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-anthracite-900 border-b border-anthracite-100 pb-2"><Package className="w-5 h-5 text-emerald-500"/> Paket ve Materyal Analizi</h3>
-                  <div className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed bg-white border border-anthracite-200 p-5 rounded-2xl shadow-sm">
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-anthracite-900 border-b border-anthracite-100 pb-2"><Package className="w-5 h-5 text-emerald-500"/> Ürün ve Stok Durumu</h3>
+                  
+                  {/* BEDEN SEÇİMİ VE STOK GÖRÜNÜMÜ */}
+                  <div className="flex flex-wrap gap-3 mt-4">
+                    {product.stocks && Object.entries(product.stocks).length > 0 ? (
+                      Object.entries(product.stocks).map(([size, qty]: [string, any]) => (
+                        <button
+                          key={size}
+                          disabled={Number(qty) <= 0}
+                          onClick={() => setSelectedSize(size)}
+                          className={`px-5 py-3 rounded-xl font-black text-sm transition-all border-2 flex flex-col items-center gap-1 min-w-[70px] ${
+                            Number(qty) <= 0 
+                              ? 'bg-anthracite-50 border-anthracite-200 text-anthracite-300 cursor-not-allowed grayscale' 
+                              : selectedSize === size 
+                                ? 'bg-anthracite-900 border-anthracite-900 text-white shadow-lg scale-105' 
+                                : 'bg-white border-anthracite-200 text-anthracite-600 hover:border-anthracite-900'
+                          }`}
+                        >
+                          <span>{size}</span>
+                          <span className={`text-[9px] uppercase ${Number(qty) <= 0 ? 'text-red-400' : selectedSize === size ? 'text-white/60' : 'text-anthracite-400'}`}>
+                            {Number(qty) <= 0 ? 'Tükendi' : `${qty} Stok`}
+                          </span>
+                        </button>
+                      ))
+                    ) : (
+                      <span className="text-sm font-bold text-anthracite-400 italic">Bu üründe beden seçeneği yüklü değil.</span>
+                    )}
+                  </div>
+
+                  <div className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed bg-white border border-anthracite-200 p-5 rounded-2xl shadow-sm mt-6">
                     <p className="mb-4">{product.description}</p>
                     <ul className="space-y-2 mt-4">
                        <li className="flex justify-between items-center bg-anthracite-50 px-4 py-2 rounded-xl">
@@ -183,10 +218,6 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                        <li className="flex justify-between items-center bg-anthracite-50 px-4 py-2 rounded-xl">
                           <span className="font-bold text-anthracite-500 text-xs uppercase tracking-widest">Ağırlık / Gramaj</span>
                           <span className="font-black text-anthracite-900">{product.gsm || "Belirtilmemiş"}</span>
-                       </li>
-                       <li className="flex justify-between items-center bg-blue-50 border border-blue-100 px-4 py-3 rounded-xl mt-3 shadow-inner">
-                          <span className="font-bold text-blue-600 text-[10px] uppercase tracking-widest">Paket İçi Beden Asortisi</span>
-                          <span className="font-black text-blue-900 text-lg">{product.sizes || "Standart Parça"}</span>
                        </li>
                     </ul>
                   </div>
@@ -211,10 +242,19 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                 </div>
 
                 <button 
+                  disabled={!selectedSize}
                   onClick={() => setShowAddressModal(true)}
-                  className="w-full flex items-center justify-center gap-2 bg-[#25D366] text-white py-4 rounded-2xl font-bold text-lg hover:bg-[#20BE5C] hover:scale-[1.02] transition-all shadow-xl shadow-emerald-500/20"
+                  className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl ${
+                    !selectedSize 
+                      ? 'bg-anthracite-100 text-anthracite-400 cursor-not-allowed border border-anthracite-200 shadow-none' 
+                      : 'bg-[#25D366] text-white hover:bg-[#20BE5C] shadow-emerald-500/20'
+                  }`}
                 >
-                  <MessageCircle className="w-6 h-6" /> Siparişi Tamamla (Bilgileri Gir)
+                  {selectedSize ? (
+                    <><MessageCircle className="w-6 h-6" /> Siparişi Tamamla (Bilgileri Gir)</>
+                  ) : (
+                    "Lütfen Beden Seçiniz"
+                  )}
                 </button>
               </div>
             </>

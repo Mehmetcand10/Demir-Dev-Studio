@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.100.1",
     "html2canvas": "^1.4.1",
@@ -16,13 +17,16 @@
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^1.7.0",
     "next": "14.2.3",
+    "qrcode.react": "^4.2.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "recharts": "^3.8.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/recharts": "^1.8.29",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
     "postcss": "^8",

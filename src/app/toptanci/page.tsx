@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck, Loader2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
@@ -20,13 +20,19 @@ export default function ToptanciDashboard() {
   const [wholesalePrice, setWholesalePrice] = useState('');
   const [minOrder, setMinOrder] = useState('');
   
+  const [stockEntries, setStockEntries] = useState<{size: string, quantity: number}[]>([
+    { size: 'S', quantity: 0 },
+    { size: 'M', quantity: 0 },
+    { size: 'L', quantity: 0 },
+    { size: 'XL', quantity: 0 }
+  ]);
+  
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [user, setUser] = useState<any>(null);
-
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const fetchMyProducts = useCallback(async (userId: string) => {
     setLoadingProducts(true);
@@ -53,6 +59,7 @@ export default function ToptanciDashboard() {
 
   const clearForm = () => {
      setName(''); setFabricType(''); setWholesalePrice(''); setSelectedFiles([]); setPreviewUrls([]); setGsm(''); setSizes(''); setMinOrder('');
+     setStockEntries([{ size: 'S', quantity: 0 }, { size: 'M', quantity: 0 }, { size: 'L', quantity: 0 }, { size: 'XL', quantity: 0 }]);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,19 +92,25 @@ export default function ToptanciDashboard() {
         uploadedUrls.push(publicUrl);
       }
 
+      const stocksJson = stockEntries.reduce((acc: any, curr) => {
+        if (curr.size.trim()) acc[curr.size.trim()] = Number(curr.quantity);
+        return acc;
+      }, {});
+
       const { error: dbError } = await supabase.from('products').insert([
         {
           wholesaler_id: user.id,
           name,
           category,
-          gender, // YENİ KOLON
-          sizes: sizes || "Standart Paket", // YENİ KOLON
+          gender,
+          sizes: stockEntries.map(s => `${s.size}(${s.quantity})`).join(', '),
+          stocks: stocksJson,
           description: `Toptancı doğrudan satışı: B2B ${category} koleksiyonu.`,
           fabric_type: fabricType,
-          gsm: gsm || null, // Dinamikleşti, zorunlu 160gsm kaldırıldı
+          gsm: gsm || null,
           images: uploadedUrls,
           base_wholesale_price: Number(wholesalePrice),
-          margin_price: Number(wholesalePrice) * 0.15, // Demir Dev Payı (%15 Otomatik)
+          margin_price: Number(wholesalePrice) * 0.15,
           stock_status: 'In Stock',
           min_order_quantity: Number(minOrder)
         }
@@ -230,22 +243,62 @@ export default function ToptanciDashboard() {
                  </div>
                </div>
 
-               {/* 3. Materyal ve Serbest Beden Modülü */}
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                 <div>
-                   <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Paket (Asorti) İçeriği *Önemli*</label>
-                   <input required type="text" value={sizes} onChange={e=>setSizes(e.target.value)} className="w-full px-5 py-4 rounded-xl border border-emerald-200 bg-emerald-50 text-base focus:bg-white focus:ring-4 focus:ring-emerald-100 outline-none transition-all font-black text-emerald-900 placeholder:text-emerald-300" placeholder="Örn: 36-37-38-39-40 veya S(2)-M-L-XL" />
-                   <p className="text-[10px] text-anthracite-400 font-bold mt-2">Müşterinin paketten tam olarak hangi bedenden çıkaracağını açıkça yazın.</p>
+               {/* 3. Materyal ve BEDENLİ STOK Modülü */}
+               <div className="grid grid-cols-1 gap-6">
+                 <div className="bg-emerald-50/50 border border-emerald-100 rounded-3xl p-6 sm:p-8 text-left">
+                   <div className="flex justify-between items-center mb-6">
+                      <label className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block border-l-4 border-emerald-500 pl-3">Beden Bazlı Stok Yönetimi (Asorti Giriniz)</label>
+                      <button type="button" onClick={() => setStockEntries([...stockEntries, { size: '', quantity: 0 }])} className="text-[10px] font-black bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition-all">+ YENİ BEDEN EKLE</button>
+                   </div>
+                   
+                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      {stockEntries.map((entry, idx) => (
+                        <div key={idx} className="bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm relative group/item text-center">
+                          <input 
+                            type="text" 
+                            placeholder="Beden" 
+                            value={entry.size} 
+                            onChange={(e) => {
+                              const newEntries = [...stockEntries];
+                              newEntries[idx].size = e.target.value.toUpperCase();
+                              setStockEntries(newEntries);
+                            }}
+                            className="w-full text-center font-black text-anthracite-900 border-b border-anthracite-100 mb-2 focus:border-emerald-500 outline-none uppercase pb-1"
+                          />
+                          <div className="flex items-center justify-center gap-2">
+                             <span className="text-[9px] font-bold text-anthracite-400">ADET:</span>
+                             <input 
+                               type="number" 
+                               min="0" 
+                               value={entry.quantity} 
+                               onChange={(e) => {
+                                 const newEntries = [...stockEntries];
+                                 newEntries[idx].quantity = Number(e.target.value);
+                                 setStockEntries(newEntries);
+                               }}
+                               className="w-12 text-center font-black text-emerald-600 bg-emerald-50 rounded-md py-1"
+                             />
+                          </div>
+                          <button 
+                            type="button" 
+                            onClick={() => setStockEntries(stockEntries.filter((_, i) => i !== idx))}
+                            className="absolute -top-2 -right-2 bg-red-100 text-red-500 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-all border border-red-200"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                   </div>
                  </div>
                  
-                 <div className="flex flex-col gap-4">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
-                      <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block">Kumaş / Materyal Türü</label>
-                      <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-5 py-3 rounded-xl border border-anthracite-200 bg-anthracite-50 text-sm font-bold text-anthracite-900 focus:bg-white focus:ring-2 outline-none" placeholder="%100 Deri veya Pamuk" />
+                      <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2 text-left">Kumaş / Materyal Türü</label>
+                      <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-5 py-4 rounded-xl border border-anthracite-200 bg-anthracite-50 text-sm font-bold text-anthracite-900 focus:bg-white focus:ring-2 outline-none" placeholder="%100 Deri veya Pamuk" />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block">Gramaj / Ağırlık (Varsa)</label>
-                      <input type="text" value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full px-5 py-3 rounded-xl border border-anthracite-200 bg-anthracite-50 text-sm font-bold text-anthracite-900 focus:bg-white focus:ring-2 outline-none" placeholder="Örn: 240gsm (Ayakkabıda boş geçebilirsiniz)" />
+                      <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2 text-left">Gramaj / Ağırlık (Varsa)</label>
+                      <input type="text" value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full px-5 py-4 rounded-xl border border-anthracite-200 bg-anthracite-50 text-sm font-bold text-anthracite-900 focus:bg-white focus:ring-2 outline-none" placeholder="Örn: 240gsm (Ayakkabıda boş geçebilirsiniz)" />
                     </div>
                  </div>
                </div>
@@ -339,7 +392,11 @@ export default function ToptanciDashboard() {
                       <h3 className="font-black text-xl line-clamp-2 leading-tight mb-2 text-anthracite-900">{product.name}</h3>
                       <div className="flex flex-wrap items-center gap-1.5 mb-4">
                         <span className="text-[9px] uppercase tracking-widest font-black text-emerald-700 bg-emerald-100 px-2 py-1 rounded-md">{product.gender || "Unisex"}</span>
-                        <span className="text-[9px] uppercase tracking-widest font-black text-anthracite-600 bg-anthracite-100 px-2 py-1 rounded-md">{product.category}</span>
+                        {product.stocks && Object.entries(product.stocks).map(([size, qty]: [string, any]) => (
+                           <span key={size} className={`text-[8px] font-black px-1.5 py-0.5 rounded border ${Number(qty) > 0 ? 'bg-white border-emerald-200 text-emerald-600' : 'bg-red-50 border-red-200 text-red-400'}`}>
+                             {size}: {qty}
+                           </span>
+                        ))}
                       </div>
                       <div className="flex justify-between items-end border-t border-anthracite-100 pt-3">
                         <div>

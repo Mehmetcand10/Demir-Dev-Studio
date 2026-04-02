@@ -1,14 +1,21 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { 
   CheckCircle, Users, Store, UserRound, Wallet, 
   TrendingUp, Package, Clock, ShieldCheck, 
   Archive, FolderArchive, Trash2, LayoutDashboard,
   FileText, History, Info, Printer
 } from 'lucide-react';
+import { 
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
+  CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell 
+} from 'recharts';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
+import { QRCodeSVG } from 'qrcode.react';
+import NotificationBell from '@/components/NotificationBell';
+import { notify } from '@/utils/notifications';
 import Link from 'next/link';
 
 type TabType = 'finance' | 'payments' | 'approvals' | 'archive';
@@ -18,47 +25,51 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>('finance');
+  const [mounted, setMounted] = useState(false);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
-  useEffect(() => {
-    checkAdminAccess();
-  }, []);
-
-  const checkAdminAccess = async () => {
-    setLoading(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      window.location.href = '/login';
-      return;
-    }
-
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-    if (profile?.role === 'admin') {
-      setIsAdmin(true);
-      await fetchPendingUsers();
-      await fetchOrders();
-    }
-    setLoading(false);
-  };
-
-  const fetchPendingUsers = async () => {
+  const fetchPendingUsers = useCallback(async () => {
     const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('is_approved', false)
       .order('created_at', { ascending: false });
     if (data) setProfiles(data);
-  };
+  }, [supabase]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     const { data } = await supabase
       .from('orders')
       .select('*, product:product_id(*), wholesaler:wholesaler_id(business_name)')
       .order('created_at', { ascending: false });
     if (data) setOrders(data);
-  };
+  }, [supabase]);
+
+  const checkAdminAccess = useCallback(async () => {
+    setLoading(true);
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) {
+      window.location.href = '/login';
+      return;
+    }
+    setUser(authUser);
+
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
+    if (profile?.role === 'admin') {
+      setIsAdmin(true);
+      await fetchPendingUsers();
+      await fetchOrders();
+    }
+    setLoading(false);
+  }, [supabase, fetchPendingUsers, fetchOrders]);
+
+  useEffect(() => {
+    setMounted(true);
+    checkAdminAccess();
+  }, [checkAdminAccess]);
 
   const approveUser = async (id: string, role: string) => {
     const { error } = await supabase.from('profiles').update({ is_approved: true }).eq('id', id);
@@ -68,12 +79,51 @@ export default function AdminDashboard() {
     }
   };
 
-  const approveOrderPayment = async (id: string, wholesalerName: string) => {
+  const approveOrderPayment = async (orderId: string, wholesalerName: string) => {
     if(!confirm("Müşterinin IBAN adresinize ödeme geçtiğini teyit ettiniz mi? Sipariş üretim/stok için Toptancı deposuna yönlendirilecek!")) return;
     
-    const { error } = await supabase.from('orders').update({ status: 'approved' }).eq('id', id);
+    // 1. Sipariş detaylarını al (Beden, Miktar, Buyer ve Ürün İsmi için)
+    const { data: order } = await supabase.from('orders').select('product_id, selected_size, quantity, buyer_id, product_name').eq('id', orderId).single();
+    
+    if (order && order.selected_size) {
+      // 2. Ürünün mevcut stoklarını al
+      const { data: product } = await supabase.from('products').select('stocks').eq('id', order.product_id).single();
+      
+      if (product && product.stocks) {
+        const newStocks = { ...product.stocks };
+        const currentQty = Number(newStocks[order.selected_size]) || 0;
+        // Stoğu düşür (En az 0 olacak şekilde)
+        newStocks[order.selected_size] = Math.max(0, currentQty - order.quantity);
+        
+        // 3. Stokları güncelle
+        await supabase.from('products').update({ stocks: newStocks }).eq('id', order.product_id);
+
+        // 4. Düşük Stok Bildirimi (Toptancıya)
+        if (newStocks[order.selected_size] <= 5) {
+          const { data: prod } = await supabase.from('products').select('name, wholesaler_id').eq('id', order.product_id).single();
+          if (prod) {
+            await notify(
+              prod.wholesaler_id,
+              "⚠️ Düşük Stok Uyarısı!",
+              `'${prod.name}' ürününün ${order.selected_size} bedeni tükenmek üzere (Kalan: ${newStocks[order.selected_size]}). Lütfen stok tazeleyin!`,
+              'warning'
+            );
+          }
+        }
+      }
+    }
+
+    const { error } = await supabase.from('orders').update({ status: 'approved' }).eq('id', orderId);
     if (!error) {
-      alert(`Sipariş Onaylandı ve Kasa Güvenceye Alındı! ${wholesalerName || 'Toptancı'} tarafına kargolama emri iletildi.`);
+      // 5. Butiğe Bildirim Gönder (Ödemeniz Onaylandı)
+      await notify(
+        order?.buyer_id,
+        "✅ Ödemeniz Onaylandı!",
+        `Siparişiniz (${order?.product_name}) onaylandı ve toptancıya kargo emri iletildi.`,
+        'success'
+      );
+
+      alert(`Sipariş Onaylandı ve Stok Güncellendi! ${wholesalerName || 'Toptancı'} tarafına kargolama emri iletildi.`);
       fetchOrders();
     }
   };
@@ -106,6 +156,35 @@ export default function AdminDashboard() {
   const activeOrders = orders.filter(o => (o.status === 'approved' || o.status === 'shipped') && !o.is_archived);
   const archivedOrdersList = orders.filter(o => o.is_archived);
 
+  // GRAFİK VERİSİ HAZIRLAMA (Son 7 Günlük Trend)
+  const chartData = orders
+    .filter(o => !o.is_archived)
+    .reduce((acc: any[], order) => {
+      const date = new Date(order.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+      const existing = acc.find(item => item.name === date);
+      if (existing) {
+        existing.sales += Number(order.total_price);
+        existing.profit += Number(order.commission_earned);
+      } else {
+        acc.push({ name: date, sales: Number(order.total_price), profit: Number(order.commission_earned) });
+      }
+      return acc;
+    }, [])
+    .slice(-7);
+
+  const categoryData = orders.reduce((acc: any[], order) => {
+    const cat = order.product?.category || 'Diğer';
+    const existing = acc.find(item => item.name === cat);
+    if (existing) {
+      existing.value += 1;
+    } else {
+      acc.push({ name: cat, value: 1 });
+    }
+    return acc;
+  }, []);
+
+  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+
   return (
     <>
     {!isAdmin && !loading ? (
@@ -118,10 +197,13 @@ export default function AdminDashboard() {
     ) : (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 min-h-screen">
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8 gap-4">
+      <div className="flex justify-between items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-anthracite-900 leading-tight">Merkez Komuta ve Finans</h1>
-          <p className="text-anthracite-500 font-medium mt-1 text-sm sm:text-lg">Ağdaki tüm nakit akışı ve üyelikleri buradan yönetin.</p>
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-anthracite-900 leading-tight text-left">Merkez Komuta ve Finans</h1>
+          <p className="text-anthracite-500 font-medium mt-1 text-sm sm:text-lg text-left">Ağdaki tüm nakit akışı ve üyelikleri buradan yönetin.</p>
+        </div>
+        <div className="shrink-0 bg-white p-1 rounded-full border border-anthracite-100 shadow-sm">
+          {user && <NotificationBell userId={user.id} />}
         </div>
       </div>
 
@@ -176,6 +258,50 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            {/* GÖRSEL ANALİZ PANELİ */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+               <div className="lg:col-span-8 bg-white border border-anthracite-100 rounded-[2rem] p-6 sm:p-8 shadow-sm">
+                  <h3 className="text-sm font-black text-anthracite-900 mb-6 flex items-center gap-2 uppercase tracking-tight">
+                    <TrendingUp className="w-4 h-4 text-emerald-500" /> Günlük Satış & Kâr Trendi
+                  </h3>
+                  <div className="h-[250px] w-full">
+                    {mounted && (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
+                          <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
+                          <Tooltip contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
+                          <Line type="monotone" dataKey="sales" name="Satış (₺)" stroke="#10b981" strokeWidth={4} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} />
+                          <Line type="monotone" dataKey="profit" name="Net Kâr (₺)" stroke="#3b82f6" strokeWidth={4} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+               </div>
+               
+               <div className="lg:col-span-4 bg-white border border-anthracite-100 rounded-[2rem] p-6 sm:p-8 shadow-sm">
+                  <h3 className="text-sm font-black text-anthracite-900 mb-6 flex items-center gap-2 uppercase tracking-tight">
+                    <Package className="w-4 h-4 text-blue-500" /> Kategori Dağılımı
+                  </h3>
+                  <div className="h-[250px] w-full">
+                    {mounted && (
+                      <ResponsiveContainer width="100%" height="100%">
+                         <PieChart>
+                           <Pie data={categoryData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
+                             {categoryData.map((entry, index) => (
+                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                             ))}
+                           </Pie>
+                           <Tooltip />
+                           <Legend verticalAlign="bottom" wrapperStyle={{fontSize: '10px', fontWeight: 'bold'}} />
+                         </PieChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+               </div>
+            </div>
+
             <div className="grid lg:grid-cols-2 gap-10">
               <div className="bg-white border-2 border-anthracite-100 rounded-[2.5rem] p-8 shadow-xl">
                  <h2 className="text-xl font-bold flex items-center gap-3 mb-6 border-b border-anthracite-100 pb-5 text-anthracite-900">
@@ -186,12 +312,18 @@ export default function AdminDashboard() {
                      <p className="text-sm font-semibold text-anthracite-400 text-center py-10 bg-anthracite-50 rounded-2xl border border-dashed border-anthracite-200">Ödeme bekleyen sipariş bulunmuyor.</p>
                    ) : waitingOrders.map(order => (
                      <div key={order.id} className="p-5 sm:p-6 bg-amber-50/50 border border-amber-100 rounded-3xl flex flex-col gap-4">
-                        <div className="flex justify-between items-start">
-                           <div className="max-w-[70%] text-left">
+                        <div className="flex justify-between items-start gap-4">
+                           <div className="max-w-[60%] text-left">
                              <h3 className="font-black text-lg sm:text-xl text-anthracite-900 break-words">{order.buyer_name}</h3>
                              <p className="text-xs sm:text-sm font-bold text-anthracite-500 line-clamp-1">{order.product_name}</p>
+                             <span className="inline-block mt-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-black rounded-lg uppercase">Beden: {order.selected_size || 'N/A'}</span>
                            </div>
-                           <span className="text-xl sm:text-2xl font-black text-amber-600 shrink-0">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
+                           <div className="flex flex-col items-end gap-2">
+                              <span className="text-xl sm:text-2xl font-black text-amber-600 shrink-0">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
+                              <div className="bg-white p-1.5 rounded-xl border border-amber-200 shadow-sm">
+                                 <QRCodeSVG value={`https://demir-dev-studio.vercel.app/admin?order=${order.id}`} size={48} />
+                              </div>
+                           </div>
                         </div>
                         <button onClick={()=>approveOrderPayment(order.id, order.wholesaler?.business_name)} className="w-full py-4 bg-anthracite-900 text-white font-black text-[10px] sm:text-sm uppercase tracking-widest rounded-2xl shadow-xl transition-all hover:bg-black">TEYİT EDİLDİ - ONAYLA</button>
                      </div>
@@ -210,14 +342,22 @@ export default function AdminDashboard() {
                      <div key={order.id} className="p-5 sm:p-6 bg-white border border-anthracite-100 rounded-3xl flex flex-col gap-4 shadow-sm relative group">
                         <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                            <div className="text-left w-full sm:w-auto">
-                             <span className={`inline-block text-[9px] font-black tracking-widest px-2.5 py-1 rounded-full border ${order.status === 'shipped' ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
-                               {order.status === 'shipped' ? 'KARGOLANDI' : 'ÜRETİM/STOK'}
-                             </span>
-                             <h3 className="font-black text-base sm:text-lg text-anthracite-900 mt-2 break-words">{order.buyer_name}</h3>
+                             <div className="flex items-center gap-2 mb-2">
+                               <span className={`inline-block text-[9px] font-black tracking-widest px-2.5 py-1 rounded-full border ${order.status === 'shipped' ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
+                                 {order.status === 'shipped' ? 'KARGOLANDI' : 'ÜRETİM/STOK'}
+                               </span>
+                               <span className="inline-block px-2.5 py-1 bg-anthracite-100 text-anthracite-800 text-[9px] font-black rounded-full border border-anthracite-200 uppercase">Beden: {order.selected_size || 'N/A'}</span>
+                             </div>
+                             <h3 className="font-black text-base sm:text-lg text-anthracite-900 break-words">{order.buyer_name}</h3>
                              <p className="text-[10px] font-bold text-anthracite-500 uppercase tracking-widest">Tedarikçi: {order.wholesaler?.business_name || 'Bilinmiyor'}</p>
                            </div>
                            <div className="flex items-center sm:items-end sm:flex-col justify-between sm:justify-start w-full sm:w-auto gap-3">
-                             <span className="text-xl sm:text-2xl font-black">{order.quantity} Adet</span>
+                             <div className="flex flex-col items-end gap-1">
+                               <span className="text-xl sm:text-2xl font-black">{order.quantity} Adet</span>
+                               <div className="bg-white p-1 rounded-lg border border-anthracite-100 shadow-sm">
+                                 <QRCodeSVG value={`https://demir-dev-studio.vercel.app/admin?order=${order.id}`} size={32} />
+                               </div>
+                             </div>
                              <div className="flex gap-2">
                                {order.status === 'shipped' && (
                                  <button onClick={() => archiveOrder(order.id)} className="bg-anthracite-900 text-white p-2.5 rounded-xl transition-all sm:opacity-0 sm:group-hover:opacity-100 hover:bg-emerald-500" title="Arşivle">
