@@ -116,40 +116,40 @@ export default function AdminDashboard() {
         <Link href="/" className="mt-8 px-8 py-3.5 bg-anthracite-900 hover:bg-black transition-colors text-white font-bold rounded-full shadow-xl">Ana Sayfaya Dön ve Terk Et</Link>
       </div>
     ) : (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 min-h-screen">
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8 gap-4">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-anthracite-900">Merkez Komuta ve Finans</h1>
-          <p className="text-anthracite-500 font-medium mt-1">Ağdaki tüm nakit akışı ve üyelikleri buradan yönetin.</p>
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-anthracite-900 leading-tight">Merkez Komuta ve Finans</h1>
+          <p className="text-anthracite-500 font-medium mt-1 text-sm sm:text-lg">Ağdaki tüm nakit akışı ve üyelikleri buradan yönetin.</p>
         </div>
       </div>
 
-      {/* MODAL TABS NAVIGATION */}
-      <div className="flex flex-wrap items-center gap-2 mb-10 bg-anthracite-100 p-2 rounded-3xl w-max">
+      {/* MODAL TABS NAVIGATION - MOBILE SCROLLABLE */}
+      <div className="flex flex-nowrap items-center gap-2 mb-8 bg-anthracite-100 p-1.5 rounded-2xl sm:rounded-3xl overflow-x-auto scrollbar-hide w-full sm:w-max whitespace-nowrap px-2 sm:px-1.5">
         <button 
           onClick={() => setActiveTab('finance')}
-          className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-sm transition-all ${activeTab === 'finance' ? 'bg-white shadow-lg text-anthracite-900' : 'text-anthracite-500 hover:text-black'}`}
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'finance' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
         >
-          <LayoutDashboard className="w-4 h-4" /> Finans & Operasyon
+          <LayoutDashboard className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Finans & Operasyon
         </button>
         <button 
           onClick={() => setActiveTab('payments')}
-          className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-sm transition-all ${activeTab === 'payments' ? 'bg-white shadow-lg text-anthracite-900' : 'text-anthracite-500 hover:text-black'}`}
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'payments' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
         >
-          <Wallet className="w-4 h-4" /> Toptancı Hakedişleri
+          <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Hakedişler
         </button>
         <button 
           onClick={() => setActiveTab('approvals')}
-          className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-sm transition-all ${activeTab === 'approvals' ? 'bg-white shadow-lg text-anthracite-900' : 'text-anthracite-500 hover:text-black'}`}
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'approvals' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
         >
-          <Users className="w-4 h-4" /> Üye Onayları {profiles.length > 0 && <span className="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">{profiles.length}</span>}
+          <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Onaylar {profiles.length > 0 && <span className="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full ml-1">{profiles.length}</span>}
         </button>
         <button 
           onClick={() => setActiveTab('archive')}
-          className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-sm transition-all ${activeTab === 'archive' ? 'bg-white shadow-lg text-anthracite-900' : 'text-anthracite-500 hover:text-black'}`}
+          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'archive' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
         >
-          <History className="w-4 h-4" /> Arşiv
+          <History className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Arşiv
         </button>
       </div>
 
@@ -161,18 +161,18 @@ export default function AdminDashboard() {
         {/* TAB: FİNANS & OPERASYON */}
         {activeTab === 'finance' && (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-anthracite-900 rounded-[2rem] p-8 text-white shadow-xl group">
-                <p className="text-white/60 font-bold text-xs uppercase tracking-widest mb-1.5">Toplam Satış Hacmi</p>
-                <h3 className="text-4xl font-black">{totalCiro.toLocaleString('tr-TR')} <span className="text-xl text-white/50">₺</span></h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+              <div className="bg-anthracite-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+                <p className="text-white/60 font-bold text-[10px] uppercase tracking-widest mb-1.5">Toplam Satış Hacmi</p>
+                <h3 className="text-2xl sm:text-4xl font-black">{totalCiro.toLocaleString('tr-TR')} <span className="text-lg text-white/50">₺</span></h3>
               </div>
-              <div className="bg-emerald-500 rounded-[2rem] p-8 text-white shadow-xl shadow-emerald-500/20">
-                <p className="text-white/80 font-bold text-xs uppercase tracking-widest mb-1.5">Net Platform Kazancı</p>
-                <h3 className="text-4xl font-black">{totalKazaniciniz.toLocaleString('tr-TR')} <span className="text-xl text-white/50">₺</span></h3>
+              <div className="bg-emerald-500 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-emerald-500/20">
+                <p className="text-white/80 font-bold text-[10px] uppercase tracking-widest mb-1.5">Net Platform Kazancı</p>
+                <h3 className="text-2xl sm:text-4xl font-black">{totalKazaniciniz.toLocaleString('tr-TR')} <span className="text-xl text-white/50">₺</span></h3>
               </div>
-              <div className="bg-white border-2 border-anthracite-100 rounded-[2rem] p-8 shadow-sm">
-                <p className="text-anthracite-500 font-bold text-xs uppercase tracking-widest mb-1.5">Toptancı Hakedişleri</p>
-                <h3 className="text-4xl font-black text-anthracite-900">{toptanciHakedisleri.toLocaleString('tr-TR')} <span className="text-xl text-anthracite-400">₺</span></h3>
+              <div className="bg-white border-2 border-anthracite-100 rounded-3xl p-6 sm:p-8 shadow-sm">
+                <p className="text-anthracite-500 font-bold text-[10px] uppercase tracking-widest mb-1.5 text-left">Toptancı Hakedişleri</p>
+                <h3 className="text-2xl sm:text-4xl font-black text-anthracite-900 text-left">{toptanciHakedisleri.toLocaleString('tr-TR')} <span className="text-xl text-anthracite-400">₺</span></h3>
               </div>
             </div>
 
@@ -183,17 +183,17 @@ export default function AdminDashboard() {
                  </h2>
                  <div className="space-y-4">
                    {waitingOrders.length === 0 ? (
-                     <p className="text-sm font-semibold text-anthracite-400 text-center py-10 bg-anthracite-50 rounded-2xl">Ödeme bekleyen sipariş bulunmuyor.</p>
+                     <p className="text-sm font-semibold text-anthracite-400 text-center py-10 bg-anthracite-50 rounded-2xl border border-dashed border-anthracite-200">Ödeme bekleyen sipariş bulunmuyor.</p>
                    ) : waitingOrders.map(order => (
-                     <div key={order.id} className="p-6 bg-amber-50/50 border border-amber-100 rounded-3xl flex flex-col gap-4">
+                     <div key={order.id} className="p-5 sm:p-6 bg-amber-50/50 border border-amber-100 rounded-3xl flex flex-col gap-4">
                         <div className="flex justify-between items-start">
-                           <div>
-                             <h3 className="font-black text-xl text-anthracite-900">{order.buyer_name}</h3>
-                             <p className="text-sm font-bold text-anthracite-500">{order.product_name}</p>
+                           <div className="max-w-[70%] text-left">
+                             <h3 className="font-black text-lg sm:text-xl text-anthracite-900 break-words">{order.buyer_name}</h3>
+                             <p className="text-xs sm:text-sm font-bold text-anthracite-500 line-clamp-1">{order.product_name}</p>
                            </div>
-                           <span className="text-2xl font-black text-amber-600">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
+                           <span className="text-xl sm:text-2xl font-black text-amber-600 shrink-0">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
                         </div>
-                        <button onClick={()=>approveOrderPayment(order.id, order.wholesaler?.business_name)} className="w-full py-4 bg-anthracite-900 text-white font-black text-sm rounded-2xl shadow-xl transition-all hover:bg-black">TEYİT EDİLDİ - ONAYLA</button>
+                        <button onClick={()=>approveOrderPayment(order.id, order.wholesaler?.business_name)} className="w-full py-4 bg-anthracite-900 text-white font-black text-[10px] sm:text-sm uppercase tracking-widest rounded-2xl shadow-xl transition-all hover:bg-black">TEYİT EDİLDİ - ONAYLA</button>
                      </div>
                    ))}
                  </div>
@@ -205,31 +205,33 @@ export default function AdminDashboard() {
                  </h2>
                  <div className="space-y-4">
                    {activeOrders.length === 0 ? (
-                     <p className="text-sm font-semibold text-anthracite-400 text-center py-10 bg-white rounded-2xl">Aktif kargo süreci bulunmuyor.</p>
+                     <p className="text-sm font-semibold text-anthracite-400 text-center py-10 bg-white rounded-2xl border border-dashed border-anthracite-200">Aktif kargo süreci bulunmuyor.</p>
                    ) : activeOrders.map(order => (
-                     <div key={order.id} className="p-6 bg-white border border-anthracite-100 rounded-3xl flex flex-col gap-3 shadow-sm relative group">
-                        <div className="flex justify-between items-start">
-                           <div>
-                             <span className={`text-[10px] font-black tracking-widest px-3 py-1 rounded-full border ${order.status === 'shipped' ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
+                     <div key={order.id} className="p-5 sm:p-6 bg-white border border-anthracite-100 rounded-3xl flex flex-col gap-4 shadow-sm relative group">
+                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                           <div className="text-left w-full sm:w-auto">
+                             <span className={`inline-block text-[9px] font-black tracking-widest px-2.5 py-1 rounded-full border ${order.status === 'shipped' ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
                                {order.status === 'shipped' ? 'KARGOLANDI' : 'ÜRETİM/STOK'}
                              </span>
-                             <h3 className="font-black text-lg text-anthracite-900 mt-3">{order.buyer_name}</h3>
-                             <p className="text-xs font-bold text-anthracite-500">Tedarikçi: {order.wholesaler?.business_name || 'Bilinmiyor'}</p>
+                             <h3 className="font-black text-base sm:text-lg text-anthracite-900 mt-2 break-words">{order.buyer_name}</h3>
+                             <p className="text-[10px] font-bold text-anthracite-500 uppercase tracking-widest">Tedarikçi: {order.wholesaler?.business_name || 'Bilinmiyor'}</p>
                            </div>
-                             <div className="flex items-center gap-2">
-                               <span className="text-2xl font-black">{order.quantity} Adet</span>
+                           <div className="flex items-center sm:items-end sm:flex-col justify-between sm:justify-start w-full sm:w-auto gap-3">
+                             <span className="text-xl sm:text-2xl font-black">{order.quantity} Adet</span>
+                             <div className="flex gap-2">
                                {order.status === 'shipped' && (
-                                 <button onClick={() => archiveOrder(order.id)} className="opacity-0 group-hover:opacity-100 bg-anthracite-900 text-white p-2 rounded-xl transition-all hover:bg-emerald-500" title="Arşivle">
+                                 <button onClick={() => archiveOrder(order.id)} className="bg-anthracite-900 text-white p-2.5 rounded-xl transition-all sm:opacity-0 sm:group-hover:opacity-100 hover:bg-emerald-500" title="Arşivle">
                                    <FolderArchive className="w-4 h-4" />
                                  </button>
                                )}
-                               <button onClick={() => exportInvoicePDF(order)} className="bg-blue-600 text-white p-2 rounded-xl hover:bg-blue-700 transition-all font-bold text-xs flex items-center gap-1" title="PDF Fatura">
+                               <button onClick={() => exportInvoicePDF(order)} className="bg-blue-600 text-white p-2.5 rounded-xl hover:bg-blue-700 transition-all font-bold text-[10px] flex items-center gap-1.5" title="PDF Fatura">
                                  <FileText className="w-4 h-4" /> PDF
                                </button>
                              </div>
+                           </div>
                         </div>
                         {order.status === 'shipped' && order.tracking_number && (
-                          <div className="mt-2 bg-blue-50 text-blue-800 p-3 rounded-xl border border-blue-100 text-[10px] font-black tracking-widest text-center">
+                          <div className="bg-blue-50 text-blue-800 p-3 rounded-xl border border-blue-100 text-[10px] font-black tracking-widest text-center break-all shadow-inner">
                             TAKİP NO: {order.tracking_number}
                           </div>
                         )}
@@ -243,27 +245,27 @@ export default function AdminDashboard() {
 
         {/* TAB: TOPTANCI HAKEDİŞLERİ */}
         {activeTab === 'payments' && (
-          <div className="bg-white border-2 border-anthracite-100 rounded-[2.5rem] p-10 shadow-xl">
-            <h2 className="text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
-               <Wallet className="w-7 h-7 text-emerald-500" /> Toptancı Hakediş Hesapları
+          <div className="bg-white border-2 border-anthracite-100 rounded-[2rem] p-6 sm:p-10 shadow-xl">
+            <h2 className="text-xl sm:text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
+               <Wallet className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-500" /> Toptancı Hakediş Hesapları
             </h2>
-            <p className="text-anthracite-500 font-medium mb-8">Hangi toptancıya toplamda ne kadar ödeme yapılması gerektiğini buradan takip edebilirsiniz.</p>
+            <p className="text-anthracite-500 font-medium mb-8 text-xs sm:text-sm text-left">Tüm hakedişleri buradan takip edebilirsiniz.</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                {Object.entries(wholesalerSummary).length === 0 ? (
-                 <p className="col-span-full text-center py-20 font-bold text-anthracite-400">Henüz hakedişi oluşmuş bir toptancı bulunmuyor.</p>
+                 <p className="col-span-full text-center py-20 font-bold text-anthracite-400 text-sm">Henüz hakedişi oluşmuş bir toptancı bulunmuyor.</p>
                ) : Object.entries(wholesalerSummary).map(([name, data]: [any, any]) => (
-                 <div key={name} className="bg-anthracite-50 border border-anthracite-100 rounded-3xl p-8 flex flex-col gap-4 shadow-sm hover:shadow-lg transition-all">
-                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
-                       <Store className="w-6 h-6 text-anthracite-400" />
+                 <div key={name} className="bg-anthracite-50 border border-anthracite-100 rounded-[2rem] p-6 sm:p-8 flex flex-col gap-4 shadow-sm hover:shadow-lg transition-all text-left">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm">
+                       <Store className="w-5 h-5 sm:w-6 sm:h-6 text-anthracite-400" />
                     </div>
                     <div>
-                       <h3 className="font-black text-xl text-anthracite-900">{name}</h3>
-                       <p className="text-xs font-bold text-anthracite-500 uppercase tracking-widest mt-1">{data.count} Aktif Sipariş</p>
+                       <h3 className="font-black text-lg sm:text-xl text-anthracite-900 break-words">{name}</h3>
+                       <p className="text-[10px] font-black text-anthracite-500 uppercase tracking-widest mt-1">{data.count} Aktif Sipariş</p>
                     </div>
-                    <div className="mt-4 pt-4 border-t border-anthracite-200">
-                       <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Toplam Alacak</p>
-                       <span className="text-3xl font-black text-emerald-600">{data.total.toLocaleString('tr-TR')} ₺</span>
+                    <div className="mt-2 pt-4 border-t border-anthracite-200">
+                       <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1">Toplam Alacak</p>
+                       <span className="text-2xl sm:text-3xl font-black text-emerald-600">{data.total.toLocaleString('tr-TR')} ₺</span>
                     </div>
                  </div>
                ))}
@@ -273,26 +275,26 @@ export default function AdminDashboard() {
 
         {/* TAB: ÜYE ONAYLARI */}
         {activeTab === 'approvals' && (
-          <div className="bg-white border-2 border-anthracite-100 rounded-[2.5rem] p-10 shadow-xl">
-             <h2 className="text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
-               <ShieldCheck className="w-7 h-7 text-blue-500" /> Onay Bekleyen Hesaplar
+          <div className="bg-white border-2 border-anthracite-100 rounded-[2rem] p-6 sm:p-10 shadow-xl">
+             <h2 className="text-xl sm:text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3 text-left">
+               <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-blue-500" /> Onay Bekleyenler
              </h2>
-             <p className="text-anthracite-500 font-medium mb-8">Platforma girmek için giriş yapmış ve admin teyidi bekleyen üyeler.</p>
+             <p className="text-anthracite-500 font-medium mb-8 text-xs sm:text-sm text-left">Giriş yapmış ve onay bekleyen tüm üyeler.</p>
              <div className="space-y-4">
                 {profiles.length === 0 ? (
-                  <p className="text-center py-20 font-bold text-anthracite-400">Bekleyen üyelik talebi yok.</p>
+                  <p className="text-center py-20 font-bold text-anthracite-400 text-sm">Bekleyen üyelik talebi yok.</p>
                 ) : profiles.map(profile => (
-                  <div key={profile.id} className="flex flex-col sm:flex-row items-center justify-between p-6 bg-anthracite-50 rounded-[2rem] border border-anthracite-100 gap-6">
-                     <div className="flex items-center gap-5 mr-auto">
-                        <div className={`p-4 rounded-2xl ${profile.role === 'toptanci' ? 'bg-emerald-500' : 'bg-blue-500'} text-white shadow-xl`}>
+                  <div key={profile.id} className="flex flex-col md:flex-row items-center justify-between p-5 bg-anthracite-50 rounded-3xl border border-anthracite-100 gap-6 text-left">
+                     <div className="flex items-center gap-4 mr-auto text-left w-full">
+                        <div className={`p-4 rounded-2xl ${profile.role === 'toptanci' ? 'bg-emerald-500' : 'bg-blue-500'} text-white shadow-xl shrink-0`}>
                           {profile.role === 'toptanci' ? <Store /> : <UserRound />}
                         </div>
-                        <div>
-                           <h3 className="font-black text-xl">{profile.business_name || 'İsimsiz Üye'}</h3>
-                           <span className="text-xs font-bold uppercase tracking-widest opacity-50">{profile.role === 'toptanci' ? 'Toptancı' : 'Butik'}</span>
+                        <div className="min-w-0">
+                           <h3 className="font-black text-lg break-words">{profile.business_name || 'İsimsiz Üye'}</h3>
+                           <span className="text-[10px] font-black uppercase tracking-widest opacity-50 block sm:inline">{profile.role === 'toptanci' ? 'Toptancı Firması' : 'Butik Müşterisi'}</span>
                         </div>
                      </div>
-                     <button onClick={() => approveUser(profile.id, profile.role)} className="bg-anthracite-900 text-white px-8 py-4 rounded-2xl font-black text-sm shadow-xl hover:bg-black transition-all">YETKİ VER VE ONAYLA</button>
+                     <button onClick={() => approveUser(profile.id, profile.role)} className="w-full md:w-auto bg-anthracite-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-xl hover:bg-black transition-all">ONAYLA</button>
                   </div>
                 ))}
              </div>
@@ -301,28 +303,28 @@ export default function AdminDashboard() {
 
         {/* TAB: ARŞİV */}
         {activeTab === 'archive' && (
-           <div className="bg-white border-2 border-anthracite-100 rounded-[2.5rem] p-10 shadow-xl">
-              <h2 className="text-2xl font-black text-anthracite-900 mb-8 flex items-center gap-3">
-                <Archive className="w-7 h-7 text-anthracite-400" /> Sipariş Geçmişi (Arşiv)
+           <div className="bg-white border-2 border-anthracite-100 rounded-[2rem] p-6 sm:p-10 shadow-xl">
+              <h2 className="text-xl sm:text-2xl font-black text-anthracite-900 mb-8 flex items-center gap-3 text-left">
+                <Archive className="w-6 h-6 sm:w-7 sm:h-7 text-anthracite-400" /> Arşivlenmiş Kayıtlar
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-4 overflow-hidden">
                 {archivedOrdersList.length === 0 ? (
-                  <p className="text-center py-20 font-bold text-anthracite-400">Arşivlenmiş sipariş bulunmuyor.</p>
+                  <p className="text-center py-20 font-bold text-anthracite-400 text-sm">Arşivlenmiş sipariş bulunmuyor.</p>
                 ) : archivedOrdersList.map(order => (
-                  <div key={order.id} className="p-6 border-b border-anthracite-100 flex justify-between items-center opacity-70">
-                     <div className="flex items-center gap-4">
-                        <Package className="w-10 h-10 text-anthracite-300" />
-                        <div>
-                           <h3 className="font-bold text-lg">{order.product_name}</h3>
-                           <p className="text-xs font-medium text-anthracite-500">{order.buyer_name} | {new Date(order.created_at).toLocaleDateString('tr-TR')}</p>
+                  <div key={order.id} className="p-4 sm:p-6 border-b border-anthracite-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-anthracite-50/30 rounded-2xl sm:rounded-none">
+                     <div className="flex items-center gap-4 text-left w-full sm:w-auto">
+                        <Package className="w-8 h-8 sm:w-10 sm:h-10 text-anthracite-200 shrink-0" />
+                        <div className="min-w-0 text-left">
+                           <h3 className="font-bold text-base sm:text-lg break-words line-clamp-1">{order.product_name}</h3>
+                           <p className="text-[10px] sm:text-xs font-semibold text-anthracite-400 uppercase tracking-widest">{order.buyer_name} | {new Date(order.created_at).toLocaleDateString('tr-TR')}</p>
                         </div>
                      </div>
-                     <div className="flex items-center gap-3">
-                        <div className="text-right">
-                           <span className="block font-black text-xl">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
-                           <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">Kargolandı</span>
+                     <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-0 border-anthracite-100">
+                        <div className="text-left sm:text-right">
+                           <span className="block font-black text-lg sm:text-xl">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
+                           <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md uppercase border border-emerald-100">Tamamlandı</span>
                         </div>
-                        <button onClick={() => exportInvoicePDF(order)} className="p-3 bg-anthracite-100 rounded-2xl hover:bg-white border hover:border-anthracite-900 transition-all text-anthracite-900" title="PDF Dökümü Al">
+                        <button onClick={() => exportInvoicePDF(order)} className="p-3 bg-white border border-anthracite-200 rounded-xl hover:bg-anthracite-900 hover:text-white transition-all text-anthracite-700 shadow-sm" title="PDF Çıktısı Al">
                           <Printer className="w-5 h-5" />
                         </button>
                      </div>
