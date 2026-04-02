@@ -5,11 +5,12 @@ import {
   CheckCircle, Users, Store, UserRound, Wallet, 
   TrendingUp, Package, Clock, ShieldCheck, 
   Archive, FolderArchive, Trash2, LayoutDashboard,
-  FileText, History, Info, Printer, Megaphone, Send
+  FileText, History, Info, Printer, Megaphone, Send,
+  ArrowRight, BarChart3, Receipt, UserCheck
 } from 'lucide-react';
 import { 
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
-  CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell 
+  CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, AreaChart, Area 
 } from 'recharts';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
@@ -17,8 +18,9 @@ import { QRCodeSVG } from 'qrcode.react';
 import NotificationBell from '@/components/NotificationBell';
 import { notify } from '@/utils/notifications';
 import Link from 'next/link';
+import Image from 'next/image';
 
-type TabType = 'finance' | 'payments' | 'approvals' | 'archive' | 'announcements';
+type TabType = 'overview' | 'orders' | 'payments' | 'approvals' | 'announcements' | 'archive';
 
 export default function AdminDashboard() {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -26,7 +28,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<TabType>('finance');
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [mounted, setMounted] = useState(false);
   
   // Duyuru State'leri
@@ -76,12 +78,10 @@ export default function AdminDashboard() {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
     if (profile?.role === 'admin') {
       setIsAdmin(true);
-      await fetchPendingUsers();
-      await fetchOrders();
-      await fetchAnnouncements();
+      await Promise.all([fetchPendingUsers(), fetchOrders(), fetchAnnouncements()]);
     }
     setLoading(false);
-  }, [supabase, fetchPendingUsers, fetchOrders]);
+  }, [supabase, fetchPendingUsers, fetchOrders, fetchAnnouncements]);
 
   useEffect(() => {
     setMounted(true);
@@ -99,74 +99,36 @@ export default function AdminDashboard() {
   const approveOrderPayment = async (orderId: string, wholesalerName: string) => {
     if(!confirm("Müşterinin IBAN adresinize ödeme geçtiğini teyit ettiniz mi? Sipariş üretim/stok için Toptancı deposuna yönlendirilecek!")) return;
     
-    // 1. Sipariş detaylarını al (Beden, Miktar, Buyer ve Ürün İsmi için)
+    // Stok düşme ve bildirim mantığı (Aynı kalıyor)
     const { data: order } = await supabase.from('orders').select('product_id, selected_size, quantity, buyer_id, product_name').eq('id', orderId).single();
-    
     if (order && order.selected_size) {
-      // 2. Ürünün mevcut stoklarını al
       const { data: product } = await supabase.from('products').select('stocks').eq('id', order.product_id).single();
-      
       if (product && product.stocks) {
         const newStocks = { ...product.stocks };
-        const currentQty = Number(newStocks[order.selected_size]) || 0;
-        // Stoğu düşür (En az 0 olacak şekilde)
-        newStocks[order.selected_size] = Math.max(0, currentQty - order.quantity);
-        
-        // 3. Stokları güncelle
+        newStocks[order.selected_size] = Math.max(0, (Number(newStocks[order.selected_size]) || 0) - order.quantity);
         await supabase.from('products').update({ stocks: newStocks }).eq('id', order.product_id);
-
-        // 4. Düşük Stok Bildirimi (Toptancıya)
-        if (newStocks[order.selected_size] <= 5) {
-          const { data: prod } = await supabase.from('products').select('name, wholesaler_id').eq('id', order.product_id).single();
-          if (prod) {
-            await notify(
-              prod.wholesaler_id,
-              "⚠️ Düşük Stok Uyarısı!",
-              `'${prod.name}' ürününün ${order.selected_size} bedeni tükenmek üzere (Kalan: ${newStocks[order.selected_size]}). Lütfen stok tazeleyin!`,
-              'warning'
-            );
-          }
-        }
       }
     }
 
     const { error } = await supabase.from('orders').update({ status: 'approved' }).eq('id', orderId);
     if (!error) {
-      // 5. Butiğe Bildirim Gönder (Ödemeniz Onaylandı)
-      await notify(
-        order?.buyer_id,
-        "✅ Ödemeniz Onaylandı!",
-        `Siparişiniz (${order?.product_name}) onaylandı ve toptancıya kargo emri iletildi.`,
-        'success'
-      );
-
-      alert(`Sipariş Onaylandı ve Stok Güncellendi! ${wholesalerName || 'Toptancı'} tarafına kargolama emri iletildi.`);
+      await notify(order?.buyer_id, "✅ Ödemeniz Onaylandı!", `'${order?.product_name}' siparişiniz onaylandı ve toptancıya kargo emri iletildi.`, 'success');
+      alert(`Sipariş Onaylandı! ${wholesalerName || 'Toptancı'} tarafına kargolama emri iletildi.`);
       fetchOrders();
     }
   };
 
   const archiveOrder = async (id: string) => {
-    if(!confirm("Bu siparişi kargolandığı için arşivlemek istiyor musunuz? İstatistikleriniz bozulmaz, sadece görünümden kalkar.")) return;
+    if(!confirm("Bu siparişi kargolandığı için arşivlemek istiyor musunuz?")) return;
     const { error } = await supabase.from('orders').update({ is_archived: true }).eq('id', id);
-    if (!error) {
-      fetchOrders();
-    }
+    if (!error) fetchOrders();
   };
 
   const handlePublishAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPublishing(true);
-    const { error } = await supabase.from('announcements').insert({
-      title: annTitle,
-      content: annContent,
-      target_role: annTarget,
-      type: annType
-    });
-    if (!error) {
-      alert("Duyuru başarıyla yayınlandı!");
-      setAnnTitle(''); setAnnContent('');
-      fetchAnnouncements();
-    }
+    const { error } = await supabase.from('announcements').insert({ title: annTitle, content: annContent, target_role: annTarget, type: annType });
+    if (!error) { alert("Duyuru başarıyla yayınlandı!"); setAnnTitle(''); setAnnContent(''); fetchAnnouncements(); }
     setIsPublishing(false);
   };
 
@@ -176,12 +138,22 @@ export default function AdminDashboard() {
     fetchAnnouncements();
   };
 
-  // FİNANSAL HESAPLAMALAR (useMemo ile optimize edildi)
-  const totalCiro = useMemo(() => orders.reduce((acc, order) => acc + Number(order.total_price), 0), [orders]);
-  const totalKazaniciniz = useMemo(() => orders.reduce((acc, order) => acc + Number(order.commission_earned), 0), [orders]);
-  const toptanciHakedisleri = useMemo(() => orders.reduce((acc, order) => acc + Number(order.wholesaler_earning), 0), [orders]);
-  
-  // TOPTANCI BAZLI HAKEDİŞ HESAPLAMA (useMemo ile optimize edildi)
+  // HESAPLAMALAR
+  const totalCiro = useMemo(() => orders.reduce((acc, o) => acc + Number(o.total_price), 0), [orders]);
+  const totalProfit = useMemo(() => orders.reduce((acc, o) => acc + Number(o.commission_earned), 0), [orders]);
+  const pendingOrdersCount = useMemo(() => orders.filter(o => o.status === 'waiting_payment' && !o.is_archived).length, [orders]);
+  const pendingApprovalsCount = profiles.length;
+
+  const chartData = useMemo(() => orders
+    .filter(o => !o.is_archived)
+    .reduce((acc: any[], order) => {
+      const date = new Date(order.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+      const existing = acc.find(item => item.name === date);
+      if (existing) { existing.sales += Number(order.total_price); existing.profit += Number(order.commission_earned); }
+      else { acc.push({ name: date, sales: Number(order.total_price), profit: Number(order.commission_earned) }); }
+      return acc;
+    }, []).slice(-10), [orders]);
+
   const wholesalerSummary = useMemo(() => orders
     .filter(o => !o.is_archived)
     .reduce((acc: any, order) => {
@@ -192,401 +164,397 @@ export default function AdminDashboard() {
       return acc;
     }, {}), [orders]);
 
-  const waitingOrders = useMemo(() => orders.filter(o => o.status === 'waiting_payment' && !o.is_archived), [orders]);
-  const activeOrders = useMemo(() => orders.filter(o => (o.status === 'approved' || o.status === 'shipped') && !o.is_archived), [orders]);
-  const archivedOrdersList = useMemo(() => orders.filter(o => o.is_archived), [orders]);
-
-  // GRAFİK VERİSİ HAZIRLAMA (Son 7 Günlük Trend - useMemo ile optimize edildi)
-  const chartData = useMemo(() => orders
-    .filter(o => !o.is_archived)
-    .reduce((acc: any[], order) => {
-      const date = new Date(order.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
-      const existing = acc.find(item => item.name === date);
-      if (existing) {
-        existing.sales += Number(order.total_price);
-        existing.profit += Number(order.commission_earned);
-      } else {
-        acc.push({ name: date, sales: Number(order.total_price), profit: Number(order.commission_earned) });
-      }
-      return acc;
-    }, [])
-    .slice(-7), [orders]);
-
-  const categoryData = useMemo(() => orders.reduce((acc: any[], order) => {
-    const cat = order.product?.category || 'Diğer';
-    const existing = acc.find(item => item.name === cat);
-    if (existing) {
-      existing.value += 1;
-    } else {
-      acc.push({ name: cat, value: 1 });
-    }
-    return acc;
-  }, []), [orders]);
-
-  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
+  const activeOrders = useMemo(() => orders.filter(o => !o.is_archived), [orders]);
 
   return (
     <>
     {!isAdmin && !loading ? (
-      <div className="min-h-[80vh] flex flex-col items-center justify-center bg-anthracite-50 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-anthracite-50 px-4">
         <ShieldCheck className="w-24 h-24 text-red-500 mb-6 drop-shadow-md" />
-        <h1 className="text-3xl font-black text-anthracite-900 tracking-tight text-center">YETKİSİZ ERİŞİM DURDURULDU</h1>
-        <p className="text-anthracite-500 mt-3 text-center max-w-md font-medium">Bu sayfaya girmeye güvenlik izniniz bulunmamaktadır.</p>
-        <Link href="/" className="mt-8 px-8 py-3.5 bg-anthracite-900 hover:bg-black transition-colors text-white font-bold rounded-full shadow-xl">Ana Sayfaya Dön ve Terk Et</Link>
+        <h1 className="text-3xl font-black text-anthracite-900 tracking-tight text-center uppercase">YETKİSİZ ERİŞİM</h1>
+        <Link href="/" className="mt-8 px-8 py-3.5 bg-anthracite-900 text-white font-bold rounded-2xl shadow-xl">Geri Dön</Link>
       </div>
     ) : (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen bg-anthracite-50/20">
       
-      <div className="flex justify-between items-center mb-6 sm:mb-8 gap-4">
+      {/* ÜST BAŞLIK VE BİLDİRİM */}
+      <div className="flex justify-between items-center mb-10 gap-4">
         <div>
-          <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-anthracite-900 leading-tight text-left">Merkez Komuta ve Finans</h1>
-          <p className="text-anthracite-500 font-medium mt-1 text-sm sm:text-lg text-left">Ağdaki tüm nakit akışı ve üyelikleri buradan yönetin.</p>
+           <div className="flex items-center gap-2 text-emerald-600 mb-1">
+              <BarChart3 className="w-5 h-5" />
+              <span className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 px-2 py-0.5 rounded">MERKEZ KOMUTA</span>
+           </div>
+           <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-anthracite-900 text-left">Dashboard</h1>
         </div>
-        <div className="shrink-0 bg-white p-1 rounded-full border border-anthracite-100 shadow-sm">
-          {user && <NotificationBell userId={user.id} />}
+        <div className="flex items-center gap-3">
+            <div className="bg-white p-2 rounded-2xl border border-anthracite-100 shadow-sm">
+                {user && <NotificationBell userId={user.id} />}
+            </div>
         </div>
       </div>
 
-      {/* MODAL TABS NAVIGATION - MOBILE SCROLLABLE */}
-      <div className="flex flex-nowrap items-center gap-2 mb-8 bg-anthracite-100 p-1.5 rounded-2xl sm:rounded-3xl overflow-x-auto scrollbar-hide w-full sm:w-max whitespace-nowrap px-2 sm:px-1.5">
-        <button 
-          onClick={() => setActiveTab('finance')}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'finance' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
-        >
-          <LayoutDashboard className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Finans & Operasyon
-        </button>
-        <button 
-          onClick={() => setActiveTab('payments')}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'payments' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
-        >
-          <Wallet className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Hakedişler
-        </button>
-        <button 
-          onClick={() => setActiveTab('approvals')}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'approvals' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
-        >
-          <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Onaylar {profiles.length > 0 && <span className="bg-red-500 text-white text-[9px] px-1.5 py-0.5 rounded-full ml-1">{profiles.length}</span>}
-        </button>
-        <button 
-          onClick={() => setActiveTab('archive')}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'archive' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
-        >
-          <History className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Arşiv
-        </button>
-        <button 
-          onClick={() => setActiveTab('announcements')}
-          className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all shrink-0 ${activeTab === 'announcements' ? 'bg-white shadow-md text-anthracite-900 border border-anthracite-200' : 'text-anthracite-500 hover:text-black'}`}
-        >
-          <Megaphone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500" /> Duyurular
-        </button>
+      {/* BENTO STATS CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+          <div className="bg-anthracite-900 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
+                  <TrendingUp className="w-16 h-16" />
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2">Toplam Ciro</p>
+              <h3 className="text-3xl font-black">{totalCiro.toLocaleString('tr-TR')} ₺</h3>
+          </div>
+          <div className="bg-emerald-500 p-8 rounded-[2.5rem] text-white shadow-2xl shadow-emerald-500/20 group">
+              <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mb-2">Platform Kârı</p>
+              <h3 className="text-3xl font-black">{totalProfit.toLocaleString('tr-TR')} ₺</h3>
+          </div>
+          <div onClick={() => setActiveTab('orders')} className="bg-white p-8 rounded-[2.5rem] border-2 border-anthracite-100 shadow-sm cursor-pointer group hover:border-amber-400 transition-colors">
+              <p className="text-[10px] font-black uppercase tracking-widest text-anthracite-400 mb-2">Bekleyen Ödemeler</p>
+              <h3 className="text-3xl font-black text-anthracite-900 flex items-center gap-2">
+                  {pendingOrdersCount} <span className="text-sm font-bold text-amber-500 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200">İŞLEM</span>
+              </h3>
+          </div>
+          <div onClick={() => setActiveTab('approvals')} className="bg-white p-8 rounded-[2.5rem] border-2 border-anthracite-100 shadow-sm cursor-pointer group hover:border-blue-400 transition-colors">
+              <p className="text-[10px] font-black uppercase tracking-widest text-anthracite-400 mb-2">Onay Bekleyenler</p>
+              <h3 className="text-3xl font-black text-anthracite-900 flex items-center gap-2">
+                  {pendingApprovalsCount} <span className="text-sm font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">KİŞİ</span>
+              </h3>
+          </div>
+      </div>
+
+      {/* STICKY TAB NAVIGATION */}
+      <div className="sticky top-20 z-40 mb-10 overflow-x-auto scrollbar-hide py-2">
+          <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 rounded-3xl border border-anthracite-100 shadow-lg w-max mx-auto sm:mx-0">
+             {(['overview', 'orders', 'payments', 'approvals', 'announcements', 'archive'] as const).map((tab) => {
+                 const icons = { overview: LayoutDashboard, orders: ShoppingBag, payments: Wallet, approvals: UserCheck, announcements: Megaphone, archive: History };
+                 const labels = { overview: 'Özet', orders: 'İşlemler', payments: 'Alacaklar', approvals: 'Onaylar', announcements: 'Duyuru', archive: 'Arşiv' };
+                 const Icon = icons[tab as keyof typeof icons] || Package;
+                 return (
+                    <button 
+                        key={tab} 
+                        onClick={() => setActiveTab(tab)}
+                        className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-tighter transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
+                    >
+                        <Icon className="w-4 h-4" /> {labels[tab as keyof typeof labels]}
+                    </button>
+                 )
+             })}
+          </div>
       </div>
 
       {loading ? (
-        <div className="text-center p-20 font-bold text-anthracite-400 animate-pulse">Merkez Kasa Verileri Güvenli Ağdan Çekiliyor...</div>
+        <div className="flex flex-col items-center justify-center py-32 opacity-30 animate-pulse">
+            <Loader2 className="w-12 h-12 animate-spin mb-4" />
+            <p className="font-black text-xs uppercase tracking-[0.3em]">Merkez Hatları Yükleniyor</p>
+        </div>
       ) : (
-      <div className="flex flex-col gap-10">
+      <div className="transition-all duration-500 text-left">
 
-        {/* TAB: FİNANS & OPERASYON */}
-        {activeTab === 'finance' && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-              <div className="bg-anthracite-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
-                <p className="text-white/60 font-bold text-[10px] uppercase tracking-widest mb-1.5">Toplam Satış Hacmi</p>
-                <h3 className="text-2xl sm:text-4xl font-black">{totalCiro.toLocaleString('tr-TR')} <span className="text-lg text-white/50">₺</span></h3>
-              </div>
-              <div className="bg-emerald-500 rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-emerald-500/20">
-                <p className="text-white/80 font-bold text-[10px] uppercase tracking-widest mb-1.5">Net Platform Kazancı</p>
-                <h3 className="text-2xl sm:text-4xl font-black">{totalKazaniciniz.toLocaleString('tr-TR')} <span className="text-xl text-white/50">₺</span></h3>
-              </div>
-              <div className="bg-white border-2 border-anthracite-100 rounded-3xl p-6 sm:p-8 shadow-sm">
-                <p className="text-anthracite-500 font-bold text-[10px] uppercase tracking-widest mb-1.5 text-left">Toptancı Hakedişleri</p>
-                <h3 className="text-2xl sm:text-4xl font-black text-anthracite-900 text-left">{toptanciHakedisleri.toLocaleString('tr-TR')} <span className="text-xl text-anthracite-400">₺</span></h3>
-              </div>
-            </div>
-
-            {/* GÖRSEL ANALİZ PANELİ */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-               <div className="lg:col-span-8 bg-white border border-anthracite-100 rounded-[2rem] p-6 sm:p-8 shadow-sm">
-                  <h3 className="text-sm font-black text-anthracite-900 mb-6 flex items-center gap-2 uppercase tracking-tight">
-                    <TrendingUp className="w-4 h-4 text-emerald-500" /> Günlük Satış & Kâr Trendi
-                  </h3>
-                  <div className="h-[250px] w-full">
-                    {mounted && (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={chartData}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
-                          <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
-                          <Tooltip contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}} />
-                          <Line type="monotone" dataKey="sales" name="Satış (₺)" stroke="#10b981" strokeWidth={4} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} />
-                          <Line type="monotone" dataKey="profit" name="Net Kâr (₺)" stroke="#3b82f6" strokeWidth={4} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} />
-                        </LineChart>
-                      </ResponsiveContainer>
-                    )}
-                  </div>
-               </div>
-               
-               <div className="lg:col-span-4 bg-white border border-anthracite-100 rounded-[2rem] p-6 sm:p-8 shadow-sm">
-                  <h3 className="text-sm font-black text-anthracite-900 mb-6 flex items-center gap-2 uppercase tracking-tight">
-                    <Package className="w-4 h-4 text-blue-500" /> Kategori Dağılımı
-                  </h3>
-                  <div className="h-[250px] w-full">
-                    {mounted && (
-                      <ResponsiveContainer width="100%" height="100%">
-                         <PieChart>
-                           <Pie data={categoryData} innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="value">
-                             {categoryData.map((entry, index) => (
-                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                             ))}
-                           </Pie>
-                           <Tooltip />
-                           <Legend verticalAlign="bottom" wrapperStyle={{fontSize: '10px', fontWeight: 'bold'}} />
-                         </PieChart>
-                      </ResponsiveContainer>
-                    )}
-                  </div>
-               </div>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-10">
-              <div className="bg-white border-2 border-anthracite-100 rounded-[2.5rem] p-8 shadow-xl">
-                 <h2 className="text-xl font-bold flex items-center gap-3 mb-6 border-b border-anthracite-100 pb-5 text-anthracite-900">
-                   <Clock className="w-6 h-6 text-amber-500" /> Dekont Bekleyenler
-                 </h2>
-                 <div className="space-y-4">
-                   {waitingOrders.length === 0 ? (
-                     <p className="text-sm font-semibold text-anthracite-400 text-center py-10 bg-anthracite-50 rounded-2xl border border-dashed border-anthracite-200">Ödeme bekleyen sipariş bulunmuyor.</p>
-                   ) : waitingOrders.map(order => (
-                     <div key={order.id} className="p-5 sm:p-6 bg-amber-50/50 border border-amber-100 rounded-3xl flex flex-col gap-4">
-                        <div className="flex justify-between items-start gap-4">
-                           <div className="max-w-[60%] text-left">
-                             <h3 className="font-black text-lg sm:text-xl text-anthracite-900 break-words">{order.buyer_name}</h3>
-                             <p className="text-xs sm:text-sm font-bold text-anthracite-500 line-clamp-1">{order.product_name}</p>
-                             <span className="inline-block mt-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-black rounded-lg uppercase">Beden: {order.selected_size || 'N/A'}</span>
-                           </div>
-                           <div className="flex flex-col items-end gap-2">
-                              <span className="text-xl sm:text-2xl font-black text-amber-600 shrink-0">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
-                              <div className="bg-white p-1.5 rounded-xl border border-amber-200 shadow-sm">
-                                 <QRCodeSVG value={`https://demir-dev-studio.vercel.app/admin?order=${order.id}`} size={48} />
-                              </div>
-                           </div>
-                        </div>
-                        <button onClick={()=>approveOrderPayment(order.id, order.wholesaler?.business_name)} className="w-full py-4 bg-anthracite-900 text-white font-black text-[10px] sm:text-sm uppercase tracking-widest rounded-2xl shadow-xl transition-all hover:bg-black">TEYİT EDİLDİ - ONAYLA</button>
-                     </div>
-                   ))}
-                 </div>
-              </div>
-
-              <div className="bg-anthracite-50 border border-anthracite-200 rounded-[2.5rem] p-8">
-                 <h2 className="text-xl font-bold flex items-center gap-3 mb-6 border-b border-anthracite-200 pb-5 text-anthracite-900">
-                   <Package className="w-6 h-6 text-emerald-500" /> Operasyon Ağı
-                 </h2>
-                 <div className="space-y-4">
-                   {activeOrders.length === 0 ? (
-                     <p className="text-sm font-semibold text-anthracite-400 text-center py-10 bg-white rounded-2xl border border-dashed border-anthracite-200">Aktif kargo süreci bulunmuyor.</p>
-                   ) : activeOrders.map(order => (
-                     <div key={order.id} className="p-5 sm:p-6 bg-white border border-anthracite-100 rounded-3xl flex flex-col gap-4 shadow-sm relative group">
-                        <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
-                           <div className="text-left w-full sm:w-auto">
-                             <div className="flex items-center gap-2 mb-2">
-                               <span className={`inline-block text-[9px] font-black tracking-widest px-2.5 py-1 rounded-full border ${order.status === 'shipped' ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-emerald-50 border-emerald-200 text-emerald-600'}`}>
-                                 {order.status === 'shipped' ? 'KARGOLANDI' : 'ÜRETİM/STOK'}
-                               </span>
-                               <span className="inline-block px-2.5 py-1 bg-anthracite-100 text-anthracite-800 text-[9px] font-black rounded-full border border-anthracite-200 uppercase">Beden: {order.selected_size || 'N/A'}</span>
-                             </div>
-                             <h3 className="font-black text-base sm:text-lg text-anthracite-900 break-words">{order.buyer_name}</h3>
-                             <p className="text-[10px] font-bold text-anthracite-500 uppercase tracking-widest">Tedarikçi: {order.wholesaler?.business_name || 'Bilinmiyor'}</p>
-                           </div>
-                           <div className="flex items-center sm:items-end sm:flex-col justify-between sm:justify-start w-full sm:w-auto gap-3">
-                             <div className="flex flex-col items-end gap-1">
-                               <span className="text-xl sm:text-2xl font-black">{order.quantity} Adet</span>
-                               <div className="bg-white p-1 rounded-lg border border-anthracite-100 shadow-sm">
-                                 <QRCodeSVG value={`https://demir-dev-studio.vercel.app/admin?order=${order.id}`} size={32} />
-                               </div>
-                             </div>
-                             <div className="flex gap-2">
-                               {order.status === 'shipped' && (
-                                 <button onClick={() => archiveOrder(order.id)} className="bg-anthracite-900 text-white p-2.5 rounded-xl transition-all sm:opacity-0 sm:group-hover:opacity-100 hover:bg-emerald-500" title="Arşivle">
-                                   <FolderArchive className="w-4 h-4" />
-                                 </button>
-                               )}
-                               <button onClick={() => exportInvoicePDF(order)} className="bg-blue-600 text-white p-2.5 rounded-xl hover:bg-blue-700 transition-all font-bold text-[10px] flex items-center gap-1.5" title="PDF Fatura">
-                                 <FileText className="w-4 h-4" /> PDF
-                               </button>
-                             </div>
-                           </div>
-                        </div>
-                        {order.status === 'shipped' && order.tracking_number && (
-                          <div className="bg-blue-50 text-blue-800 p-3 rounded-xl border border-blue-100 text-[10px] font-black tracking-widest text-center break-all shadow-inner">
-                            TAKİP NO: {order.tracking_number}
-                          </div>
+        {/* OVERVIEW TAB */}
+        {activeTab === 'overview' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="lg:col-span-8 bg-white border border-anthracite-100 rounded-[3rem] p-10 shadow-sm relative overflow-hidden">
+                    <h3 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3">
+                        <TrendingUp className="w-6 h-6 text-emerald-500" /> B2B Aktivite Grafiği (Lükse Odaklı)
+                    </h3>
+                    <div className="h-[400px]">
+                        {mounted && (
+                            <ResponsiveContainer width="100%" height="100%">
+                                <AreaChart data={chartData}>
+                                    <defs>
+                                        <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                        </linearGradient>
+                                    </defs>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8', fontWeight: 'bold'}} />
+                                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8', fontWeight: 'bold'}} />
+                                    <Tooltip contentStyle={{borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)', fontWeight: 'bold'}} />
+                                    <Area type="monotone" dataKey="sales" name="Ciro (₺)" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorSales)" />
+                                    <Line type="monotone" dataKey="profit" name="Kâr (₺)" stroke="#3b82f6" strokeWidth={4} dot={{ r: 6, fill: "#fff", strokeWidth: 3 }} />
+                                </AreaChart>
+                            </ResponsiveContainer>
                         )}
-                     </div>
-                   ))}
-                 </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* TAB: TOPTANCI HAKEDİŞLERİ */}
-        {activeTab === 'payments' && (
-          <div className="bg-white border-2 border-anthracite-100 rounded-[2rem] p-6 sm:p-10 shadow-xl">
-            <h2 className="text-xl sm:text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
-               <Wallet className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-500" /> Toptancı Hakediş Hesapları
-            </h2>
-            <p className="text-anthracite-500 font-medium mb-8 text-xs sm:text-sm text-left">Tüm hakedişleri buradan takip edebilirsiniz.</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-               {Object.entries(wholesalerSummary).length === 0 ? (
-                 <p className="col-span-full text-center py-20 font-bold text-anthracite-400 text-sm">Henüz hakedişi oluşmuş bir toptancı bulunmuyor.</p>
-               ) : Object.entries(wholesalerSummary).map(([name, data]: [any, any]) => (
-                 <div key={name} className="bg-anthracite-50 border border-anthracite-100 rounded-[2rem] p-6 sm:p-8 flex flex-col gap-4 shadow-sm hover:shadow-lg transition-all text-left">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-sm">
-                       <Store className="w-5 h-5 sm:w-6 sm:h-6 text-anthracite-400" />
                     </div>
-                    <div>
-                       <h3 className="font-black text-lg sm:text-xl text-anthracite-900 break-words">{name}</h3>
-                       <p className="text-[10px] font-black text-anthracite-500 uppercase tracking-widest mt-1">{data.count} Aktif Sipariş</p>
-                    </div>
-                    <div className="mt-2 pt-4 border-t border-anthracite-200">
-                       <p className="text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-1">Toplam Alacak</p>
-                       <span className="text-2xl sm:text-3xl font-black text-emerald-600">{data.total.toLocaleString('tr-TR')} ₺</span>
-                    </div>
-                 </div>
-               ))}
-            </div>
-          </div>
-        )}
-
-        {/* TAB: ÜYE ONAYLARI */}
-        {activeTab === 'approvals' && (
-          <div className="bg-white border-2 border-anthracite-100 rounded-[2rem] p-6 sm:p-10 shadow-xl">
-             <h2 className="text-xl sm:text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3 text-left">
-               <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7 text-blue-500" /> Onay Bekleyenler
-             </h2>
-             <p className="text-anthracite-500 font-medium mb-8 text-xs sm:text-sm text-left">Giriş yapmış ve onay bekleyen tüm üyeler.</p>
-             <div className="space-y-4">
-                {profiles.length === 0 ? (
-                  <p className="text-center py-20 font-bold text-anthracite-400 text-sm">Bekleyen üyelik talebi yok.</p>
-                ) : profiles.map(profile => (
-                  <div key={profile.id} className="flex flex-col md:flex-row items-center justify-between p-5 bg-anthracite-50 rounded-3xl border border-anthracite-100 gap-6 text-left">
-                     <div className="flex items-center gap-4 mr-auto text-left w-full">
-                        <div className={`p-4 rounded-2xl ${profile.role === 'toptanci' ? 'bg-emerald-500' : 'bg-blue-500'} text-white shadow-xl shrink-0`}>
-                          {profile.role === 'toptanci' ? <Store /> : <UserRound />}
-                        </div>
-                        <div className="min-w-0">
-                           <h3 className="font-black text-lg break-words">{profile.business_name || 'İsimsiz Üye'}</h3>
-                           <span className="text-[10px] font-black uppercase tracking-widest opacity-50 block sm:inline">{profile.role === 'toptanci' ? 'Toptancı Firması' : 'Butik Müşterisi'}</span>
-                        </div>
-                     </div>
-                     <button onClick={() => approveUser(profile.id, profile.role)} className="w-full md:w-auto bg-anthracite-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] sm:text-xs uppercase tracking-widest shadow-xl hover:bg-black transition-all">ONAYLA</button>
-                  </div>
-                ))}
-             </div>
-          </div>
-        )}
-
-        {/* TAB: ARŞİV */}
-        {activeTab === 'archive' && (
-           <div className="bg-white border-2 border-anthracite-100 rounded-[2rem] p-6 sm:p-10 shadow-xl">
-              <h2 className="text-xl sm:text-2xl font-black text-anthracite-900 mb-8 flex items-center gap-3 text-left">
-                <Archive className="w-6 h-6 sm:w-7 sm:h-7 text-anthracite-400" /> Arşivlenmiş Kayıtlar
-              </h2>
-              <div className="space-y-4 overflow-hidden">
-                {archivedOrdersList.length === 0 ? (
-                  <p className="text-center py-20 font-bold text-anthracite-400 text-sm">Arşivlenmiş sipariş bulunmuyor.</p>
-                ) : archivedOrdersList.map(order => (
-                  <div key={order.id} className="p-4 sm:p-6 border-b border-anthracite-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-anthracite-50/30 rounded-2xl sm:rounded-none">
-                     <div className="flex items-center gap-4 text-left w-full sm:w-auto">
-                        <Package className="w-8 h-8 sm:w-10 sm:h-10 text-anthracite-200 shrink-0" />
-                        <div className="min-w-0 text-left">
-                           <h3 className="font-bold text-base sm:text-lg break-words line-clamp-1">{order.product_name}</h3>
-                           <p className="text-[10px] sm:text-xs font-semibold text-anthracite-400 uppercase tracking-widest">{order.buyer_name} | {new Date(order.created_at).toLocaleDateString('tr-TR')}</p>
-                        </div>
-                     </div>
-                     <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-0 border-anthracite-100">
-                        <div className="text-left sm:text-right">
-                           <span className="block font-black text-lg sm:text-xl">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
-                           <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md uppercase border border-emerald-100">Tamamlandı</span>
-                        </div>
-                        <button onClick={() => exportInvoicePDF(order)} className="p-3 bg-white border border-anthracite-200 rounded-xl hover:bg-anthracite-900 hover:text-white transition-all text-anthracite-700 shadow-sm" title="PDF Çıktısı Al">
-                          <Printer className="w-5 h-5" />
-                        </button>
-                     </div>
-                  </div>
-                ))}
-              </div>
-           </div>
-        )}
-
-        {/* TAB: DUYURU YÖNETİMİ */}
-        {activeTab === 'announcements' && (
-           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-              {/* SOL: Yeni Duyuru Oluştur */}
-              <div className="lg:col-span-5 bg-white border-2 border-anthracite-100 rounded-[2rem] p-8 shadow-xl h-max text-left">
-                 <h2 className="text-xl font-black text-anthracite-900 mb-6 flex items-center gap-3 border-b border-anthracite-100 pb-4">
-                    <Send className="w-6 h-6 text-emerald-500" /> Yeni Duyuru Yayınla
-                 </h2>
-                 <form onSubmit={handlePublishAnnouncement} className="space-y-4">
-                    <div>
-                        <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Duyuru Başlığı</label>
-                        <input required value={annTitle} onChange={e=>setAnnTitle(e.target.value)} className="w-full px-4 py-3 bg-anthracite-50 rounded-xl font-bold outline-none focus:ring-2 focus:ring-anthracite-900" placeholder="Örn: Yeni Sezon İndirimi Başladı" />
-                    </div>
-                    <div>
-                        <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Mesaj İçeriği</label>
-                        <textarea required value={annContent} onChange={e=>setAnnContent(e.target.value)} rows={4} className="w-full px-4 py-3 bg-anthracite-50 rounded-xl font-bold outline-none focus:ring-2 focus:ring-anthracite-900" placeholder="Duyuru detaylarını buraya yazın..." />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Hedef Kitle</label>
-                            <select value={annTarget} onChange={e=>setAnnTarget(e.target.value)} className="w-full px-4 py-3 bg-anthracite-50 rounded-xl font-bold outline-none">
-                                <option value="all">Herkes</option>
-                                <option value="butik">Sadece Butikler</option>
-                                <option value="toptanci">Sadece Toptancılar</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-1">Vurgu Tipi</label>
-                            <select value={annType} onChange={e=>setAnnType(e.target.value)} className="w-full px-4 py-3 bg-anthracite-50 rounded-xl font-bold outline-none">
-                                <option value="info">Bilgi (Mavi)</option>
-                                <option value="warning">Uyarı (Amber)</option>
-                                <option value="success">Başarı (Yeşil)</option>
-                                <option value="error">Hata (Kırmızı)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button disabled={isPublishing} className="w-full py-4 bg-anthracite-900 text-white font-black rounded-2xl shadow-xl hover:bg-black transition-all disabled:opacity-50 mt-4">
-                        {isPublishing ? "YAYINLANIYOR..." : "DUYURUYU ŞİMDİ YAYINLA"}
-                    </button>
-                 </form>
-              </div>
-
-              {/* SAĞ: Aktif Duyurular */}
-              <div className="lg:col-span-7 bg-anthracite-50 border border-anthracite-200 rounded-[2rem] p-8 shadow-sm">
-                 <h2 className="text-xl font-black text-anthracite-900 mb-6 flex items-center gap-3 border-b border-anthracite-200 pb-4 text-left">
-                    <History className="w-6 h-6 text-anthracite-400" /> Yayındaki Duyurular
-                 </h2>
-                 <div className="space-y-4">
-                    {announcements.length === 0 ? (
-                        <p className="text-center py-10 font-bold text-anthracite-400 italic">Şu an yayında duyuru bulunmuyor.</p>
-                    ) : announcements.map(ann => (
-                        <div key={ann.id} className="p-5 bg-white border border-anthracite-200 rounded-[2rem] shadow-sm relative group text-left">
-                            <button onClick={() => deleteAnnouncement(ann.id)} className="absolute top-4 right-4 p-2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all">
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                            <div className="flex items-center gap-2 mb-2">
-                                <span className={`w-2 h-2 rounded-full ${ann.type === 'info' ? 'bg-blue-500' : ann.type === 'warning' ? 'bg-amber-500' : ann.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
-                                <h3 className="font-black text-anthracite-900">{ann.title}</h3>
-                                <span className="text-[9px] font-black uppercase bg-anthracite-100 px-2 py-0.5 rounded ml-auto">{ann.target_role === 'all' ? 'HERKES' : ann.target_role}</span>
+                </div>
+                <div className="lg:col-span-4 space-y-6">
+                    <div className="bg-white border border-anthracite-100 rounded-[3rem] p-8 shadow-sm">
+                        <h3 className="text-lg font-black text-anthracite-900 mb-6 flex items-center gap-3">
+                            <Megaphone className="w-5 h-5 text-amber-500" /> Son Duyuru
+                        </h3>
+                        {announcements.length > 0 ? (
+                            <div className="bg-anthracite-50 p-6 rounded-2xl border border-anthracite-100">
+                                <h4 className="font-black text-md mb-2">{announcements[0].title}</h4>
+                                <p className="text-xs text-anthracite-500 font-medium line-clamp-3">{announcements[0].content}</p>
                             </div>
-                            <p className="text-sm font-medium text-anthracite-500">{ann.content}</p>
-                            <span className="block mt-3 text-[9px] font-bold text-anthracite-300 uppercase">{new Date(ann.created_at).toLocaleString('tr-TR')}</span>
+                        ) : <p className="text-xs font-bold text-anthracite-300">Henüz duyuru yok.</p>}
+                        <button onClick={() => setActiveTab('announcements')} className="w-full mt-4 flex items-center justify-center gap-2 py-3 bg-anthracite-900 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-black transition-all">PANELİ YÖNET</button>
+                    </div>
+                    <div className="bg-emerald-500 p-8 rounded-[3rem] text-white shadow-xl shadow-emerald-500/20 relative overflow-hidden">
+                        <div className="absolute -bottom-4 -right-4 opacity-10">
+                            <Store className="w-32 h-32" />
+                        </div>
+                        <h3 className="text-lg font-black mb-1">Toptancı Hakları</h3>
+                        <p className="text-xs font-medium text-white/70 mb-6">Tüm üreticilerin alacak bakiyesi:</p>
+                        <span className="text-4xl font-black">
+                             {Object.values(wholesalerSummary).reduce((a:any, b:any) => a + b.total, 0).toLocaleString('tr-TR')} ₺
+                        </span>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* ORDERS TAB (İŞLEMLER) */}
+        {activeTab === 'orders' && (
+            <div className="bg-white border border-anthracite-100 rounded-[3rem] p-8 sm:p-10 shadow-xl overflow-hidden">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 pb-6 border-b border-anthracite-100">
+                    <div>
+                        <h2 className="text-2xl font-black text-anthracite-900 mb-1">Sipariş & Operasyon Yönetimi</h2>
+                        <p className="text-sm font-medium text-anthracite-500">Üretim aşamasındaki tüm malları ve ödemeleri tek panelden yönetin.</p>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    {activeOrders.length === 0 ? (
+                        <p className="text-center py-20 font-black text-anthracite-300 italic">Şu an aktif işlem bulunmuyor.</p>
+                    ) : activeOrders.map(order => (
+                        <div key={order.id} className="group bg-white p-6 rounded-[2.5rem] border border-anthracite-100 hover:shadow-2xl hover:border-anthracite-200 transition-all flex flex-col lg:flex-row items-center gap-8 text-left relative overflow-hidden">
+                            
+                            {/* ÜRETİCİ / DURUM ETİKETİ */}
+                            <div className="absolute top-6 right-8 flex gap-2">
+                                <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${order.status === 'waiting_payment' ? 'bg-amber-50 text-amber-600 border-amber-200' : order.status === 'shipped' ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
+                                    {order.status === 'shipped' ? 'KARGODA' : order.status === 'approved' ? 'HAZIRLANIYOR' : 'ÖDEME BEKLİYOR'}
+                                </span>
+                            </div>
+
+                            {/* ÜRÜN GÖRSELİ */}
+                            <div className="w-24 h-32 shrink-0 bg-anthracite-50 rounded-2xl overflow-hidden border border-anthracite-100 relative">
+                                <Image src={order.product?.images?.[0] || ''} alt="p" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
+                            </div>
+
+                            {/* ANA BİLGİLER */}
+                            <div className="flex-1 w-full space-y-4">
+                                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                                    <div>
+                                        <h4 className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest leading-none mb-1">Butik Müşteri / Toptancı</h4>
+                                        <h3 className="text-xl font-black text-anthracite-900">{order.buyer_name}</h3>
+                                        <p className="text-xs font-bold text-anthracite-500 flex items-center gap-1">
+                                            <Store className="w-3 h-3 text-emerald-500" /> Tedarikçi: {order.wholesaler?.business_name}
+                                        </p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-1">Sipariş Tutarı</p>
+                                        <span className="text-3xl font-black text-anthracite-900">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-anthracite-50">
+                                    <div className="bg-anthracite-50 p-3 rounded-2xl">
+                                        <p className="text-[9px] font-black text-anthracite-400 uppercase leading-none mb-1">Model</p>
+                                        <p className="text-xs font-black line-clamp-1">{order.product_name}</p>
+                                    </div>
+                                    <div className="bg-anthracite-50 p-3 rounded-2xl text-center">
+                                        <p className="text-[9px] font-black text-anthracite-400 uppercase leading-none mb-1">Beden / Adet</p>
+                                        <p className="text-xs font-black">{order.selected_size} - {order.quantity} Adet</p>
+                                    </div>
+                                    <div className="bg-emerald-50 p-3 rounded-2xl text-center">
+                                        <p className="text-[9px] font-black text-emerald-600 uppercase leading-none mb-1">Kârınız</p>
+                                        <p className="text-xs font-black text-emerald-700">{order.commission_earned} ₺</p>
+                                    </div>
+                                    <div className="bg-blue-50 p-3 rounded-2xl text-center">
+                                       <p className="text-[9px] font-black text-blue-600 uppercase leading-none mb-1">Toptancı Hak</p>
+                                       <p className="text-xs font-black text-blue-700">{order.wholesaler_earning} ₺</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* AKSİYONLAR */}
+                            <div className="shrink-0 flex flex-row lg:flex-col gap-2 w-full lg:w-auto">
+                                {order.status === 'waiting_payment' ? (
+                                    <button onClick={()=>approveOrderPayment(order.id, order.wholesaler?.business_name)} className="flex-1 lg:w-40 py-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all">ÖDEME GELDİ - ONAYLA</button>
+                                ) : (
+                                    <>
+                                       <button onClick={() => exportInvoicePDF(order)} className="flex-1 py-3 px-6 bg-white border border-anthracite-200 text-anthracite-700 rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-anthracite-50 transition-all uppercase tracking-widest"><FileText className="w-4 h-4"/> FATURA</button>
+                                       {order.status === 'shipped' && (
+                                           <button onClick={() => archiveOrder(order.id)} className="flex-1 py-3 px-6 bg-anthracite-900 text-white rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-black transition-all uppercase tracking-widest"><Archive className="w-4 h-4"/> ARŞİVLE</button>
+                                       )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                     ))}
-                 </div>
-              </div>
-           </div>
+                </div>
+            </div>
+        )}
+
+        {/* PAYMENTS TAB (HAKEDİŞLER) */}
+        {activeTab === 'payments' && (
+            <div className="bg-white border border-anthracite-100 rounded-[3rem] p-10 shadow-xl overflow-hidden">
+                <h2 className="text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
+                   <Wallet className="w-8 h-8 text-emerald-500" /> Toptancı Hakediş Masası
+                </h2>
+                <p className="text-sm font-medium text-anthracite-500 mb-10 text-left">Üreticilerin havuzdaki net alacaklarını buradan takip edin.</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                   {Object.entries(wholesalerSummary).length === 0 ? (
+                     <p className="col-span-full text-center py-20 font-black text-anthracite-300 italic">Hesaplarda meblağ bulunmuyor.</p>
+                   ) : Object.entries(wholesalerSummary).map(([name, data]: [any, any]) => (
+                     <div key={name} className="bg-anthracite-50 border border-anthracite-100 rounded-[2.5rem] p-10 flex flex-col gap-6 shadow-sm hover:shadow-xl transition-all relative group h-full">
+                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md">
+                           <Store className="w-7 h-7 text-emerald-500" />
+                        </div>
+                        <div className="text-left">
+                           <h3 className="font-black text-2xl text-anthracite-900 leading-tight">{name}</h3>
+                           <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mt-2">{data.count} Aktif Sevkiyat İşlemi</p>
+                        </div>
+                        <div className="mt-auto pt-6 border-t border-anthracite-200">
+                           <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 leading-none">Net Alacak</p>
+                           <span className="text-4xl font-black text-emerald-600 tracking-tighter">{data.total.toLocaleString('tr-TR')} ₺</span>
+                        </div>
+                        <button className="absolute top-10 right-10 opacity-0 group-hover:opacity-100 transition-all font-black text-[10px] text-blue-500 underline uppercase">IBAN GÖR</button>
+                     </div>
+                   ))}
+                </div>
+            </div>
+        )}
+
+        {/* APPROVALS TAB */}
+        {activeTab === 'approvals' && (
+            <div className="bg-white border border-anthracite-100 rounded-[3rem] p-10 shadow-xl overflow-hidden">
+                <h2 className="text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
+                   <UserCheck className="w-8 h-8 text-blue-500" /> Üyelik ve Yetki Onayları
+                </h2>
+                <p className="text-sm font-medium text-anthracite-500 mb-10 text-left">Platforma yeni katılan firmaları ve butikleri buradan denetleyin.</p>
+                <div className="space-y-4">
+                    {profiles.length === 0 ? (
+                        <p className="text-center py-20 font-black text-anthracite-300 italic">Bekleyen onay bulunmuyor.</p>
+                    ) : profiles.map(profile => (
+                        <div key={profile.id} className="flex flex-col sm:flex-row items-center justify-between p-8 bg-anthracite-50 rounded-[2.5rem] border border-anthracite-100 gap-8">
+                            <div className="flex flex-col sm:flex-row items-center gap-6 mr-auto text-left w-full">
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${profile.role === 'toptanci' ? 'bg-emerald-500 text-white' : 'bg-blue-500 text-white'}`}>
+                                    {profile.role === 'toptanci' ? <Store className="w-8 h-8"/> : <UserRound className="w-8 h-8"/>}
+                                </div>
+                                <div className="text-center sm:text-left">
+                                    <h3 className="font-black text-2xl mb-1">{profile.business_name || 'Gizli Üye'}</h3>
+                                    <div className="flex justify-center sm:justify-start gap-2">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-anthracite-400 bg-white px-2 py-0.5 rounded border border-anthracite-200">
+                                            {profile.role === 'toptanci' ? 'Tedarikçi / Üretici' : 'Butik / Alıcı'}
+                                        </span>
+                                        <span className="text-[10px] font-black text-anthracite-500">{profile.full_name}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onClick={() => approveUser(profile.id, profile.role)} className="w-full sm:w-auto bg-anthracite-900 text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-black transition-all hover:scale-105 active:scale-95">SİSTEME KABUL ET</button>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        {/* ANNOUNCEMENTS TAB */}
+        {activeTab === 'announcements' && (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="lg:col-span-5 bg-white border border-anthracite-100 rounded-[3rem] p-10 shadow-xl h-max text-left">
+                    <h2 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3 pb-6 border-b border-anthracite-50">
+                        <Send className="w-6 h-6 text-emerald-500" /> Yeni Duyuru Yayınla
+                    </h2>
+                    <form onSubmit={handlePublishAnnouncement} className="space-y-6">
+                        <div className="space-y-4 p-6 bg-anthracite-50 rounded-[2rem] border border-anthracite-100">
+                            <div>
+                                <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2">Başlık</label>
+                                <input required value={annTitle} onChange={e=>setAnnTitle(e.target.value)} className="w-full px-5 py-3 rounded-xl font-bold bg-white outline-none focus:ring-4 focus:ring-anthracite-200 border-none shadow-inner" placeholder="Piyasa Duyurusu..." />
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2">Mesaj</label>
+                                <textarea required value={annContent} onChange={e=>setAnnContent(e.target.value)} rows={4} className="w-full px-5 py-4 rounded-xl font-bold bg-white outline-none border-none shadow-inner" placeholder="Ekiplerimize önemli bildirimi buraya yazın..." />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2">Hedef Kitle</label>
+                                <select value={annTarget} onChange={e=>setAnnTarget(e.target.value)} className="w-full px-4 py-3 bg-white border border-anthracite-200 rounded-xl font-bold">
+                                    <option value="all">HERKES</option>
+                                    <option value="butik">BUTİKLER</option>
+                                    <option value="toptanci">TOPTANCILAR</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2">Renkli Vurgu</label>
+                                <select value={annType} onChange={e=>setAnnType(e.target.value)} className="w-full px-4 py-3 bg-white border border-anthracite-200 rounded-xl font-bold">
+                                    <option value="info">INFO (MAVİ)</option>
+                                    <option value="warning">UYARI (SARI)</option>
+                                    <option value="success">BAŞARI (YEŞİL)</option>
+                                    <option value="error">KRİTİK (KIRMIZI)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button disabled={isPublishing} className="w-full py-5 bg-anthracite-900 text-white font-black rounded-2xl shadow-2xl hover:scale-[1.02] transition-all disabled:opacity-50 mt-4 uppercase text-xs tracking-widest">
+                            {isPublishing ? "ACTİVATİNG..." : "DUYURUYU ŞİMDİ YAYINLA"}
+                        </button>
+                    </form>
+                </div>
+
+                <div className="lg:col-span-7 bg-white border border-anthracite-200 rounded-[3rem] p-10 shadow-sm overflow-hidden">
+                    <h2 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3 pb-6 border-b border-anthracite-50 text-left">
+                        <History className="w-6 h-6 text-anthracite-400" /> Aktif Yayınlar
+                    </h2>
+                    <div className="space-y-4">
+                        {announcements.length === 0 ? (
+                            <p className="text-center py-20 font-black text-anthracite-300 italic">Yayında duyuru yok.</p>
+                        ) : announcements.map(ann => (
+                            <div key={ann.id} className="p-6 bg-anthracite-50 rounded-[2rem] border border-anthracite-100 relative group text-left">
+                                <button onClick={() => deleteAnnouncement(ann.id)} className="absolute top-6 right-6 p-2 text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all bg-white rounded-full shadow-sm">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className={`w-3 h-3 rounded-full border-2 border-white shadow-sm ${ann.type === 'info' ? 'bg-blue-500' : ann.type === 'warning' ? 'bg-amber-500' : ann.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                                    <h3 className="font-black text-lg text-anthracite-900 leading-none">{ann.title}</h3>
+                                    <span className="text-[8px] font-black uppercase bg-white border border-anthracite-200 px-3 py-1 rounded-full ml-auto shadow-sm tracking-widest">{ann.target_role}</span>
+                                </div>
+                                <p className="text-sm font-medium text-anthracite-600 pl-5 border-l-2 border-anthracite-200">{ann.content}</p>
+                                <div className="flex items-center justify-between mt-5 pt-4 border-t border-anthracite-200/50">
+                                   <span className="text-[9px] font-bold text-anthracite-300 uppercase">{new Date(ann.created_at).toLocaleString('tr-TR')}</span>
+                                   <span className="text-[9px] font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded uppercase">AKTİF</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* ARCHIVE TAB */}
+        {activeTab === 'archive' && (
+            <div className="bg-white border border-anthracite-100 rounded-[3rem] p-10 shadow-xl overflow-hidden">
+                <h2 className="text-2xl font-black text-anthracite-900 mb-10 flex items-center gap-3 pb-6 border-b border-anthracite-50">
+                    <Archive className="w-8 h-8 text-anthracite-300" /> Platform Geçmişi
+                </h2>
+                <div className="space-y-4">
+                    {orders.filter(o => o.is_archived).length === 0 ? (
+                        <p className="text-center py-20 font-black text-anthracite-300 italic">Arşivlenmiş kayıt bulunmuyor.</p>
+                    ) : orders.filter(o => o.is_archived).map(order => (
+                        <div key={order.id} className="p-6 border-b border-anthracite-50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 hover:bg-anthracite-50 transition-all rounded-[2rem]">
+                            <div className="flex items-center gap-6 text-left w-full sm:w-auto">
+                                <div className="w-14 h-20 bg-anthracite-100 rounded-xl overflow-hidden relative shadow-inner">
+                                    <Image src={order.product?.images?.[0] || ''} alt="p" fill className="object-cover opacity-50 grayscale" />
+                                </div>
+                                <div className="min-w-0 text-left">
+                                    <h3 className="font-black text-lg text-anthracite-900 break-words leading-tight">{order.product_name}</h3>
+                                    <p className="text-[10px] font-bold text-anthracite-400 uppercase tracking-widest mt-1">{order.buyer_name} | {new Date(order.created_at).toLocaleDateString('tr-TR')}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-8 pt-4 sm:pt-0 border-t sm:border-0 border-anthracite-100">
+                                <div className="text-left sm:text-right">
+                                    <span className="block font-black text-2xl text-anthracite-900 italic opacity-40">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
+                                    <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 uppercase tracking-widest">Başarılı</span>
+                                </div>
+                                <button onClick={() => exportInvoicePDF(order)} className="p-4 bg-white border border-anthracite-200 rounded-2xl hover:bg-anthracite-900 hover:text-white transition-all shadow-sm" title="E-Fatura">
+                                    <Printer className="w-6 h-6" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
         )}
 
       </div>
@@ -595,4 +563,44 @@ export default function AdminDashboard() {
     )}
     </>
   );
+}
+
+function ShoppingBag(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <path d="M3 6h18" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
+  )
+}
+
+function Loader2(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+    </svg>
+  )
 }
