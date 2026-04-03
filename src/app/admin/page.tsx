@@ -17,6 +17,7 @@ import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { QRCodeSVG } from 'qrcode.react';
 import NotificationBell from '@/components/NotificationBell';
 import { notify } from '@/utils/notifications';
+import { ORDER_STATUS, getOrderStatusLabel } from '@/utils/orderStatus';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -110,7 +111,7 @@ export default function AdminDashboard() {
       }
     }
 
-    const { error } = await supabase.from('orders').update({ status: 'approved' }).eq('id', orderId);
+    const { error } = await supabase.from('orders').update({ status: ORDER_STATUS.PREPARING }).eq('id', orderId);
     if (!error) {
       await notify(order?.buyer_id, "✅ Ödemeniz Onaylandı!", `'${order?.product_name}' siparişiniz onaylandı ve toptancıya kargo emri iletildi.`, 'success');
       alert(`Sipariş Onaylandı! ${wholesalerName || 'Toptancı'} tarafına kargolama emri iletildi.`);
@@ -121,6 +122,11 @@ export default function AdminDashboard() {
   const archiveOrder = async (id: string) => {
     if(!confirm("Bu siparişi kargolandığı için arşivlemek istiyor musunuz?")) return;
     const { error } = await supabase.from('orders').update({ is_archived: true }).eq('id', id);
+    if (!error) fetchOrders();
+  };
+
+  const markDelivered = async (id: string) => {
+    const { error } = await supabase.from('orders').update({ status: ORDER_STATUS.DELIVERED }).eq('id', id);
     if (!error) fetchOrders();
   };
 
@@ -141,7 +147,7 @@ export default function AdminDashboard() {
   // HESAPLAMALAR
   const totalCiro = useMemo(() => orders.reduce((acc, o) => acc + Number(o.total_price), 0), [orders]);
   const totalProfit = useMemo(() => orders.reduce((acc, o) => acc + Number(o.commission_earned), 0), [orders]);
-  const pendingOrdersCount = useMemo(() => orders.filter(o => o.status === 'waiting_payment' && !o.is_archived).length, [orders]);
+  const pendingOrdersCount = useMemo(() => orders.filter(o => o.status === ORDER_STATUS.WAITING_PAYMENT && !o.is_archived).length, [orders]);
   const pendingApprovalsCount = profiles.length;
 
   const chartData = useMemo(() => orders
@@ -321,8 +327,8 @@ export default function AdminDashboard() {
                             
                             {/* ÜRETİCİ / DURUM ETİKETİ */}
                             <div className="absolute top-6 right-8 flex gap-2">
-                                <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${order.status === 'waiting_payment' ? 'bg-amber-50 text-amber-600 border-amber-200' : order.status === 'shipped' ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
-                                    {order.status === 'shipped' ? 'KARGODA' : order.status === 'approved' ? 'HAZIRLANIYOR' : 'ÖDEME BEKLİYOR'}
+                                <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${order.status === ORDER_STATUS.WAITING_PAYMENT ? 'bg-amber-50 text-amber-600 border-amber-200' : order.status === ORDER_STATUS.SHIPPED ? 'bg-blue-50 text-blue-600 border-blue-200' : order.status === ORDER_STATUS.DELIVERED ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : order.status === ORDER_STATUS.CANCELLED ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
+                                    {getOrderStatusLabel(order.status)}
                                 </span>
                             </div>
 
@@ -369,12 +375,15 @@ export default function AdminDashboard() {
 
                             {/* AKSİYONLAR */}
                             <div className="shrink-0 flex flex-row lg:flex-col gap-2 w-full lg:w-auto">
-                                {order.status === 'waiting_payment' ? (
+                                {order.status === ORDER_STATUS.WAITING_PAYMENT ? (
                                     <button onClick={()=>approveOrderPayment(order.id, order.wholesaler?.business_name)} className="flex-1 lg:w-40 py-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all">ÖDEME GELDİ - ONAYLA</button>
                                 ) : (
                                     <>
                                        <button onClick={() => exportInvoicePDF(order)} className="flex-1 py-3 px-6 bg-white border border-anthracite-200 text-anthracite-700 rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-anthracite-50 transition-all uppercase tracking-widest"><FileText className="w-4 h-4"/> FATURA</button>
-                                       {order.status === 'shipped' && (
+                                       {order.status === ORDER_STATUS.SHIPPED && (
+                                           <button onClick={() => markDelivered(order.id)} className="flex-1 py-3 px-6 bg-emerald-600 text-white rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-emerald-700 transition-all uppercase tracking-widest">TESLİM EDİLDİ</button>
+                                       )}
+                                       {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && (
                                            <button onClick={() => archiveOrder(order.id)} className="flex-1 py-3 px-6 bg-anthracite-900 text-white rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-black transition-all uppercase tracking-widest"><Archive className="w-4 h-4"/> ARŞİVLE</button>
                                        )}
                                     </>

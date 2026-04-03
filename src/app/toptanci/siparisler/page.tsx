@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Package, ArrowLeft, Loader2, FileText } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
+import { ORDER_STATUS } from '@/utils/orderStatus';
 import Link from 'next/link';
 
 export default function ToptanciSiparisler() {
@@ -40,7 +41,7 @@ export default function ToptanciSiparisler() {
     if (!trackingCode) return;
     
     const { error } = await supabase.from('orders').update({
-       status: 'shipped',
+       status: ORDER_STATUS.SHIPPED,
        tracking_number: trackingCode
     }).eq('id', orderId);
     
@@ -90,8 +91,8 @@ export default function ToptanciSiparisler() {
                <div key={order.id} className="bg-anthracite-50 border border-anthracite-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:bg-white hover:shadow-xl hover:-translate-y-1">
                   <div>
                     <div className="flex flex-wrap justify-between items-start mb-6 gap-2">
-                      <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${order.status === 'shipped' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'}`}>
-                        {order.status === 'shipped' ? 'KARGOLANDI GİTTİ' : 'YENİ SİPARİŞ - HAZIRLA'}
+                      <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${order.status === ORDER_STATUS.SHIPPED ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'}`}>
+                        {order.status === ORDER_STATUS.SHIPPED ? 'KARGOLANDI GİTTİ' : 'YENİ SİPARİŞ - HAZIRLA'}
                       </span>
                       <span className="font-black text-emerald-900 border-2 border-emerald-100 bg-emerald-50 px-3 py-1.5 rounded-xl shadow-sm">
                         {Number(order.quantity)} Adet
@@ -108,7 +109,7 @@ export default function ToptanciSiparisler() {
                     </div>
                   </div>
 
-                  {order.status === 'approved' ? (
+                  {order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? (
                      <div className="flex flex-col gap-2">
                         <button onClick={() => handleShipOrder(order.id)} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
                            Kargola ve Takip No Gir

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, MessageCircle, Package, Search, Lock } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
+import { ORDER_STATUS } from '@/utils/orderStatus';
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<any>(null);
@@ -79,7 +80,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
            buyer_name: currentUserProfile.business_name || currentUserProfile.full_name,
            product_name: product.name,
            selected_size: selectedSize,
-           status: 'waiting_payment'
+           status: ORDER_STATUS.WAITING_PAYMENT
       });
 
       if(error) throw error;

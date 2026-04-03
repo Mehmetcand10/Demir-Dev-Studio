@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
+import { ORDER_STATUS, isProductionActive } from '@/utils/orderStatus';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -20,6 +21,14 @@ export default function Siparislerim() {
   const [user, setUser] = useState<any>(null);
 
   const supabase = useMemo(() => createClient(), []);
+
+  const cancelOrder = async (orderId: string) => {
+    if (!confirm("Bu siparişi ödeme öncesinde iptal etmek istiyor musunuz?")) return;
+    const { error } = await supabase.from('orders').update({ status: ORDER_STATUS.CANCELLED }).eq('id', orderId);
+    if (!error) {
+      setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED } : o)));
+    }
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -41,12 +50,12 @@ export default function Siparislerim() {
 
   // HESAPLAMALAR
   const totalSpent = useMemo(() => orders.reduce((acc, o) => acc + Number(o.total_price), 0), [orders]);
-  const activeCount = useMemo(() => orders.filter(o => (o.status === 'approved' || o.status === 'shipped') && !o.is_archived).length, [orders]);
-  const waitingCount = useMemo(() => orders.filter(o => o.status === 'waiting_payment').length, [orders]);
+  const activeCount = useMemo(() => orders.filter(o => isProductionActive(o.status) && !o.is_archived).length, [orders]);
+  const waitingCount = useMemo(() => orders.filter(o => o.status === ORDER_STATUS.WAITING_PAYMENT).length, [orders]);
 
   const filteredOrders = useMemo(() => {
-    if (activeTab === 'active') return orders.filter(o => (o.status === 'approved' || o.status === 'shipped') && !o.is_archived);
-    if (activeTab === 'waiting') return orders.filter(o => o.status === 'waiting_payment' && !o.is_archived);
+    if (activeTab === 'active') return orders.filter(o => isProductionActive(o.status) && !o.is_archived);
+    if (activeTab === 'waiting') return orders.filter(o => o.status === ORDER_STATUS.WAITING_PAYMENT && !o.is_archived);
     return orders.filter(o => o.is_archived);
   }, [orders, activeTab]);
 
@@ -108,9 +117,9 @@ export default function Siparislerim() {
             
             // STATUS TRACKER LOGIC
             const steps = [
-              { id: 'payment', label: 'Ödeme Teyidi', icon: CreditCard, active: true },
-              { id: 'preparing', label: 'Üretim/Hazırlık', icon: Package, active: order.status !== 'waiting_payment' },
-              { id: 'shipped', label: 'Kargoya Verildi', icon: Truck, active: order.status === 'shipped' }
+              { id: 'payment', label: 'Ödeme Teyidi', icon: CreditCard, active: order.status !== ORDER_STATUS.CANCELLED },
+              { id: 'preparing', label: 'Üretim/Hazırlık', icon: Package, active: order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING || order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED },
+              { id: 'shipped', label: 'Kargoya Verildi', icon: Truck, active: order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED }
             ];
 
             return (
@@ -137,7 +146,7 @@ export default function Siparislerim() {
                       {/* CANLI STATUS TRACKER (TIMELINE) */}
                       <div className="relative w-full py-4 px-4 sm:px-10">
                           <div className="absolute top-1/2 left-10 right-10 h-1 bg-anthracite-100 -translate-y-1/2 rounded-full hidden sm:block">
-                              <div className={`h-full bg-emerald-500 transition-all duration-1000 rounded-full`} style={{ width: order.status === 'waiting_payment' ? '0%' : order.status === 'approved' ? '50%' : '100%' }}></div>
+                              <div className={`h-full bg-emerald-500 transition-all duration-1000 rounded-full`} style={{ width: order.status === ORDER_STATUS.WAITING_PAYMENT ? '0%' : order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? '50%' : '100%' }}></div>
                           </div>
                           <div className="flex justify-between items-center relative z-10 w-full">
                               {steps.map((step, idx) => (
@@ -153,12 +162,12 @@ export default function Siparislerim() {
 
                       {/* AKSİYONLAR VE BİLGİ BANTLARI */}
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-anthracite-50">
-                         {order.status === 'waiting_payment' ? (
+                         {order.status === ORDER_STATUS.WAITING_PAYMENT ? (
                             <div className="bg-amber-50 text-amber-700 p-4 rounded-2xl border border-amber-200 text-xs font-bold flex items-center gap-3 w-full sm:w-auto">
                                <Info className="w-5 h-5 shrink-0" />
                                Lütfen dekontunuzu WhatsApp (Merkez) hattına iletin.
                             </div>
-                         ) : order.status === 'shipped' && order.tracking_number ? (
+                         ) : order.status === ORDER_STATUS.SHIPPED && order.tracking_number ? (
                             <div className="bg-blue-50 text-blue-700 p-4 rounded-xl border border-blue-100 text-center w-full sm:w-auto">
                                <p className="text-[9px] font-black uppercase tracking-widest opacity-60">Resmi Kargo Takip No</p>
                                <p className="text-xl font-black font-mono">{order.tracking_number}</p>
@@ -166,9 +175,14 @@ export default function Siparislerim() {
                          ) : <div className="text-anthracite-300 font-bold text-xs">Süreçler titizlikle takip ediliyor.</div>}
 
                          <div className="flex items-center gap-3 w-full sm:w-auto">
-                            {(order.status === 'approved' || order.status === 'shipped') && (
+                            {(order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING || order.status === ORDER_STATUS.SHIPPED) && (
                                 <button onClick={() => exportInvoicePDF(order)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-anthracite-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
                                    <FileText className="w-5 h-5" /> Fatura İndir
+                                </button>
+                            )}
+                            {order.status === ORDER_STATUS.WAITING_PAYMENT && (
+                                <button onClick={() => cancelOrder(order.id)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-red-50 text-red-700 border border-red-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-100 transition-all">
+                                   İptal Et
                                 </button>
                             )}
                             <Link href="/katalog" className="p-4 bg-white border border-anthracite-200 rounded-2xl text-anthracite-400 hover:text-black transition-all">

@@ -2,9 +2,20 @@
 
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { ORDER_STATUS } from "./orderStatus";
 
 export const exportInvoicePDF = (order: any) => {
   const doc = new jsPDF() as any;
+  const statusText =
+    order.status === ORDER_STATUS.SHIPPED
+      ? "Kargoda"
+      : order.status === ORDER_STATUS.DELIVERED
+        ? "Teslim Edildi"
+        : order.status === ORDER_STATUS.CANCELLED
+          ? "İptal"
+          : order.status === ORDER_STATUS.WAITING_PAYMENT
+            ? "Ödeme Bekleniyor"
+            : "Hazırlanıyor";
 
   // FIRMA BILGILERI
   const companyName = "DEMIR DEV STUDIO";
@@ -28,7 +39,7 @@ export const exportInvoicePDF = (order: any) => {
   doc.setFontSize(11);
   doc.setTextColor(0, 0, 0);
   doc.text(`Siparis No: #${order.id.slice(0, 8).toUpperCase()}`, 140, 22);
-  doc.text(`Durum: ${order.status === 'shipped' ? 'Teslim Edildi' : 'Onaylandi'}`, 140, 28);
+  doc.text(`Durum: ${statusText}`, 140, 28);
 
   // CIZGI
   doc.setDrawColor(230, 230, 230);

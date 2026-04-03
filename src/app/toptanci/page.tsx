@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import NotificationBell from '@/components/NotificationBell';
+import { ORDER_STATUS } from '@/utils/orderStatus';
 
 type TabType = 'studio' | 'inventory' | 'orders' | 'finance';
 
@@ -387,8 +388,8 @@ export default function ToptanciDashboard() {
                         ) : orders.map(ord => (
                             <div key={ord.id} className="group p-6 sm:p-8 bg-anthracite-50/50 hover:bg-white rounded-[2.5rem] border border-anthracite-100 hover:shadow-2xl transition-all flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
                                 <div className="absolute top-8 right-10 flex gap-2">
-                                     <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${ord.status === 'shipped' ? 'bg-blue-50 text-blue-600 border-blue-200 shadow-sm' : 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm'}`}>
-                                         {ord.status === 'shipped' ? 'KARGOLANDI' : 'HAZIRLANIYOR'}
+                                     <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${ord.status === ORDER_STATUS.SHIPPED ? 'bg-blue-50 text-blue-600 border-blue-200 shadow-sm' : ord.status === ORDER_STATUS.DELIVERED ? 'bg-indigo-50 text-indigo-600 border-indigo-200 shadow-sm' : 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-sm'}`}>
+                                         {ord.status === ORDER_STATUS.SHIPPED ? 'KARGOLANDI' : ord.status === ORDER_STATUS.DELIVERED ? 'TESLİM' : 'HAZIRLANIYOR'}
                                      </span>
                                 </div>
                                 <div className="text-left flex-1 w-full flex flex-col sm:flex-row items-center gap-8">
