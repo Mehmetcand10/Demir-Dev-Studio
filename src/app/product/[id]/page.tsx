@@ -7,6 +7,7 @@ import { ArrowLeft, MessageCircle, Package, Search, Lock } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
 import { ORDER_STATUS } from '@/utils/orderStatus';
+import { notify } from '@/utils/notifications';
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<any>(null);
@@ -85,8 +86,23 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
       if(error) throw error;
 
+      // 1.5 Admin (Yönetim) tarafına sistem bildirimi düş
+      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin');
+      if (admins && admins.length > 0) {
+        await Promise.all(
+          admins.map((admin) =>
+            notify(
+              admin.id,
+              "🆕 Yeni Sipariş Bildirimi",
+              `${currentUserProfile.business_name || currentUserProfile.full_name} tarafından '${product.name}' için ${totalItems} adet sipariş oluşturuldu.`,
+              "info"
+            )
+          )
+        );
+      }
+
       // 2. WhatsApp Profesyonel Şablonu Oluştur ve Bota Yönlendir
-      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name} (Beden: ${selectedSize})\n🔢 Miktar: ${totalItems} Adet (MOQ Şartı Sağlandı)\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
+      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name} (Beden: ${selectedSize})\n🔢 Miktar: ${totalItems} Adet (MOQ Şartı Sağlandı)\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\n⚠️ Yönetim Notu: Sipariş sisteme kaydoldu, ödeme teyidi sonrası hazırlık sürecine alınabilir.\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
       
       // Demir Dev Studio (Merkez) Resmi WhatsApp Numarası
       const whatsappNumber = "905528323906"; 

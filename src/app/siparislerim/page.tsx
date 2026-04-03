@@ -9,6 +9,7 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { ORDER_STATUS, isProductionActive } from '@/utils/orderStatus';
+import { notify } from '@/utils/notifications';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -19,6 +20,10 @@ export default function Siparislerim() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [showDisputeModal, setShowDisputeModal] = useState(false);
+  const [disputeOrder, setDisputeOrder] = useState<any>(null);
+  const [disputeReason, setDisputeReason] = useState('');
+  const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -27,6 +32,45 @@ export default function Siparislerim() {
     const { error } = await supabase.from('orders').update({ status: ORDER_STATUS.CANCELLED }).eq('id', orderId);
     if (!error) {
       setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED } : o)));
+    }
+  };
+
+  const createDispute = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!disputeOrder || !user) return;
+    setIsSubmittingDispute(true);
+    try {
+      const { error } = await supabase.from('order_disputes').insert({
+        order_id: disputeOrder.id,
+        buyer_id: user.id,
+        wholesaler_id: disputeOrder.wholesaler_id || null,
+        reason: disputeReason.trim(),
+        status: 'open'
+      });
+      if (error) throw error;
+
+      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin');
+      if (admins && admins.length > 0) {
+        await Promise.all(
+          admins.map((admin) =>
+            notify(
+              admin.id,
+              "⚠️ Yeni Uyuşmazlık Kaydı",
+              `${disputeOrder.product_name} siparişi için butik tarafından uyuşmazlık bildirildi.`,
+              "warning"
+            )
+          )
+        );
+      }
+
+      alert("Uyuşmazlık kaydınız yönetime iletildi.");
+      setShowDisputeModal(false);
+      setDisputeReason('');
+      setDisputeOrder(null);
+    } catch (err: any) {
+      alert("Uyuşmazlık kaydı oluşturulamadı: " + err.message);
+    } finally {
+      setIsSubmittingDispute(false);
     }
   };
 
@@ -185,6 +229,14 @@ export default function Siparislerim() {
                                    İptal Et
                                 </button>
                             )}
+                            {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && (
+                                <button
+                                  onClick={() => { setDisputeOrder(order); setShowDisputeModal(true); }}
+                                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-amber-50 text-amber-700 border border-amber-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all"
+                                >
+                                  Sorun Bildir
+                                </button>
+                            )}
                             <Link href="/katalog" className="p-4 bg-white border border-anthracite-200 rounded-2xl text-anthracite-400 hover:text-black transition-all">
                                <ArrowRight className="w-5 h-5" />
                             </Link>
@@ -195,6 +247,36 @@ export default function Siparislerim() {
               </div>
             )
           })}
+        </div>
+      )}
+
+      {showDisputeModal && disputeOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-[2rem] p-8 w-full max-w-xl shadow-2xl relative">
+            <h3 className="text-2xl font-black mb-2 text-anthracite-900">Uyuşmazlık / İade Talebi</h3>
+            <p className="text-anthracite-500 mb-6 text-sm font-medium">
+              Sipariş: <span className="font-black text-anthracite-900">{disputeOrder.product_name}</span>
+            </p>
+            <form onSubmit={createDispute} className="flex flex-col gap-4">
+              <textarea
+                required
+                minLength={10}
+                rows={5}
+                value={disputeReason}
+                onChange={(e) => setDisputeReason(e.target.value)}
+                className="w-full px-5 py-4 border border-anthracite-200 rounded-2xl bg-anthracite-50 focus:bg-white focus:ring-4 focus:ring-anthracite-100 outline-none font-medium text-anthracite-900 resize-none transition-all"
+                placeholder="Sorunu detaylıca yazın (eksik ürün, hatalı beden, hasarlı teslim vb.)"
+              />
+              <div className="flex gap-3 mt-2">
+                <button type="button" onClick={() => { setShowDisputeModal(false); setDisputeReason(''); setDisputeOrder(null); }} className="flex-1 py-3 rounded-2xl font-bold text-anthracite-500 hover:bg-anthracite-100 transition-colors">
+                  Vazgeç
+                </button>
+                <button disabled={isSubmittingDispute} type="submit" className="flex-[2] py-3 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-2xl shadow-xl transition-all disabled:opacity-50">
+                  {isSubmittingDispute ? 'Gönderiliyor...' : 'Talebi Gönder'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

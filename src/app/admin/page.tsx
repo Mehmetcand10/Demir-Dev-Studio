@@ -34,6 +34,7 @@ export default function AdminDashboard() {
   
   // Duyuru State'leri
   const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [disputes, setDisputes] = useState<any[]>([]);
   const [annTitle, setAnnTitle] = useState('');
   const [annContent, setAnnContent] = useState('');
   const [annTarget, setAnnTarget] = useState('all');
@@ -67,6 +68,15 @@ export default function AdminDashboard() {
     if (data) setAnnouncements(data);
   }, [supabase]);
 
+  const fetchDisputes = useCallback(async () => {
+    const { data } = await supabase
+      .from('order_disputes')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(30);
+    if (data) setDisputes(data);
+  }, [supabase]);
+
   const checkAdminAccess = useCallback(async () => {
     setLoading(true);
     const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -79,10 +89,10 @@ export default function AdminDashboard() {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
     if (profile?.role === 'admin') {
       setIsAdmin(true);
-      await Promise.all([fetchPendingUsers(), fetchOrders(), fetchAnnouncements()]);
+      await Promise.all([fetchPendingUsers(), fetchOrders(), fetchAnnouncements(), fetchDisputes()]);
     }
     setLoading(false);
-  }, [supabase, fetchPendingUsers, fetchOrders, fetchAnnouncements]);
+  }, [supabase, fetchPendingUsers, fetchOrders, fetchAnnouncements, fetchDisputes]);
 
   useEffect(() => {
     setMounted(true);
@@ -130,6 +140,14 @@ export default function AdminDashboard() {
     if (!error) fetchOrders();
   };
 
+  const resolveDispute = async (id: string) => {
+    const { error } = await supabase
+      .from('order_disputes')
+      .update({ status: 'resolved', resolved_at: new Date().toISOString() })
+      .eq('id', id);
+    if (!error) fetchDisputes();
+  };
+
   const handlePublishAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPublishing(true);
@@ -149,6 +167,16 @@ export default function AdminDashboard() {
   const totalProfit = useMemo(() => orders.reduce((acc, o) => acc + Number(o.commission_earned), 0), [orders]);
   const pendingOrdersCount = useMemo(() => orders.filter(o => o.status === ORDER_STATUS.WAITING_PAYMENT && !o.is_archived).length, [orders]);
   const pendingApprovalsCount = profiles.length;
+  const delayedPreparingCount = useMemo(
+    () =>
+      orders.filter((o) => {
+        if (o.status !== ORDER_STATUS.PREPARING) return false;
+        const diffHours = (Date.now() - new Date(o.created_at).getTime()) / (1000 * 60 * 60);
+        return diffHours >= 72;
+      }).length,
+    [orders]
+  );
+  const openDisputeCount = useMemo(() => disputes.filter((d) => d.status === 'open' || d.status === 'reviewing').length, [disputes]);
 
   const chartData = useMemo(() => orders
     .filter(o => !o.is_archived)
@@ -220,9 +248,11 @@ export default function AdminDashboard() {
           </div>
           <div onClick={() => setActiveTab('approvals')} className="bg-white p-8 rounded-[2.5rem] border-2 border-anthracite-100 shadow-sm cursor-pointer group hover:border-blue-400 transition-colors">
               <p className="text-[10px] font-black uppercase tracking-widest text-anthracite-400 mb-2">Onay Bekleyenler</p>
-              <h3 className="text-3xl font-black text-anthracite-900 flex items-center gap-2">
+              <h3 className="text-3xl font-black text-anthracite-900 flex items-center gap-2 mb-2">
                   {pendingApprovalsCount} <span className="text-sm font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">KİŞİ</span>
               </h3>
+              <p className="text-[10px] font-black uppercase tracking-widest text-red-500">Geciken Hazırlık: {delayedPreparingCount}</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-amber-600">Açık Uyuşmazlık: {openDisputeCount}</p>
           </div>
       </div>
 
@@ -330,6 +360,11 @@ export default function AdminDashboard() {
                                 <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${order.status === ORDER_STATUS.WAITING_PAYMENT ? 'bg-amber-50 text-amber-600 border-amber-200' : order.status === ORDER_STATUS.SHIPPED ? 'bg-blue-50 text-blue-600 border-blue-200' : order.status === ORDER_STATUS.DELIVERED ? 'bg-indigo-50 text-indigo-600 border-indigo-200' : order.status === ORDER_STATUS.CANCELLED ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>
                                     {getOrderStatusLabel(order.status)}
                                 </span>
+                                {order.status === ORDER_STATUS.PREPARING && ((Date.now() - new Date(order.created_at).getTime()) / (1000 * 60 * 60)) >= 72 && (
+                                  <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border bg-red-50 text-red-600 border-red-200">
+                                    3+ Gün Gecikme
+                                  </span>
+                                )}
                             </div>
 
                             {/* ÜRÜN GÖRSELİ */}
@@ -392,6 +427,36 @@ export default function AdminDashboard() {
                         </div>
                     ))}
                 </div>
+
+                <div className="mt-10 pt-8 border-t border-anthracite-100">
+                  <h3 className="text-lg font-black text-anthracite-900 mb-4 flex items-center gap-2">
+                    <Info className="w-5 h-5 text-amber-500" /> Uyuşmazlık / İade Talepleri ({openDisputeCount})
+                  </h3>
+                  {disputes.length === 0 ? (
+                    <p className="text-sm font-bold text-anthracite-300">Açık uyuşmazlık kaydı yok.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {disputes.slice(0, 8).map((d) => (
+                        <div key={d.id} className="p-4 rounded-2xl border border-anthracite-100 bg-anthracite-50 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+                          <div className="min-w-0">
+                            <p className="text-xs font-black text-anthracite-500 uppercase tracking-widest">Order: {d.order_id?.slice(0, 8)}</p>
+                            <p className="text-sm font-bold text-anthracite-800 break-words">{d.reason}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase ${d.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                              {d.status}
+                            </span>
+                            {d.status !== 'resolved' && (
+                              <button onClick={() => resolveDispute(d.id)} className="px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-anthracite-900 text-white hover:bg-black transition-all">
+                                Çözüldü
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
             </div>
         )}
 
@@ -414,6 +479,23 @@ export default function AdminDashboard() {
                         <div className="text-left">
                            <h3 className="font-black text-2xl text-anthracite-900 leading-tight">{name}</h3>
                            <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mt-2">{data.count} Aktif Sevkiyat İşlemi</p>
+                           <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">
+                             Performans Skoru: {(() => {
+                               const list = orders.filter((o) => (o.wholesaler?.business_name || 'Bilinmeyen Toptancı') === name && !o.is_archived);
+                               if (list.length === 0) return 0;
+                               const shippedOrDelivered = list.filter((o) => o.status === ORDER_STATUS.SHIPPED || o.status === ORDER_STATUS.DELIVERED).length;
+                               const delivered = list.filter((o) => o.status === ORDER_STATUS.DELIVERED).length;
+                               const onTime = list.filter((o) => {
+                                 if (!(o.status === ORDER_STATUS.SHIPPED || o.status === ORDER_STATUS.DELIVERED)) return false;
+                                 const diffHours = (Date.now() - new Date(o.created_at).getTime()) / (1000 * 60 * 60);
+                                 return diffHours <= 72;
+                               }).length;
+                               const onTimeRate = onTime / list.length;
+                               const deliveredRate = delivered / list.length;
+                               const dispatchRate = shippedOrDelivered / list.length;
+                               return Math.round((onTimeRate * 0.5 + deliveredRate * 0.3 + dispatchRate * 0.2) * 100);
+                             })()} / 100
+                           </p>
                         </div>
                         <div className="mt-auto pt-6 border-t border-anthracite-200">
                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 leading-none">Net Alacak</p>
