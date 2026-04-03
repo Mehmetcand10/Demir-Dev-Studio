@@ -100,18 +100,18 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16 min-h-screen">
+    <div className="max-w-4xl mx-auto px-4 py-10 sm:py-16 min-h-screen">
       
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
          <Link href="/toptanci" className="flex items-center gap-2 text-anthracite-500 font-bold hover:text-black hover:-translate-x-1 transition-all bg-white px-5 py-3 rounded-2xl shadow-sm border border-anthracite-200">
             <ArrowLeft className="w-5 h-5" /> Geri Dön
          </Link>
-         <h1 className="text-3xl font-black tracking-tight text-anthracite-900 border-b-2 border-emerald-500 pb-2">
+         <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-anthracite-900 border-b-2 border-emerald-500 pb-2">
             Raflardaki Ürünü Düzenle
          </h1>
       </div>
 
-      <div className="bg-white rounded-[3rem] p-10 shadow-2xl border border-anthracite-200 grid md:grid-cols-2 gap-12">
+      <div className="bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 shadow-2xl border border-anthracite-200 grid md:grid-cols-2 gap-8 sm:gap-12">
          
          {/* Sol: Mevcut Fotolar */}
          <div className="flex flex-col">
@@ -136,7 +136,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   <input required type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-lg focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none transition-all shadow-sm" />
                </div>
 
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Cinsiyet</label>
                     <select value={gender} onChange={e=>setGender(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-emerald-900 focus:ring-4 outline-none cursor-pointer">
@@ -156,7 +156,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   <input required type="text" value={sizes} onChange={e=>setSizes(e.target.value)} className="w-full px-5 py-4 border border-emerald-200 bg-emerald-50 rounded-2xl font-black text-emerald-900 focus:ring-4 outline-none shadow-sm" placeholder="Örn: S-M-L veya 36-40" />
                </div>
 
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Materyal</label>
                     <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-5 py-3 border border-anthracite-200 bg-anthracite-50 rounded-xl font-bold text-anthracite-900 focus:ring-2 outline-none shadow-sm" />
@@ -169,7 +169,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
                <hr className="border-anthracite-100 my-2" />
 
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-2 block border-l-2 border-blue-500 pl-2">Paket (Seri) Adedi</label>
                     <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-5 py-4 border border-blue-200 bg-blue-50/50 rounded-2xl font-black text-2xl text-blue-900 focus:ring-4 outline-none shadow-sm" />

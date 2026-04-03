@@ -44,16 +44,16 @@ export default function Favoriler() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-screen">
-      <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
         <div>
            <div className="flex items-center gap-3 text-red-500 mb-2">
               <Heart className="w-6 h-6 fill-current" />
               <span className="text-xs font-black uppercase tracking-widest text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100">KİŞİSEL LİSTESİ</span>
            </div>
-           <h1 className="text-4xl sm:text-6xl font-black tracking-tighter text-anthracite-900">Beğendiğim Ürünler</h1>
+           <h1 className="text-3xl sm:text-6xl font-black tracking-tighter text-anthracite-900">Beğendiğim Ürünler</h1>
            <p className="text-anthracite-500 font-medium mt-2">Daha sonra satın almak üzere kaydettiğiniz modeller.</p>
         </div>
-        <Link href="/katalog" className="px-8 py-4 bg-anthracite-900 text-white rounded-2xl font-black shadow-xl hover:scale-105 transition-all text-sm">
+        <Link href="/katalog" className="px-6 sm:px-8 py-4 bg-anthracite-900 text-white rounded-2xl font-black shadow-xl hover:scale-105 transition-all text-sm w-full md:w-auto text-center">
            VİTRİNE GERİ DÖN
         </Link>
       </div>

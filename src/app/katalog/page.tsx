@@ -96,7 +96,7 @@ export default function Katalog() {
       
       {/* HEADER VE ARAMA */}
       <div className="flex flex-col gap-6 mb-10">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-wrap justify-between items-center gap-3">
             <div>
                 <h1 className="text-3xl sm:text-5xl font-black tracking-tighter text-anthracite-900 mb-2">Sezon Koleksiyonu</h1>
                 <p className="text-anthracite-500 font-medium">B2B ağındaki en yeni modelleri anlık keşfedin.</p>
@@ -246,19 +246,19 @@ export default function Katalog() {
       {/* QUICK VIEW MODAL */}
       {showQuickView && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-anthracite-900/40 backdrop-blur-md">
-              <div className="bg-white w-full max-w-4xl rounded-[3rem] overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+              <div className="bg-white w-full max-w-4xl rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl flex flex-col md:flex-row relative max-h-[92vh] overflow-y-auto">
                   <button onClick={() => setShowQuickView(null)} className="absolute top-6 right-6 z-10 p-2 bg-anthracite-100 rounded-full hover:bg-anthracite-200 transition-colors">
                     <X className="w-6 h-6" />
                   </button>
                   <div className="w-full md:w-1/2 aspect-[3/4] relative bg-anthracite-50">
                     <Image src={showQuickView.images?.[0]} alt="quick" fill className="object-cover" />
                   </div>
-                  <div className="w-full md:w-1/2 p-10 flex flex-col text-left">
+                  <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col text-left">
                      <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-max mb-4 uppercase tracking-widest">{showQuickView.category}</span>
-                     <h2 className="text-4xl font-black text-anthracite-900 mb-2 leading-tight">{showQuickView.name}</h2>
+                     <h2 className="text-3xl sm:text-4xl font-black text-anthracite-900 mb-2 leading-tight break-words">{showQuickView.name}</h2>
                      <p className="text-anthracite-500 font-medium mb-6">{showQuickView.description}</p>
                      
-                     <div className="grid grid-cols-2 gap-4 mb-8">
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                         <div className="bg-anthracite-50 p-4 rounded-2xl">
                             <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-1">Bedenler</p>
                             <p className="font-bold text-anthracite-900">{showQuickView.sizes}</p>
@@ -269,12 +269,12 @@ export default function Katalog() {
                         </div>
                      </div>
 
-                     <div className="mt-auto flex items-center justify-between">
+                     <div className="mt-auto flex flex-wrap items-center justify-between gap-4">
                         <div className="flex flex-col">
                             <span className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest leading-none mb-1">Alış Fiyatı (Adet)</span>
                             <span className="font-black text-3xl text-anthracite-900">{(Number(showQuickView.base_wholesale_price) + Number(showQuickView.margin_price || 0)).toLocaleString("tr-TR")} ₺</span>
                         </div>
-                        <Link href={`/product/${showQuickView.id}`} className="px-8 py-4 bg-anthracite-900 text-white rounded-2xl font-black hover:scale-105 transition-all shadow-xl">Hemen Sipariş Ver</Link>
+                        <Link href={`/product/${showQuickView.id}`} className="px-6 sm:px-8 py-4 bg-anthracite-900 text-white rounded-2xl font-black hover:scale-105 transition-all shadow-xl w-full sm:w-auto text-center">Hemen Sipariş Ver</Link>
                      </div>
                   </div>
               </div>

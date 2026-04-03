@@ -47,7 +47,7 @@ export default function WholesalerProfile() {
           <ArrowLeft className="w-4 h-4" /> Genel Vitrine Dön
         </Link>
 
-        <div className="bg-white border-2 border-anthracite-100 rounded-[3rem] p-10 flex flex-col md:flex-row items-center gap-10 shadow-xl relative overflow-hidden">
+        <div className="bg-white border-2 border-anthracite-100 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 flex flex-col md:flex-row items-center gap-8 sm:gap-10 shadow-xl relative overflow-hidden">
            <div className="absolute top-0 right-0 -mt-20 -mr-20 opacity-5">
               <Package className="w-96 h-96" />
            </div>
@@ -63,7 +63,7 @@ export default function WholesalerProfile() {
                     <Star className="w-3 h-3 fill-current" /> <span className="text-[10px] font-black uppercase tracking-widest">Premium Satıcı</span>
                  </div>
               </div>
-              <h1 className="text-4xl sm:text-6xl font-black tracking-tighter text-anthracite-900 mb-2 leading-tight">{profile.business_name || profile.full_name}</h1>
+              <h1 className="text-3xl sm:text-6xl font-black tracking-tighter text-anthracite-900 mb-2 leading-tight break-words">{profile.business_name || profile.full_name}</h1>
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-6 text-anthracite-500 font-medium">
                  <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-emerald-500" /> Merter / İSTANBUL
@@ -78,7 +78,7 @@ export default function WholesalerProfile() {
 
       {/* MAĞAZA ÜRÜNLERİ */}
       <div className="flex flex-col gap-8">
-        <div className="flex items-center justify-between border-b-2 border-anthracite-100 pb-5">
+        <div className="flex flex-wrap items-center justify-between border-b-2 border-anthracite-100 pb-5 gap-2">
            <h2 className="text-2xl font-black text-anthracite-900">Mağaza Koleksiyonu ({products.length})</h2>
            <p className="text-anthracite-400 font-bold text-sm">Üreticiden doğrudan sevkiyat.</p>
         </div>

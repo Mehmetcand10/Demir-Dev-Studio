@@ -178,7 +178,7 @@ export default function AdminDashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen bg-anthracite-50/20">
       
       {/* ÜST BAŞLIK VE BİLDİRİM */}
-      <div className="flex justify-between items-center mb-10 gap-4">
+      <div className="flex flex-wrap justify-between items-center mb-10 gap-4">
         <div>
            <div className="flex items-center gap-2 text-emerald-600 mb-1">
               <BarChart3 className="w-5 h-5" />
@@ -221,7 +221,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* STICKY TAB NAVIGATION (Bento-Cockpit Stabilized) */}
-      <div className="sticky top-0 z-50 mb-10 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 bg-anthracite-50/80 backdrop-blur-xl border-b border-anthracite-100 transition-all">
+      <div className="sticky top-0 z-50 mb-10 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 bg-anthracite-50/80 backdrop-blur-xl border-b border-anthracite-100 transition-all overflow-x-auto">
           <div className="flex items-center gap-2 bg-white p-1.5 rounded-[2rem] border border-anthracite-100 shadow-xl w-max mx-auto sm:mx-0">
              {(['overview', 'orders', 'payments', 'approvals', 'announcements', 'archive'] as const).map((tab) => {
                  const icons = { overview: LayoutDashboard, orders: ShoppingBag, payments: Wallet, approvals: UserCheck, announcements: Megaphone, archive: HistoryIcon };
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
                     <button 
                         key={tab} 
                         onClick={() => setActiveTab(tab)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-[1.5rem] font-black text-xs uppercase tracking-tighter transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-lg' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-[1.5rem] font-black text-[10px] sm:text-xs uppercase tracking-tighter whitespace-nowrap transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-lg' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
                     >
                         <Icon className="w-4 h-4" /> {labels[tab as keyof typeof labels]}
                     </button>

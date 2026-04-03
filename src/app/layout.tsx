@@ -37,7 +37,7 @@ export default async function RootLayout({
 
   return (
     <html lang="tr">
-      <body className={`${inter.className} min-h-screen flex flex-col antialiased`}>
+      <body className={`${inter.className} min-h-screen flex flex-col antialiased overflow-x-hidden`}>
         <AnnouncementBanner />
         <script
           dangerouslySetInnerHTML={{
@@ -51,12 +51,13 @@ export default async function RootLayout({
           }}
         />
         <nav className="border-b border-anthracite-200 dark:border-anthracite-800 bg-white/80 dark:bg-anthracite-900/80 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 text-xl font-semibold tracking-tight">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2 flex flex-wrap items-center justify-between gap-3">
+            <Link href="/" className="flex items-center gap-2 text-lg sm:text-xl font-semibold tracking-tight min-w-0">
               <Package className="w-6 h-6" />
-              <span>Demir Dev Studio</span>
+              <span className="truncate">Demir Dev Studio</span>
             </Link>
-            <div className="flex items-center gap-6">
+            <div className="w-full md:w-auto overflow-x-auto">
+            <div className="flex items-center gap-3 sm:gap-6 min-w-max md:min-w-0 pb-1 md:pb-0">
               <Link href="/katalog" className="text-sm font-bold hover:text-anthracite-500 transition-colors flex items-center h-full tracking-wide">
                 Tüm Ürünler
               </Link>
@@ -100,6 +101,7 @@ export default async function RootLayout({
               ) : (
                 <Link href="/login" className="text-sm font-bold hover:text-anthracite-500 transition-colors">Giriş Yap</Link>
               )}
+            </div>
             </div>
           </div>
         </nav>

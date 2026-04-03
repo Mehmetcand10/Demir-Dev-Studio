@@ -120,14 +120,14 @@ export default function Register() {
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium mb-1.5 block">Vergi No (VKN)</label>
               <input required type="text" value={taxId} onChange={(e) => setTaxId(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-anthracite-200 bg-anthracite-50 text-sm outline-none" placeholder="1234567890" />
             </div>
             <div>
               <label className="text-sm font-medium mb-1.5 block">Telefon (İletişim)</label>
-              <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 rounded-xl border-anthracite-200 bg-anthracite-50 text-sm outline-none" placeholder="05..." />
+              <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-anthracite-200 bg-anthracite-50 text-sm outline-none" placeholder="05..." />
             </div>
           </div>
 

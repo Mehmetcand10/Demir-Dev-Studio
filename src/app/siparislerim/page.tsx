@@ -64,7 +64,7 @@ export default function Siparislerim() {
            </div>
            <h1 className="text-4xl sm:text-6xl font-black tracking-tighter text-anthracite-900 leading-none">Siparişlerim</h1>
         </div>
-        <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4 w-full md:w-auto">
             <div className="bg-white px-6 py-4 rounded-[2rem] border border-anthracite-100 shadow-sm min-w-[150px]">
                 <p className="text-[9px] font-black text-anthracite-400 uppercase tracking-widest mb-1">Toplam Alım</p>
                 <p className="text-2xl font-black text-anthracite-900">{totalSpent.toLocaleString('tr-TR')} ₺</p>
@@ -77,14 +77,14 @@ export default function Siparislerim() {
       </div>
 
       {/* TABS NAVIGATION */}
-      <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 rounded-[2.5rem] border border-anthracite-100 shadow-lg w-max mb-10">
-          <button onClick={() => setActiveTab('active')} className={`flex items-center gap-2 px-8 py-3.5 rounded-[2rem] font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'active' ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black'}`}>
+      <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 rounded-[2.5rem] border border-anthracite-100 shadow-lg w-max mb-10 overflow-x-auto max-w-full">
+          <button onClick={() => setActiveTab('active')} className={`flex items-center gap-2 px-5 sm:px-8 py-3.5 rounded-[2rem] font-black text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'active' ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black'}`}>
               <Truck className="w-4 h-4" /> Aktif Takip ({activeCount})
           </button>
-          <button onClick={() => setActiveTab('waiting')} className={`flex items-center gap-2 px-8 py-3.5 rounded-[2rem] font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'waiting' ? 'bg-white border-2 border-amber-400 text-amber-600 shadow-md scale-105' : 'text-anthracite-400 hover:text-black'}`}>
+          <button onClick={() => setActiveTab('waiting')} className={`flex items-center gap-2 px-5 sm:px-8 py-3.5 rounded-[2rem] font-black text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'waiting' ? 'bg-white border-2 border-amber-400 text-amber-600 shadow-md scale-105' : 'text-anthracite-400 hover:text-black'}`}>
               <CreditCard className="w-4 h-4" /> Ödeme Bekleyen ({waitingCount})
           </button>
-          <button onClick={() => setActiveTab('archive')} className={`flex items-center gap-2 px-8 py-3.5 rounded-[2rem] font-black text-xs uppercase tracking-widest transition-all ${activeTab === 'archive' ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black'}`}>
+          <button onClick={() => setActiveTab('archive')} className={`flex items-center gap-2 px-5 sm:px-8 py-3.5 rounded-[2rem] font-black text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'archive' ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black'}`}>
               <HistoryIcon className="w-4 h-4" /> Arşiv
           </button>
       </div>

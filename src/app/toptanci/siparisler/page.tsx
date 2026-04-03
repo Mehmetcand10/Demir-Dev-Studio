@@ -59,7 +59,7 @@ export default function ToptanciSiparisler() {
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-anthracite-200 pb-6">
         <div>
-          <h1 className="text-4xl font-black tracking-tight text-anthracite-900 flex items-center gap-3">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-anthracite-900 flex items-center gap-3">
             <Package className="w-10 h-10 text-emerald-500" /> Kargo & Lojistik Masası
           </h1>
           <p className="text-anthracite-500 font-medium mt-1 text-lg">Platformdan aldığınız resmi satışı onaylanmış siparişlerinizi bu odadan kargolayıp gönderin.</p>
@@ -89,7 +89,7 @@ export default function ToptanciSiparisler() {
             {orders.map(order => (
                <div key={order.id} className="bg-anthracite-50 border border-anthracite-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:bg-white hover:shadow-xl hover:-translate-y-1">
                   <div>
-                    <div className="flex justify-between items-start mb-6">
+                    <div className="flex flex-wrap justify-between items-start mb-6 gap-2">
                       <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${order.status === 'shipped' ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'}`}>
                         {order.status === 'shipped' ? 'KARGOLANDI GİTTİ' : 'YENİ SİPARİŞ - HAZIRLA'}
                       </span>
@@ -97,7 +97,7 @@ export default function ToptanciSiparisler() {
                         {Number(order.quantity)} Adet
                       </span>
                     </div>
-                    <h3 className="text-2xl font-black text-anthracite-900 mb-2 leading-tight">{order.product_name || "Silinmiş Ürün"}</h3>
+                    <h3 className="text-xl sm:text-2xl font-black text-anthracite-900 mb-2 leading-tight break-words">{order.product_name || "Silinmiş Ürün"}</h3>
                     <p className="text-sm font-black text-emerald-600 mb-6 tracking-widest uppercase">Hesaba Geçecek Ciro: {Number(order.wholesaler_earning).toLocaleString('tr-TR')} ₺</p>
                     
                     <div className="bg-white p-5 rounded-2xl border border-anthracite-100 mb-6 shadow-inner">

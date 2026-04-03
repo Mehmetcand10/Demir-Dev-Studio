@@ -106,7 +106,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-wrap justify-between items-center mb-8 gap-3">
         <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-anthracite-500 hover:text-anthracite-900 dark:hover:text-white transition-colors">
           <ArrowLeft className="w-4 h-4" /> Kataloğa Dön
         </Link>
@@ -211,14 +211,14 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                     )}
                   </div>
 
-                  <div className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed bg-white border border-anthracite-200 p-5 rounded-2xl shadow-sm mt-6">
+                  <div className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed bg-white border border-anthracite-200 p-5 rounded-2xl shadow-sm mt-6 overflow-hidden">
                     <p className="mb-4">{product.description}</p>
                     <ul className="space-y-2 mt-4">
-                       <li className="flex justify-between items-center bg-anthracite-50 px-4 py-2 rounded-xl">
+                       <li className="flex flex-wrap justify-between items-center gap-2 bg-anthracite-50 px-4 py-2 rounded-xl">
                           <span className="font-bold text-anthracite-500 text-xs uppercase tracking-widest">Kumaş / Materyal</span>
                           <span className="font-black text-anthracite-900">{product.fabric_type}</span>
                        </li>
-                       <li className="flex justify-between items-center bg-anthracite-50 px-4 py-2 rounded-xl">
+                       <li className="flex flex-wrap justify-between items-center gap-2 bg-anthracite-50 px-4 py-2 rounded-xl">
                           <span className="font-bold text-anthracite-500 text-xs uppercase tracking-widest">Ağırlık / Gramaj</span>
                           <span className="font-black text-anthracite-900">{product.gsm || "Belirtilmemiş"}</span>
                        </li>
@@ -228,7 +228,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               </div>
 
               <div className="mt-auto border-t border-anthracite-100 dark:border-anthracite-800 pt-8 flex flex-col gap-6">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-col">
                     <span className="font-bold text-anthracite-900 dark:text-white">Sipariş Miktarı</span>
                     <span className="text-[10px] text-anthracite-400 font-medium">Minimum {product.min_order_quantity} adet ve katları</span>
@@ -240,7 +240,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/30 p-4 rounded-xl text-emerald-900 dark:text-emerald-100 mb-2 border border-emerald-100 dark:border-emerald-800/50">
+                <div className="flex flex-wrap items-center justify-between gap-2 bg-emerald-50 dark:bg-emerald-950/30 p-4 rounded-xl text-emerald-900 dark:text-emerald-100 mb-2 border border-emerald-100 dark:border-emerald-800/50">
                   <div className="flex flex-col">
                     <span className="text-sm font-medium">Toplam Tutar ({totalItems} Adet)</span>
                   </div>
@@ -284,7 +284,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
             <p className="text-anthracite-500 mb-8 text-sm font-medium">Bu adres toptancıya veya kurye tarafına irsaliye olarak düşecektir. Lütfen eksiksiz giriniz.</p>
             
             <form onSubmit={handleCreateOrder} className="flex flex-col gap-5">
-               <div className="grid grid-cols-2 gap-5">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                  <div>
                    <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block pl-2">İl</label>
                    <input required value={il} onChange={e=>setIl(e.target.value)} type="text" className="w-full px-5 py-4 border border-anthracite-200 rounded-2xl bg-anthracite-50 focus:bg-white focus:ring-4 focus:ring-anthracite-100 outline-none font-bold text-anthracite-900 transition-all" placeholder="Örn: İstanbul" />

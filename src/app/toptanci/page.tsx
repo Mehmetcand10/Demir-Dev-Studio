@@ -114,7 +114,7 @@ export default function ToptanciDashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen bg-anthracite-50/10">
       
       {/* ÜST BAŞLIK */}
-      <div className="flex justify-between items-center mb-10 text-left">
+      <div className="flex flex-wrap justify-between items-center mb-10 text-left gap-4">
         <div>
            <div className="flex items-center gap-2 text-emerald-600 mb-1">
               <Layers className="w-5 h-5" />
@@ -128,7 +128,7 @@ export default function ToptanciDashboard() {
       </div>
 
       {/* STICKY TAB NAVIGATION (Stationary Elite v2) */}
-      <div className="sticky top-0 z-50 mb-10 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 bg-anthracite-50/80 backdrop-blur-xl border-b border-anthracite-100 transition-all">
+      <div className="sticky top-0 z-50 mb-10 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-4 bg-anthracite-50/80 backdrop-blur-xl border-b border-anthracite-100 transition-all overflow-x-auto">
           <div className="flex items-center gap-2 bg-white p-1.5 rounded-[2rem] border border-anthracite-100 shadow-xl w-max mx-auto sm:mx-0">
              {(['inventory', 'orders', 'studio', 'finance'] as const).map((tab) => {
                  const icons = { studio: PlusCircle, inventory: LayoutDashboard, orders: ShoppingBag, finance: Wallet };
@@ -138,7 +138,7 @@ export default function ToptanciDashboard() {
                     <button 
                         key={tab} 
                         onClick={() => setActiveTab(tab)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-[1.5rem] font-black text-xs uppercase tracking-tighter transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-lg' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
+                        className={`flex items-center gap-2 px-4 sm:px-6 py-3 rounded-[1.5rem] font-black text-[10px] sm:text-xs uppercase tracking-tighter whitespace-nowrap transition-all ${activeTab === tab ? 'bg-anthracite-900 text-white shadow-lg' : 'text-anthracite-400 hover:text-black hover:bg-anthracite-50'}`}
                     >
                         <Icon className="w-4 h-4" /> {labels[tab as keyof typeof labels]}
                     </button>
@@ -180,7 +180,7 @@ export default function ToptanciDashboard() {
                                   </div>
                                </div>
                                <div className="p-6">
-                                   <div className="flex justify-between items-start mb-4">
+                                   <div className="flex justify-between items-start mb-4 gap-3">
                                        <h3 className="font-black text-lg text-anthracite-900 leading-tight line-clamp-1">{p.name}</h3>
                                    </div>
                                    <div className="flex flex-wrap gap-1.5 mb-6">
@@ -195,7 +195,7 @@ export default function ToptanciDashboard() {
                                            <span className="text-[9px] font-black text-anthracite-400 uppercase leading-none mb-1">Net Kazanç</span>
                                            <span className="font-black text-xl text-emerald-600">{p.base_wholesale_price.toLocaleString('tr-TR')} ₺</span>
                                        </div>
-                                       <div className="bg-anthracite-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest">MOQ: {p.min_order_quantity}</div>
+                                       <div className="bg-anthracite-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest shrink-0">MOQ: {p.min_order_quantity}</div>
                                    </div>
                                </div>
                            </div>
