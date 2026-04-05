@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { KeyRound, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { AuthCard } from '@/components/layout/AuthCard';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -22,60 +23,58 @@ export default function ForgotPassword() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
-    if (error) setError("Mail gönderilirken hata oluştu: Kasa ile olan ağınız kesilmiş veya kayıtlı değilsiniz.");
+    if (error) setError("E-posta gönderilemedi. Adresin kayıtlı olduğundan emin olun.");
     else setSuccess(true);
     
     setLoading(false);
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center bg-anthracite-50 px-4 py-12 relative overflow-hidden">
-      
-      {/* Lüks Arka Plan Dağıtımı */}
-      <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-emerald-500/10 blur-[150px] rounded-full pointer-events-none"></div>
-
-      <div className="w-full max-w-[26rem] bg-white rounded-[2rem] p-8 sm:p-10 shadow-2xl border border-anthracite-100 relative z-10 text-center">
-        <Link href="/login" className="absolute top-8 left-8 text-anthracite-400 hover:text-black transition-colors">
-          <ArrowLeft className="w-6 h-6" />
+    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
+      <AuthCard className="relative max-w-md text-center">
+        <Link href="/login" className="absolute left-4 top-4 text-anthracite-400 transition hover:text-anthracite-700" aria-label="Geri">
+          <ArrowLeft className="h-5 w-5" strokeWidth={2} />
         </Link>
 
-        <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl mx-auto flex items-center justify-center mb-6 mt-6 shadow-inner border border-emerald-100">
-           <KeyRound className="w-10 h-10" />
+        <div className="mx-auto mb-5 mt-6 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-600">
+           <KeyRound className="h-6 w-6" strokeWidth={2} />
         </div>
         
-        <h1 className="text-3xl font-black text-anthracite-900 tracking-tight mb-3">Şifrenizi Mi Unuttunuz?</h1>
+        <h1 className="mb-2 text-xl font-semibold text-anthracite-900">Şifre sıfırlama</h1>
         
         {success ? (
-          <div className="mt-6 p-6 bg-emerald-50 rounded-2xl border border-emerald-200">
-             <h3 className="text-emerald-800 font-bold mb-2">Kurtarma Bağlantısı Gönderildi!</h3>
-             <p className="text-emerald-700 text-sm font-medium">Lütfen <strong>{email}</strong> adresinizin gelen kutusunu kontrol edin. Gelen yeşil butona basarak yeni bir kilit kapısı oluşturabilirsiniz.</p>
+          <div className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50/90 p-4 text-left text-sm text-emerald-900">
+             <p className="font-medium">Bağlantı gönderildi.</p>
+             <p className="mt-2 text-emerald-800/90"><strong>{email}</strong> gelen kutusunu kontrol edin.</p>
           </div>
         ) : (
           <>
-            <p className="text-anthracite-500 font-medium text-sm mb-8 px-2">Sorun değil. İşletmenize ait kayıtlı yönetici e-postasını girin, size kasa anahtarınızı yenileyecek lüks bir bağlantı atalım.</p>
+            <p className="mb-6 text-sm text-anthracite-600">
+              Kayıtlı e-postanızı girin; şifre yenileme bağlantısı gönderelim.
+            </p>
             
-            {error && <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold mb-6 border border-red-100">{error}</div>}
+            {error && <div className="mb-4 rounded-xl border border-red-100 bg-red-50/90 p-3 text-sm text-red-700">{error}</div>}
 
-            <form onSubmit={handleReset} className="flex flex-col gap-4">
+            <form onSubmit={handleReset} className="flex flex-col gap-3 text-left">
               <input 
                 required 
                 type="email" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
-                className="w-full px-5 py-4 rounded-2xl border border-anthracite-200 bg-anthracite-50 text-anthracite-900 font-bold outline-none focus:ring-4 focus:ring-anthracite-100 transition-all text-center placeholder:font-medium placeholder:text-anthracite-300" 
-                placeholder="Örn: iletisim@butik.com" 
+                className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" 
+                placeholder="ornek@firma.com" 
               />
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-anthracite-900 hover:bg-black text-white font-black py-4.5 rounded-2xl shadow-xl transition-all hover:scale-[1.02] disabled:opacity-50 mt-2"
+                className="w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800 disabled:opacity-50"
               >
-                {loading ? "Sistem Ağ Taraması Yapılıyor..." : "Kurtarma Bağlantısı Gönder"}
+                {loading ? "Gönderiliyor…" : "Bağlantı gönder"}
               </button>
             </form>
           </>
         )}
-      </div>
+      </AuthCard>
     </div>
   );
 }

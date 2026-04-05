@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Package, Heart } from 'lucide-react';
 import { createClient } from '@/utils/supabase/server';
 import AnnouncementBanner from "@/components/AnnouncementBanner";
+import { SiteBackground } from "@/components/layout/SiteBackground";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -50,69 +51,68 @@ export default async function RootLayout({
             `,
           }}
         />
-        <nav className="border-b border-anthracite-200 dark:border-anthracite-800 bg-white/80 dark:bg-anthracite-900/80 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2 flex flex-wrap items-center justify-between gap-3">
-            <Link href="/" className="flex items-center gap-2 text-lg sm:text-xl font-semibold tracking-tight min-w-0">
-              <Package className="w-6 h-6" />
+        <nav className="sticky top-0 z-50 border-b border-anthracite-200/80 bg-white/90 backdrop-blur-md">
+          <div className="mx-auto flex min-h-14 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
+            <Link href="/" className="flex min-w-0 items-center gap-2 text-base font-semibold tracking-tight text-anthracite-900 sm:text-lg">
+              <Package className="h-5 w-5 shrink-0 text-emerald-600" strokeWidth={2} />
               <span className="truncate">Demir Dev Studio</span>
             </Link>
-            <div className="w-full md:w-auto overflow-x-auto">
-            <div className="flex items-center gap-3 sm:gap-6 min-w-max md:min-w-0 pb-1 md:pb-0">
-              <Link href="/katalog" className="text-sm font-bold hover:text-anthracite-500 transition-colors flex items-center h-full tracking-wide">
-                Tüm Ürünler
+            <div className="w-full overflow-x-auto md:w-auto">
+            <div className="flex min-w-max items-center gap-1 pb-1 sm:gap-2 md:min-w-0 md:pb-0">
+              <Link href="/katalog" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+                Katalog
               </Link>
               {userRole === 'butik' && user ? (
                 <>
-                  <Link href="/favorites" className="text-sm font-bold text-red-500 hover:text-red-600 transition-colors flex items-center gap-1 h-full tracking-wide">
-                    <Heart className="w-4 h-4 fill-current" /> Favorilerim
+                  <Link href="/favorites" className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50">
+                    <Heart className="h-4 w-4 fill-current" strokeWidth={2} /> Favoriler
                   </Link>
-                  <Link href="/siparislerim" className="text-sm font-bold text-anthracite-400 hover:text-black transition-colors flex items-center h-full tracking-wide">
-                    Siparişlerim (Kargo)
+                  <Link href="/siparislerim" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+                    Siparişlerim
                   </Link>
                 </>
               ) : null}
               
               {user ? (
-                <div className="flex items-center gap-2">
+                <div className="ml-1 flex flex-wrap items-center gap-2">
                   {userRole === 'admin' && (
                     <Link 
                       href="/admin" 
-                      className="text-sm font-bold text-emerald-600 bg-emerald-50 px-5 py-2 rounded-full border border-emerald-200 transition-colors shadow-sm hover:scale-105"
+                      className="rounded-lg border border-emerald-200/80 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100/80"
                     >
-                      Merkez Yönetim
+                      Yönetim
                     </Link>
                   )}
                   {userRole === 'toptanci' && (
                     <Link 
                       href="/toptanci" 
-                      className="text-sm font-bold text-emerald-600 bg-emerald-50 px-5 py-2 rounded-full border border-emerald-200 transition-colors shadow-sm hover:scale-105"
+                      className="rounded-lg border border-emerald-200/80 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100/80"
                     >
-                      Kendi Satıcı Panelim
+                      Toptancı paneli
                     </Link>
                   )}
-                  {/* BUTİKLERE ÜSTTEKİ YÖNETİM BUTONLARI ÇIKMAYACAK! SADECE ÇIKIŞ YAP. */}
                   
                   <form action="/auth/signout" method="post">
-                    <button type="submit" className="text-sm font-bold text-red-500 hover:text-white px-4 py-2 border border-red-100 hover:border-red-500 bg-white hover:bg-red-500 rounded-full transition-all shadow-sm">
-                      Çıkış Yap
+                    <button type="submit" className="rounded-lg border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50">
+                      Çıkış
                     </button>
                   </form>
                 </div>
               ) : (
-                <Link href="/login" className="text-sm font-bold hover:text-anthracite-500 transition-colors">Giriş Yap</Link>
+                <Link href="/login" className="ml-1 flex h-9 items-center rounded-lg bg-anthracite-900 px-4 text-sm font-medium text-white transition hover:bg-anthracite-800">Giriş</Link>
               )}
             </div>
             </div>
           </div>
         </nav>
         
-        <main className="flex-grow">
-          {children}
+        <main className="flex flex-grow flex-col">
+          <SiteBackground>{children}</SiteBackground>
         </main>
 
-        <footer className="border-t border-anthracite-200 dark:border-anthracite-800 py-8 text-center bg-anthracite-50 dark:bg-anthracite-900 mt-auto">
-          <p className="text-sm text-anthracite-500 font-medium">
-            Demir Dev Studio Yazılım Güvencesiyle © {new Date().getFullYear()}
+        <footer className="mt-auto border-t border-anthracite-200/70 bg-white/60 py-6 text-center backdrop-blur-sm">
+          <p className="text-xs text-anthracite-500 sm:text-sm">
+            Demir Dev Studio © {new Date().getFullYear()}
           </p>
         </footer>
       </body>

@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
-import { Save, ArrowLeft, Loader2, Edit3, Image as ImageIcon } from 'lucide-react';
+import { Save, ArrowLeft, Loader2, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { DashboardShell } from '@/components/dashboard/DashboardShell';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -93,36 +94,39 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   };
 
   if (loading) return (
-     <div className="flex flex-col items-center justify-center min-h-[80vh] bg-anthracite-50">
-        <Loader2 className="w-16 h-16 text-emerald-500 animate-spin mb-6" />
-        <p className="text-xl font-black text-anthracite-900 tracking-tight">Vitrindeki Ürününüz Masaya Getiriliyor...</p>
-     </div>
+     <DashboardShell>
+       <div className="flex flex-col items-center justify-center py-24">
+          <Loader2 className="mb-4 h-10 w-10 animate-spin text-emerald-600" strokeWidth={2} />
+          <p className="text-sm font-medium text-anthracite-500">Yükleniyor…</p>
+       </div>
+     </DashboardShell>
   );
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-10 sm:py-16 min-h-screen">
+    <DashboardShell>
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:py-10">
       
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-         <Link href="/toptanci" className="flex items-center gap-2 text-anthracite-500 font-bold hover:text-black hover:-translate-x-1 transition-all bg-white px-5 py-3 rounded-2xl shadow-sm border border-anthracite-200">
-            <ArrowLeft className="w-5 h-5" /> Geri Dön
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+         <Link href="/toptanci" className="inline-flex items-center gap-2 rounded-lg border border-anthracite-200/80 bg-white px-4 py-2.5 text-sm font-medium text-anthracite-700 shadow-sm transition hover:bg-anthracite-50">
+            <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Panele dön
          </Link>
-         <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-anthracite-900 border-b-2 border-emerald-500 pb-2">
-            Raflardaki Ürünü Düzenle
+         <h1 className="text-xl font-semibold text-anthracite-900 sm:text-2xl">
+            Ürünü düzenle
          </h1>
       </div>
 
-      <div className="bg-white rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 shadow-2xl border border-anthracite-200 grid md:grid-cols-2 gap-8 sm:gap-12">
+      <div className="grid gap-8 rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:gap-10 sm:p-8 md:grid-cols-2">
          
          {/* Sol: Mevcut Fotolar */}
          <div className="flex flex-col">
-            <h3 className="text-lg font-black text-anthracite-900 mb-4 flex items-center gap-2"><ImageIcon className="w-5 h-5 text-emerald-500"/> Ürün Görselleri</h3>
-            <div className="w-full aspect-[3/4] bg-emerald-50/50 rounded-3xl overflow-hidden border-2 border-emerald-100 relative shadow-inner">
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-anthracite-900"><ImageIcon className="h-4 w-4 text-emerald-600" strokeWidth={2}/> Görseller</h3>
+            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-emerald-100/90 bg-emerald-50/40 shadow-inner">
                {images && images.length > 0 ? (
                  <Image src={images[0]} alt="Ana Gorsel" fill className="object-cover" />
                ) : (
                  <div className="w-full h-full flex items-center justify-center font-bold text-anthracite-400">Görsel Bulunamadı</div>
                )}
-               <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-xl text-white font-bold text-xs shadow-lg">Şu an Vitrinde ({images.length} Fotoğraf)</div>
+               <div className="absolute bottom-3 left-3 rounded-lg bg-black/55 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">{images.length} görsel</div>
             </div>
             <p className="text-xs text-anthracite-500 mt-4 text-center font-medium">*Fotoğrafları değiştirmek için Mevcut ürünü silip baştan Koleksiyon oluşturmalısınız.*</p>
          </div>
@@ -132,38 +136,38 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
             <form onSubmit={handleUpdate} className="flex flex-col gap-6">
                
                <div>
-                  <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Ürün (Model) Başlığı</label>
-                  <input required type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-lg focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 outline-none transition-all shadow-sm" />
+                  <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Ürün adı</label>
+                  <input required type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm font-medium outline-none transition focus:ring-2 focus:ring-emerald-500/15" />
                </div>
 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Cinsiyet</label>
-                    <select value={gender} onChange={e=>setGender(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-emerald-900 focus:ring-4 outline-none cursor-pointer">
+                    <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Cinsiyet</label>
+                    <select value={gender} onChange={e=>setGender(e.target.value)} className="w-full cursor-pointer rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15">
                       <option>Kadın</option><option>Erkek</option><option>Kız Çocuk</option><option>Erkek Çocuk</option><option>Unisex</option>
                     </select>
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Kategori</label>
-                    <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full px-5 py-4 border border-anthracite-200 bg-anthracite-50 rounded-2xl font-black text-anthracite-900 focus:ring-4 outline-none cursor-pointer">
+                    <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Kategori</label>
+                    <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full cursor-pointer rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15">
                       <option>Tişört</option><option>Sweatshirt</option><option>İç Çamaşırı / Pijama</option><option>Ayakkabı / Sneaker</option><option>Triko</option><option>Pantolon / Jean</option><option>Mont / Kaban</option><option>Elbise / Etek</option><option>Aksesuar</option>
                     </select>
                   </div>
                </div>
 
                <div>
-                  <label className="text-[10px] font-black uppercase text-emerald-600 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Paket İçi Beden Asortisi</label>
-                  <input required type="text" value={sizes} onChange={e=>setSizes(e.target.value)} className="w-full px-5 py-4 border border-emerald-200 bg-emerald-50 rounded-2xl font-black text-emerald-900 focus:ring-4 outline-none shadow-sm" placeholder="Örn: S-M-L veya 36-40" />
+                  <label className="mb-1.5 block text-xs font-medium text-emerald-800">Beden asortisi</label>
+                  <input required type="text" value={sizes} onChange={e=>setSizes(e.target.value)} className="w-full rounded-xl border border-emerald-200/90 bg-emerald-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/20" placeholder="Örn: S-M-L" />
                </div>
 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Materyal</label>
-                    <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-5 py-3 border border-anthracite-200 bg-anthracite-50 rounded-xl font-bold text-anthracite-900 focus:ring-2 outline-none shadow-sm" />
+                    <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Materyal</label>
+                    <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-2 block border-l-2 border-emerald-500 pl-2">Ağırlık (Opsiyonel)</label>
-                    <input type="text" value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full px-5 py-3 border border-anthracite-200 bg-anthracite-50 rounded-xl font-bold text-anthracite-900 focus:ring-2 outline-none shadow-sm" placeholder="Örn: 240gsm" />
+                    <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Gramaj (isteğe bağlı)</label>
+                    <input type="text" value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" placeholder="240 gsm" />
                   </div>
                </div>
 
@@ -171,18 +175,18 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-2 block border-l-2 border-blue-500 pl-2">Paket (Seri) Adedi</label>
-                    <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full px-5 py-4 border border-blue-200 bg-blue-50/50 rounded-2xl font-black text-2xl text-blue-900 focus:ring-4 outline-none shadow-sm" />
+                    <label className="mb-1.5 block text-xs font-medium text-anthracite-600">MOQ (seri adedi)</label>
+                    <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-white px-3.5 py-2.5 text-sm tabular-nums outline-none focus:ring-2 focus:ring-emerald-500/15" />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase text-blue-600 tracking-widest mb-2 block border-l-2 border-blue-500 pl-2">Sizin Fiyatınız (₺)</label>
-                    <input required type="number" min="1" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full px-5 py-4 border-2 border-blue-200 bg-blue-50/50 rounded-2xl font-black text-2xl text-blue-900 focus:ring-4 outline-none shadow-sm" />
+                    <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Toptan fiyat (₺)</label>
+                    <input required type="number" min="1" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-white px-3.5 py-2.5 text-sm tabular-nums outline-none focus:ring-2 focus:ring-emerald-500/15" />
                   </div>
                </div>
 
-               <button disabled={saving} type="submit" className="w-full bg-anthracite-900 text-white font-black text-xl py-6 rounded-2xl shadow-xl hover:bg-black hover:-translate-y-1 transition-all flex items-center justify-center gap-3 mt-4 disabled:opacity-50 border-t-4 border-anthracite-700">
-                  {saving ? <Loader2 className="w-6 h-6 animate-spin"/> : <Save className="w-6 h-6"/>}
-                  {saving ? "Canlıya Aktarılıyor..." : "DEĞİŞİKLİKLERİ KAYDET"}
+               <button disabled={saving} type="submit" className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-anthracite-900 py-3.5 text-sm font-medium text-white transition hover:bg-anthracite-800 disabled:opacity-50">
+                  {saving ? <Loader2 className="h-5 w-5 animate-spin"/> : <Save className="h-5 w-5" strokeWidth={2}/>}
+                  {saving ? "Kaydediliyor…" : "Kaydet"}
                </button>
 
             </form>
@@ -190,5 +194,6 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       </div>
 
     </div>
+    </DashboardShell>
   )
 }

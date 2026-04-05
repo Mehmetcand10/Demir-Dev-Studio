@@ -63,8 +63,8 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
     fetchData();
   }, [fetchData]);
 
-  if (loading) return <div className="p-24 text-center font-bold">Vitrin Hazırlanıyor...</div>;
-  if (!product) return <div className="p-24 text-center text-red-500">Böyle bir ürün veritabanında bulunamadı.</div>;
+  if (loading) return <div className="py-24 text-center text-sm font-medium text-anthracite-400">Yükleniyor…</div>;
+  if (!product) return <div className="py-24 text-center text-sm font-medium text-red-600">Ürün bulunamadı.</div>;
 
   const totalItems = seriCount * product.min_order_quantity;
   const unitPrice = Number(product.base_wholesale_price) + Number(product.margin_price || 0);
@@ -136,20 +136,20 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex flex-wrap justify-between items-center mb-8 gap-3">
-        <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-anthracite-500 hover:text-anthracite-900 dark:hover:text-white transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Kataloğa Dön
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-anthracite-600 transition hover:text-anthracite-900">
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Katalog
         </Link>
         {currentUserProfile && <NotificationBell userId={currentUserProfile.id} />}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
+      <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         {/* Sol: ÇOKLU FOTOĞRAF GALERİSİ & TEXTURE ZOOM */}
         <div className="flex flex-col gap-4">
           
           <div 
-            className="relative w-full aspect-[3/4] bg-anthracite-50 dark:bg-anthracite-900 rounded-2xl overflow-hidden cursor-zoom-in group border border-anthracite-100"
+            className="group relative aspect-[3/4] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-anthracite-200/70 bg-anthracite-50 dark:bg-anthracite-900"
             onClick={() => setIsZoomed(!isZoomed)}
           >
             <Image 
@@ -159,11 +159,11 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               priority
               className={`object-cover transition-transform duration-700 ${isZoomed ? "scale-150 origin-center" : "scale-100 group-hover:scale-105"}`}
             />
-            <div className="absolute bottom-4 right-4 bg-white/80 dark:bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-medium shadow-sm pointer-events-none">
-              <Search className="w-3 h-3" /> Dokuyu Yakından İncele
+            <div className="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-medium text-anthracite-700 shadow-sm backdrop-blur-sm dark:bg-black/80 dark:text-white">
+              <Search className="h-3 w-3" strokeWidth={2} /> Yakınlaştır
             </div>
             {product.images?.length > 1 && (
-              <div className="absolute top-4 left-4 bg-black/60 text-white text-[10px] font-bold tracking-wider px-3 py-1.5 rounded-full backdrop-blur-sm shadow-xl">
+              <div className="absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
                  {activeImageIndex + 1} / {product.images.length}
               </div>
             )}
@@ -176,7 +176,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                 <button 
                   key={idx} 
                   onClick={() => { setActiveImageIndex(idx); setIsZoomed(false); }}
-                  className={`relative w-24 h-32 rounded-xl overflow-hidden shrink-0 snap-start border-2 transition-all ${activeImageIndex === idx ? 'border-anthracite-900 dark:border-white shadow-lg scale-100' : 'border-transparent opacity-60 hover:opacity-100 scale-95 hover:scale-100'}`}
+                  className={`relative h-32 w-24 shrink-0 snap-start overflow-hidden rounded-lg border-2 transition-all ${activeImageIndex === idx ? 'border-anthracite-800 shadow-sm dark:border-white' : 'border-transparent opacity-55 hover:opacity-100'}`}
                 >
                   <Image src={img} alt={`Küçük Ölçek ${idx}`} fill className="object-cover" />
                 </button>
@@ -188,26 +188,24 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
         {/* Sağ: Bilgiler ve Sipariş İşlemleri */}
         <div className="flex flex-col">
-          <div className="mb-2 flex flex-wrap gap-2 items-center">
-            <span className="text-xs font-black tracking-widest text-emerald-600 uppercase bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">{product.gender || "Unisex"}</span>
-            <span className="text-xs font-black tracking-widest text-anthracite-500 uppercase bg-anthracite-50 px-3 py-1 rounded-full">{product.category}</span>
-            <span className="text-xs font-black tracking-widest text-blue-600 uppercase bg-blue-50 px-3 py-1 rounded-full border border-blue-100">{product.sizes || "Standart Paket"}</span>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-emerald-100/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">{product.gender || "Unisex"}</span>
+            <span className="rounded-full bg-anthracite-100/60 px-2.5 py-0.5 text-xs font-medium text-anthracite-700">{product.category}</span>
+            <span className="rounded-full border border-sky-100/80 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800">{product.sizes || "Standart"}</span>
           </div>
-          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">{product.name}</h1>
+          <h1 className="mb-4 text-2xl font-semibold tracking-tight text-anthracite-900 md:text-3xl lg:text-4xl">{product.name}</h1>
 
           {/* SADECE ONAYLI BUTİKLER GÖREBİLİR (GATEKEEPING) */}
           {isApproved ? (
             <>
-              <div className="mb-8 p-6 bg-blue-50 dark:bg-blue-950/20 rounded-2xl border border-blue-100 dark:border-blue-900/30">
-                <div className="flex items-end gap-4 mb-3">
-                  <span className="text-4xl font-bold tracking-tight text-anthracite-900 dark:text-white">{unitPrice.toLocaleString("tr-TR")} ₺</span>
-                  <span className="text-sm text-anthracite-500 mb-1">/ adet</span>
+              <div className="mb-6 rounded-2xl border border-sky-100/90 bg-sky-50/50 p-5 dark:bg-blue-950/20">
+                <div className="mb-2 flex items-end gap-3">
+                  <span className="text-3xl font-semibold tabular-nums tracking-tight text-anthracite-900 dark:text-white">{unitPrice.toLocaleString("tr-TR")} ₺</span>
+                  <span className="mb-0.5 text-sm text-anthracite-500">/ adet</span>
                 </div>
-                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
-                  <Package className="w-4 h-4" />
-                  <span className="text-xs font-black uppercase tracking-widest">
-                    M.O.Q (Minimum Sipariş): {product.min_order_quantity} Adet 
-                  </span>
+                <div className="flex items-center gap-2 text-sm text-sky-900/80 dark:text-blue-300">
+                  <Package className="h-4 w-4 shrink-0" strokeWidth={2} />
+                  <span className="font-medium">MOQ: {product.min_order_quantity} adet</span>
                 </div>
               </div>
 
@@ -228,7 +226,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                         type="button"
                         disabled={Number(qty) <= 0}
                         onClick={() => setSelectedSize(size)}
-                        className={`px-5 py-3 rounded-xl font-black text-sm transition-all border-2 flex flex-col items-center gap-1 min-w-[70px] ${
+                        className={`flex min-w-[68px] flex-col items-center gap-0.5 rounded-xl border-2 px-4 py-2.5 text-sm font-medium transition-all ${
                           Number(qty) <= 0
                             ? 'bg-anthracite-50 border-anthracite-200 text-anthracite-300 cursor-not-allowed grayscale'
                             : selectedSize === size
@@ -249,13 +247,13 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <div className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed bg-white border border-anthracite-200 p-5 rounded-2xl shadow-sm mt-6 overflow-hidden">
                     <p className="mb-4">{product.description}</p>
                     <ul className="space-y-2 mt-4">
-                       <li className="flex flex-wrap justify-between items-center gap-2 bg-anthracite-50 px-4 py-2 rounded-xl">
-                          <span className="font-bold text-anthracite-500 text-xs uppercase tracking-widest">Kumaş / Materyal</span>
-                          <span className="font-black text-anthracite-900">{product.fabric_type}</span>
+                       <li className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-anthracite-50/80 px-4 py-2">
+                          <span className="text-xs font-medium text-anthracite-500">Kumaş</span>
+                          <span className="text-sm font-medium text-anthracite-900">{product.fabric_type}</span>
                        </li>
-                       <li className="flex flex-wrap justify-between items-center gap-2 bg-anthracite-50 px-4 py-2 rounded-xl">
-                          <span className="font-bold text-anthracite-500 text-xs uppercase tracking-widest">Ağırlık / Gramaj</span>
-                          <span className="font-black text-anthracite-900">{product.gsm || "Belirtilmemiş"}</span>
+                       <li className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-anthracite-50/80 px-4 py-2">
+                          <span className="text-xs font-medium text-anthracite-500">Gramaj</span>
+                          <span className="text-sm font-medium text-anthracite-900">{product.gsm || "—"}</span>
                        </li>
                     </ul>
                   </div>
@@ -268,43 +266,42 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                     <span className="font-bold text-anthracite-900 dark:text-white">Sipariş Miktarı</span>
                     <span className="text-[10px] text-anthracite-400 font-medium">Minimum {product.min_order_quantity} adet ve katları</span>
                   </div>
-                  <div className="flex items-center gap-4 border-2 border-anthracite-200 dark:border-anthracite-700 rounded-2xl p-1 bg-white dark:bg-anthracite-900">
-                    <button onClick={() => setSeriCount(Math.max(1, seriCount - 1))} className="w-10 h-10 rounded-xl bg-anthracite-50 dark:bg-anthracite-800 flex items-center justify-center font-black hover:bg-anthracite-200 transition-colors">-</button>
-                    <span className="w-12 text-center font-black text-xl">{seriCount} <span className="text-[10px] block text-anthracite-400">Paket</span></span>
-                    <button onClick={() => setSeriCount(seriCount + 1)} className="w-10 h-10 rounded-xl bg-anthracite-50 dark:bg-anthracite-800 flex items-center justify-center font-black hover:bg-anthracite-200 transition-colors">+</button>
+                  <div className="flex items-center gap-1 rounded-xl border border-anthracite-200/90 bg-white p-1 dark:border-anthracite-700 dark:bg-anthracite-900">
+                    <button type="button" onClick={() => setSeriCount(Math.max(1, seriCount - 1))} className="flex h-9 w-9 items-center justify-center rounded-lg bg-anthracite-50 text-lg font-medium transition hover:bg-anthracite-100 dark:bg-anthracite-800">−</button>
+                    <span className="w-11 text-center text-lg font-semibold">{seriCount}<span className="block text-[10px] font-normal text-anthracite-400">paket</span></span>
+                    <button type="button" onClick={() => setSeriCount(seriCount + 1)} className="flex h-9 w-9 items-center justify-center rounded-lg bg-anthracite-50 text-lg font-medium transition hover:bg-anthracite-100 dark:bg-anthracite-800">+</button>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 bg-emerald-50 dark:bg-emerald-950/30 p-4 rounded-xl text-emerald-900 dark:text-emerald-100 mb-2 border border-emerald-100 dark:border-emerald-800/50">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium">Toplam Tutar ({totalItems} Adet)</span>
-                  </div>
-                  <span className="text-xl font-bold">{totalPrice.toLocaleString("tr-TR")} ₺</span>
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-100/90 bg-emerald-50/60 p-4 text-emerald-950 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-100">
+                  <span className="text-sm font-medium">Toplam ({totalItems} adet)</span>
+                  <span className="text-lg font-semibold tabular-nums">{totalPrice.toLocaleString("tr-TR")} ₺</span>
                 </div>
 
                 <button 
+                  type="button"
                   disabled={!selectedSize}
                   onClick={() => setShowAddressModal(true)}
-                  className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl ${
+                  className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition ${
                     !selectedSize 
-                      ? 'bg-anthracite-100 text-anthracite-400 cursor-not-allowed border border-anthracite-200 shadow-none' 
-                      : 'bg-[#25D366] text-white hover:bg-[#20BE5C] shadow-emerald-500/20'
+                      ? 'cursor-not-allowed border border-anthracite-200 bg-anthracite-100 text-anthracite-400' 
+                      : 'bg-[#25D366] text-white shadow-sm hover:bg-[#20BE5C]'
                   }`}
                 >
                   {selectedSize ? (
-                    <><MessageCircle className="w-6 h-6" /> Siparişi Tamamla (Bilgileri Gir)</>
+                    <><MessageCircle className="h-5 w-5" strokeWidth={2} /> Sipariş — adres gir</>
                   ) : (
-                    "Lütfen Beden Seçiniz"
+                    "Beden seçin"
                   )}
                 </button>
               </div>
             </>
           ) : (
-            <div className="mt-8 p-8 border border-red-200 bg-red-50 dark:bg-red-900/20 rounded-3xl text-center">
-              <Lock className="w-12 h-12 text-red-500 mx-auto mb-4" />
-              <h2 className="text-xl font-bold text-red-700 dark:text-red-400 mb-2">Bu Ürünün Modeli / Fiyatı Sadece Üyelere Açıktır</h2>
-              <p className="text-red-600 dark:text-red-300 mb-6 text-balance">Sistemin toptancı - butik avantajlarından yararlanabilmek, net verileri ve fiyatları görebilmek için giriş yapmalı veya admin ağından onay beklemelisiniz.</p>
-              <Link href="/login" className="inline-block bg-red-600 hover:bg-red-700 transition-colors text-white px-8 py-3 rounded-full font-semibold shadow-lg shadow-red-500/30">Hemen Giriş Yap / Kayıt Ol</Link>
+            <div className="mt-6 rounded-2xl border border-red-100/90 bg-red-50/60 p-6 text-center dark:bg-red-900/20">
+              <Lock className="mx-auto mb-3 h-10 w-10 text-red-500" strokeWidth={1.5} />
+              <h2 className="mb-2 text-lg font-semibold text-red-900 dark:text-red-300">Fiyatlar onaylı üyelere açık</h2>
+              <p className="mb-5 text-sm text-red-800/90 text-balance dark:text-red-200/90">Giriş yapın veya onay bekleyin.</p>
+              <Link href="/login" className="inline-block rounded-xl bg-red-600 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-red-700">Giriş / kayıt</Link>
             </div>
           )}
 
@@ -313,30 +310,30 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       
       {/* BAŞARIYLA YAZILAN TESLİMAT POP-UP MODÜLÜ */}
       {showAddressModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-[2rem] p-8 sm:p-10 w-full max-w-lg shadow-2xl relative">
-            <h3 className="text-3xl font-black mb-2 text-anthracite-900 tracking-tight">Teslimat Adresi</h3>
-            <p className="text-anthracite-500 mb-8 text-sm font-medium">Bu adres toptancıya veya kurye tarafına irsaliye olarak düşecektir. Lütfen eksiksiz giriniz.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-xl sm:p-8">
+            <h3 className="mb-1 text-lg font-semibold text-anthracite-900">Teslimat adresi</h3>
+            <p className="mb-6 text-sm text-anthracite-600">İrsaliye için kullanılacak adresi girin.</p>
             
-            <form onSubmit={handleCreateOrder} className="flex flex-col gap-5">
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <form onSubmit={handleCreateOrder} className="flex flex-col gap-4">
+               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                  <div>
-                   <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block pl-2">İl</label>
-                   <input required value={il} onChange={e=>setIl(e.target.value)} type="text" className="w-full px-5 py-4 border border-anthracite-200 rounded-2xl bg-anthracite-50 focus:bg-white focus:ring-4 focus:ring-anthracite-100 outline-none font-bold text-anthracite-900 transition-all" placeholder="Örn: İstanbul" />
+                   <label className="mb-1.5 block text-xs font-medium text-anthracite-600">İl</label>
+                   <input required value={il} onChange={e=>setIl(e.target.value)} type="text" className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15" placeholder="İstanbul" />
                  </div>
                  <div>
-                   <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block pl-2">İlçe</label>
-                   <input required value={ilce} onChange={e=>setIlce(e.target.value)} type="text" className="w-full px-5 py-4 border border-anthracite-200 rounded-2xl bg-anthracite-50 focus:bg-white focus:ring-4 focus:ring-anthracite-100 outline-none font-bold text-anthracite-900 transition-all" placeholder="Örn: Kadıköy" />
+                   <label className="mb-1.5 block text-xs font-medium text-anthracite-600">İlçe</label>
+                   <input required value={ilce} onChange={e=>setIlce(e.target.value)} type="text" className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15" placeholder="Kadıköy" />
                  </div>
                </div>
                <div>
-                  <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-2 block pl-2">Açık Adres (Sokak / No)</label>
-                  <textarea required value={adres} onChange={e=>setAdres(e.target.value)} rows={3} className="w-full px-5 py-4 border border-anthracite-200 rounded-2xl bg-anthracite-50 focus:bg-white focus:ring-4 focus:ring-anthracite-100 outline-none font-bold text-anthracite-900 resize-none transition-all" placeholder="Caferağa Mah, Moda Cad..."></textarea>
+                  <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Açık adres</label>
+                  <textarea required value={adres} onChange={e=>setAdres(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15" placeholder="Mahalle, sokak, no…"></textarea>
                </div>
-               <div className="flex gap-4 mt-6">
-                 <button type="button" onClick={()=>setShowAddressModal(false)} className="flex-1 py-4.5 rounded-2xl font-bold text-anthracite-500 hover:bg-anthracite-100 transition-colors">Vazgeç</button>
-                 <button disabled={isOrdering} type="submit" className="flex-[2] py-4.5 bg-[#25D366] hover:bg-[#20BE5C] text-white font-black text-lg rounded-2xl shadow-xl shadow-[#25D366]/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                   {isOrdering ? 'Oluşturuluyor...' : <><MessageCircle className="w-5 h-5"/> Siparişi Kapat</>}
+               <div className="mt-2 flex gap-3">
+                 <button type="button" onClick={()=>setShowAddressModal(false)} className="flex-1 rounded-xl border border-anthracite-200 py-2.5 text-sm font-medium text-anthracite-700 transition hover:bg-anthracite-50">Vazgeç</button>
+                 <button disabled={isOrdering} type="submit" className="flex-[2] flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-2.5 text-sm font-medium text-white transition hover:bg-[#20BE5C] disabled:opacity-50">
+                   {isOrdering ? 'Gönderiliyor…' : <><MessageCircle className="h-4 w-4" strokeWidth={2}/> Onayla</>}
                  </button>
                </div>
             </form>

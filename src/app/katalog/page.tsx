@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Lock, ShoppingBag, Search, Filter, Heart, Eye, ArrowUpDown, X } from "lucide-react";
+import { Lock, ShoppingBag, Search, Heart, Eye, X } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
 import NotificationBell from "@/components/NotificationBell";
 
@@ -89,59 +89,57 @@ export default function Katalog() {
   const categories = ["Tümü", "Tişört", "Sweatshirt", "İç Çamaşırı / Pijama", "Ayakkabı / Sneaker", "Triko", "Pantolon / Jean", "Mont / Kaban", "Elbise / Etek", "Aksesuar"];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 min-h-screen">
+    <div className="mx-auto min-h-screen max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       
-      {/* HEADER VE ARAMA */}
-      <div className="flex flex-col gap-6 mb-10">
-        <div className="flex flex-wrap justify-between items-center gap-3">
+      <div className="mb-8 flex flex-col gap-5 sm:mb-10">
+        <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-                <h1 className="text-3xl sm:text-5xl font-black tracking-tighter text-anthracite-900 mb-2">Sezon Koleksiyonu</h1>
-                <p className="text-anthracite-500 font-medium">B2B ağındaki en yeni modelleri anlık keşfedin.</p>
+                <h1 className="mb-1 text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">Katalog</h1>
+                <p className="text-sm text-anthracite-600">Onaylı ürün vitrini</p>
             </div>
             <div className="hidden sm:block">
                 {user && <NotificationBell userId={user.id} />}
             </div>
         </div>
 
-        {/* ARAMA VE FİLTRE KONTROLLERİ */}
-        <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1 group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-anthracite-400 group-focus-within:text-anthracite-900 transition-colors" />
+        <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
+            <div className="group relative flex-1">
+                <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-anthracite-400 group-focus-within:text-emerald-600" strokeWidth={2} />
                 <input 
                     type="text" 
-                    placeholder="Ürün adı ile hızlı ara..." 
+                    placeholder="Ürün ara…" 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 bg-white border-2 border-anthracite-100 rounded-2xl focus:border-anthracite-900 outline-none transition-all font-bold shadow-sm"
+                    className="w-full rounded-xl border border-anthracite-200/80 bg-white py-3 pl-10 pr-4 text-sm outline-none ring-emerald-500/0 transition focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/20"
                 />
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide sm:overflow-visible">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide sm:overflow-visible sm:pb-0">
                 <select 
                     value={selectedGender} 
                     onChange={(e) => setSelectedGender(e.target.value)}
-                    className="px-4 py-4 bg-white border-2 border-anthracite-100 rounded-2xl font-bold text-sm outline-none focus:border-anthracite-900 cursor-pointer min-w-[120px]"
+                    className="min-w-[118px] cursor-pointer rounded-xl border border-anthracite-200/80 bg-white px-3 py-3 text-sm font-medium text-anthracite-800 outline-none focus:ring-2 focus:ring-emerald-500/20"
                 >
                     <option>Tümü</option><option>Erkek</option><option>Kadın</option><option>Çocuk</option><option>Unisex</option>
                 </select>
                 <select 
                     value={sortBy} 
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-4 py-4 bg-white border-2 border-anthracite-100 rounded-2xl font-bold text-sm outline-none focus:border-anthracite-900 cursor-pointer min-w-[150px]"
+                    className="min-w-[148px] cursor-pointer rounded-xl border border-anthracite-200/80 bg-white px-3 py-3 text-sm font-medium text-anthracite-800 outline-none focus:ring-2 focus:ring-emerald-500/20"
                 >
-                    <option value="newest">En Yeniler</option>
-                    <option value="price-asc">Fiyat (Düşükten Yükseğe)</option>
-                    <option value="price-desc">Fiyat (Yüksekten Düşüğe)</option>
+                    <option value="newest">En yeniler</option>
+                    <option value="price-asc">Fiyat ↑</option>
+                    <option value="price-desc">Fiyat ↓</option>
                 </select>
             </div>
         </div>
 
-        {/* KATEGORİ SLIDER */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
             {categories.map(cat => (
                 <button
                     key={cat}
+                    type="button"
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-6 py-2.5 rounded-full text-xs font-black whitespace-nowrap transition-all border-2 ${selectedCategory === cat ? 'bg-anthracite-900 border-anthracite-900 text-white shadow-lg' : 'bg-white border-anthracite-100 text-anthracite-500 hover:border-anthracite-300'}`}
+                    className={`whitespace-nowrap rounded-lg border px-3 py-2 text-xs font-medium transition ${selectedCategory === cat ? 'border-anthracite-800 bg-anthracite-900 text-white' : 'border-anthracite-200/80 bg-white text-anthracite-600 hover:border-anthracite-300'}`}
                 >
                     {cat}
                 </button>
@@ -150,12 +148,12 @@ export default function Katalog() {
       </div>
 
       {loading ? (
-        <div className="text-center py-20 font-black text-anthracite-400 animate-pulse">Koleksiyon Hazırlanıyor...</div>
+        <div className="py-20 text-center text-sm font-medium text-anthracite-400 animate-pulse">Yükleniyor…</div>
       ) : filteredProducts.length === 0 ? (
-        <div className="text-center py-32 bg-anthracite-50 rounded-[3rem] border-2 border-dashed border-anthracite-100">
-           <Search className="w-16 h-16 mx-auto text-anthracite-200 mb-4" />
-           <p className="text-xl font-black text-anthracite-400">Aradığınız kriterlere uygun ürün bulunamadı.</p>
-           <button onClick={() => { setSearchTerm(""); setSelectedCategory("Tümü"); setSelectedGender("Tümü"); }} className="mt-4 text-sm font-bold text-blue-600 underline">Filtreleri Temizle</button>
+        <div className="rounded-2xl border border-dashed border-anthracite-200/90 bg-white/60 py-20 text-center">
+           <Search className="mx-auto mb-3 h-12 w-12 text-anthracite-300" strokeWidth={1.5} />
+           <p className="mb-3 text-sm font-medium text-anthracite-600">Bu filtrelerle ürün yok.</p>
+           <button type="button" onClick={() => { setSearchTerm(""); setSelectedCategory("Tümü"); setSelectedGender("Tümü"); }} className="text-sm font-medium text-emerald-700 underline-offset-2 hover:underline">Filtreleri sıfırla</button>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
@@ -164,7 +162,7 @@ export default function Katalog() {
             const isFav = favorites.includes(p.id);
 
             return (
-              <div key={p.id} className="group flex flex-col bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-anthracite-100/90 shadow-sm transition-all hover:shadow-md hover:border-anthracite-200 relative">
+              <div key={p.id} className="group relative flex flex-col overflow-hidden rounded-xl border border-anthracite-200/70 bg-white shadow-sm transition hover:border-anthracite-300/80 hover:shadow-md sm:rounded-2xl">
                 
                 {/* Ürün Görseli — daha kısa oran, vitrinde daha çok ürün görünsün */}
                 <div className="relative aspect-[4/5] sm:aspect-[5/6] overflow-hidden bg-anthracite-50">
@@ -196,7 +194,7 @@ export default function Katalog() {
                   {!isApproved && (
                     <div className="absolute inset-0 bg-anthracite-900/55 backdrop-blur-[1px] flex flex-col items-center justify-center p-2">
                       <Lock className="w-6 h-6 sm:w-8 sm:h-8 text-white mb-1" />
-                      <span className="text-[8px] sm:text-[10px] font-black text-white bg-black/35 px-2 py-1 rounded-full uppercase tracking-tight text-center leading-tight">Onay Bekleniyor</span>
+                      <span className="rounded-full bg-black/40 px-2 py-1 text-center text-[8px] font-medium text-white sm:text-[10px]">Onay bekleniyor</span>
                     </div>
                   )}
                 </div>
@@ -219,8 +217,8 @@ export default function Katalog() {
                       <>
                         <div className="flex flex-col min-w-0">
                           <span className="text-[8px] font-bold text-anthracite-400 uppercase tracking-wide">Seri</span>
-                          <span className="font-black text-sm sm:text-base text-anthracite-900 tabular-nums leading-tight">
-                             {(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")}<span className="text-[10px] font-bold"> ₺</span>
+                          <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-base">
+                             {(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")}<span className="text-[10px] font-medium"> ₺</span>
                           </span>
                         </div>
                         <Link href={`/product/${p.id}`} className="shrink-0 bg-anthracite-900 text-white w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
@@ -241,36 +239,36 @@ export default function Katalog() {
 
       {/* QUICK VIEW MODAL */}
       {showQuickView && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-anthracite-900/40 backdrop-blur-md">
-              <div className="bg-white w-full max-w-4xl rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl flex flex-col md:flex-row relative max-h-[92vh] overflow-y-auto">
-                  <button onClick={() => setShowQuickView(null)} className="absolute top-6 right-6 z-10 p-2 bg-anthracite-100 rounded-full hover:bg-anthracite-200 transition-colors">
-                    <X className="w-6 h-6" />
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-anthracite-900/35 p-4 backdrop-blur-sm sm:p-6">
+              <div className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-y-auto overflow-hidden rounded-2xl border border-anthracite-200/80 bg-white shadow-xl md:flex-row">
+                  <button type="button" onClick={() => setShowQuickView(null)} className="absolute right-4 top-4 z-10 rounded-full bg-anthracite-100 p-2 transition hover:bg-anthracite-200">
+                    <X className="h-5 w-5" strokeWidth={2} />
                   </button>
                   <div className="w-full md:w-1/2 aspect-[3/4] relative bg-anthracite-50">
                     <Image src={showQuickView.images?.[0]} alt="quick" fill className="object-cover" />
                   </div>
-                  <div className="w-full md:w-1/2 p-6 sm:p-10 flex flex-col text-left">
-                     <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-max mb-4 uppercase tracking-widest">{showQuickView.category}</span>
-                     <h2 className="text-3xl sm:text-4xl font-black text-anthracite-900 mb-2 leading-tight break-words">{showQuickView.name}</h2>
-                     <p className="text-anthracite-500 font-medium mb-6">{showQuickView.description}</p>
+                  <div className="flex w-full flex-col p-6 text-left sm:p-8 md:w-1/2 md:p-10">
+                     <span className="mb-3 w-max rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800 ring-1 ring-emerald-100/80">{showQuickView.category}</span>
+                     <h2 className="mb-2 break-words text-xl font-semibold leading-tight text-anthracite-900 sm:text-2xl">{showQuickView.name}</h2>
+                     <p className="mb-6 text-sm text-anthracite-600">{showQuickView.description}</p>
                      
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-                        <div className="bg-anthracite-50 p-4 rounded-2xl">
-                            <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-1">Bedenler</p>
-                            <p className="font-bold text-anthracite-900">{showQuickView.sizes}</p>
+                     <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                        <div className="rounded-xl bg-anthracite-50/80 p-4 ring-1 ring-anthracite-100/80">
+                            <p className="mb-1 text-[10px] font-medium text-anthracite-500">Bedenler</p>
+                            <p className="text-sm font-medium text-anthracite-900">{showQuickView.sizes}</p>
                         </div>
-                        <div className="bg-anthracite-50 p-4 rounded-2xl">
-                            <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mb-1">M.O.Q</p>
-                            <p className="font-bold text-anthracite-900">{showQuickView.min_order_quantity} Adet</p>
+                        <div className="rounded-xl bg-anthracite-50/80 p-4 ring-1 ring-anthracite-100/80">
+                            <p className="mb-1 text-[10px] font-medium text-anthracite-500">MOQ</p>
+                            <p className="text-sm font-medium text-anthracite-900">{showQuickView.min_order_quantity} adet</p>
                         </div>
                      </div>
 
-                     <div className="mt-auto flex flex-wrap items-center justify-between gap-4">
+                     <div className="mt-auto flex flex-wrap items-end justify-between gap-4">
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest leading-none mb-1">Alış Fiyatı (Adet)</span>
-                            <span className="font-black text-3xl text-anthracite-900">{(Number(showQuickView.base_wholesale_price) + Number(showQuickView.margin_price || 0)).toLocaleString("tr-TR")} ₺</span>
+                            <span className="mb-0.5 text-[10px] font-medium text-anthracite-500">Adet fiyatı</span>
+                            <span className="text-2xl font-semibold tabular-nums text-anthracite-900">{(Number(showQuickView.base_wholesale_price) + Number(showQuickView.margin_price || 0)).toLocaleString("tr-TR")} ₺</span>
                         </div>
-                        <Link href={`/product/${showQuickView.id}`} className="px-6 sm:px-8 py-4 bg-anthracite-900 text-white rounded-2xl font-black hover:scale-105 transition-all shadow-xl w-full sm:w-auto text-center">Hemen Sipariş Ver</Link>
+                        <Link href={`/product/${showQuickView.id}`} className="w-full rounded-xl bg-anthracite-900 px-6 py-3.5 text-center text-sm font-medium text-white shadow-sm transition hover:bg-anthracite-800 sm:w-auto">Ürüne git</Link>
                      </div>
                   </div>
               </div>

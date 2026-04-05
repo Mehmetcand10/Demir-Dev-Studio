@@ -87,10 +87,12 @@ export default function NotificationBell({ userId }: { userId: string }) {
   return (
     <div className="relative" ref={dropdownRef}>
       <button 
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 rounded-full hover:bg-anthracite-100 transition-colors group"
+        className="group relative rounded-full p-2 transition-colors hover:bg-anthracite-100/80"
+        aria-label="Bildirimler"
       >
-        <Bell className={`w-6 h-6 ${unreadCount > 0 ? 'text-emerald-500' : 'text-anthracite-400 group-hover:text-anthracite-900'}`} />
+        <Bell className={`h-5 w-5 ${unreadCount > 0 ? 'text-emerald-600' : 'text-anthracite-500 group-hover:text-anthracite-800'}`} strokeWidth={2} />
         {unreadCount > 0 && (
           <span className="absolute top-1 right-1 flex h-4 w-4">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -102,12 +104,12 @@ export default function NotificationBell({ userId }: { userId: string }) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-[2rem] shadow-2xl border border-anthracite-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="p-5 border-b border-anthracite-50 flex justify-between items-center bg-anthracite-50/50">
-            <h3 className="font-black text-sm uppercase tracking-widest text-anthracite-900">Bildirimler</h3>
+        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-anthracite-200/80 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200 sm:w-96">
+          <div className="flex items-center justify-between border-b border-anthracite-100/90 bg-anthracite-50/40 p-4">
+            <h3 className="text-sm font-semibold text-anthracite-900">Bildirimler</h3>
             {unreadCount > 0 && (
-              <button onClick={markAllAsRead} className="text-[10px] font-black text-emerald-600 hover:text-emerald-700 uppercase tracking-tight">
-                TÜMÜNÜ OKUNDU YAP
+              <button type="button" onClick={markAllAsRead} className="text-xs font-medium text-emerald-700 hover:underline">
+                Tümünü okundu işaretle
               </button>
             )}
           </div>
@@ -116,7 +118,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
             {notifications.length === 0 ? (
               <div className="p-10 text-center flex flex-col items-center gap-3">
                 <Bell className="w-8 h-8 text-anthracite-200" />
-                <p className="text-xs font-bold text-anthracite-400 uppercase">Henüz bildiriminiz yok.</p>
+                <p className="text-xs font-medium text-anthracite-500">Bildirim yok.</p>
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
@@ -128,7 +130,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
                     <div className="flex gap-3">
                       <div className="mt-0.5">{getTypeIcon(n.type)}</div>
                       <div className="flex-1">
-                        <p className={`text-[13px] font-black leading-tight mb-1 ${!n.is_read ? 'text-anthracite-900' : 'text-anthracite-600'}`}>{n.title}</p>
+                        <p className={`mb-1 text-[13px] font-semibold leading-tight ${!n.is_read ? 'text-anthracite-900' : 'text-anthracite-600'}`}>{n.title}</p>
                         <p className="text-[11px] font-medium text-anthracite-500 leading-relaxed mb-2">{n.message}</p>
                         <p className="text-[9px] font-bold text-anthracite-400 uppercase">{new Date(n.created_at).toLocaleString('tr-TR')}</p>
                       </div>
@@ -149,8 +151,8 @@ export default function NotificationBell({ userId }: { userId: string }) {
             )}
           </div>
           
-          <div className="p-4 bg-anthracite-50/30 text-center border-t border-anthracite-50">
-            <p className="text-[9px] font-black text-anthracite-400 uppercase tracking-widest">Demir Dev Studio Gelişmiş Bildirim Ağı</p>
+          <div className="border-t border-anthracite-100/90 bg-anthracite-50/30 p-3 text-center">
+            <p className="text-[10px] text-anthracite-400">Demir Dev Studio</p>
           </div>
         </div>
       )}

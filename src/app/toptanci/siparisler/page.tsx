@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { Package, ArrowLeft, Loader2, FileText, Scale } from 'lucide-react';
+import { Package, ArrowLeft, Loader2, FileText, Scale, Truck } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { ORDER_STATUS } from '@/utils/orderStatus';
 import { getDisputeStatusLabel, isDisputeOpen } from '@/utils/disputeStatus';
 import Link from 'next/link';
+import { DashboardShell } from '@/components/dashboard/DashboardShell';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 
 export default function ToptanciSiparisler() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -67,44 +69,46 @@ export default function ToptanciSiparisler() {
     }
   };
 
-  if (!user && !loadingOrders) return <div className="p-20 text-center font-bold">Oturum Aranıyor...</div>;
+  if (!user && !loadingOrders) return (
+    <DashboardShell>
+      <p className="py-20 text-center text-sm text-anthracite-500">Oturum yükleniyor…</p>
+    </DashboardShell>
+  );
 
   return (
-    <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen bg-anthracite-50/50">
-      
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-anthracite-200 pb-6">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-anthracite-900 flex items-center gap-3">
-            <Package className="w-10 h-10 text-emerald-500" /> Kargo & Lojistik Masası
-          </h1>
-          <p className="text-anthracite-500 font-medium mt-1 text-lg">Platformdan aldığınız resmi satışı onaylanmış siparişlerinizi bu odadan kargolayıp gönderin.</p>
-        </div>
-        <Link href="/toptanci" className="flex items-center gap-2 text-anthracite-700 bg-white border border-anthracite-200 shadow-sm hover:shadow-md px-6 py-3 rounded-2xl font-black transition-all hover:-translate-x-1">
-          <ArrowLeft className="w-5 h-5" /> Üretim Atölyesine (Raflara) Dön
-        </Link>
-      </div>
+    <DashboardShell>
+      <DashboardHeader
+        icon={Truck}
+        eyebrow="Toptancı"
+        title="Kargo"
+        right={
+          <Link href="/toptanci" className="inline-flex items-center gap-2 rounded-lg border border-anthracite-200/80 bg-white px-4 py-2.5 text-sm font-medium text-anthracite-800 shadow-sm transition hover:bg-anthracite-50">
+            <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Panele dön
+          </Link>
+        }
+      />
 
-      <div className="bg-white border border-anthracite-200 rounded-[2.5rem] p-8 sm:p-10 shadow-xl">
-        <h2 className="text-2xl font-black flex items-center gap-3 mb-8 border-b border-anthracite-100 pb-5 text-anthracite-900">
-           Müşteriye Gönderilmeyi Bekleyen Paketleriniz
+      <div className="rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:p-8">
+        <h2 className="mb-6 border-b border-anthracite-100/90 pb-4 text-base font-semibold text-anthracite-900">
+           Bekleyen gönderiler
         </h2>
         
         {loadingOrders ? (
-          <div className="flex flex-col items-center justify-center py-20">
-             <Loader2 className="w-12 h-12 text-emerald-500 animate-spin mb-4" />
-             <p className="text-lg font-bold text-anthracite-500">Merkezdeki lojistik ağınız taranıyor...</p>
+          <div className="flex flex-col items-center justify-center py-16">
+             <Loader2 className="mb-3 h-9 w-9 animate-spin text-emerald-600" strokeWidth={2} />
+             <p className="text-sm font-medium text-anthracite-500">Yükleniyor…</p>
           </div>
         ) : orders.length === 0 ? (
-          <div className="py-24 text-center bg-anthracite-50/50 rounded-3xl border border-dashed border-anthracite-200">
-             <h3 className="text-2xl font-black text-anthracite-500 mb-3">Henüz Sipariş Ulaşmadı</h3>
-             <p className="text-base font-medium text-anthracite-400 max-w-lg mx-auto">Admin (Demir Dev Studio) siparişi onaylayıp parayı kasaya güvenceye aldığında ürün buraya &quot;Kargoya Hazır&quot; olarak düşecektir.</p>
+          <div className="rounded-2xl border border-dashed border-anthracite-200/90 bg-anthracite-50/40 py-16 text-center">
+             <h3 className="mb-2 text-sm font-medium text-anthracite-700">Sipariş yok</h3>
+             <p className="mx-auto max-w-md text-sm text-anthracite-500">Ödeme onayı sonrası siparişler burada listelenir.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
             {orders.map(order => {
               const dispute = disputesByOrder[order.id];
               return (
-               <div key={order.id} className="bg-anthracite-50 border border-anthracite-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:bg-white hover:shadow-xl hover:-translate-y-1">
+               <div key={order.id} className="flex flex-col justify-between rounded-xl border border-anthracite-200/70 bg-anthracite-50/40 p-5 shadow-sm transition hover:border-anthracite-300/80 hover:bg-white hover:shadow-md">
                   <div>
                     {dispute && (
                       <div
@@ -118,9 +122,9 @@ export default function ToptanciSiparisler() {
                       >
                         <div className="flex items-center gap-2 mb-1">
                           <Scale className="w-4 h-4 shrink-0 opacity-70" />
-                          <p className="text-[10px] font-black uppercase tracking-widest opacity-70">Uyuşmazlık</p>
+                          <p className="text-[10px] font-medium uppercase tracking-wide opacity-70">Uyuşmazlık</p>
                         </div>
-                        <p className="text-sm font-black">{getDisputeStatusLabel(dispute.status)}</p>
+                        <p className="text-sm font-semibold">{getDisputeStatusLabel(dispute.status)}</p>
                         <p className="text-xs font-medium mt-2 opacity-90 leading-relaxed">{dispute.reason}</p>
                         {dispute.admin_note && (
                           <p className="text-xs font-bold mt-2 pt-2 border-t border-black/10 leading-relaxed">
@@ -130,41 +134,41 @@ export default function ToptanciSiparisler() {
                         )}
                       </div>
                     )}
-                    <div className="flex flex-wrap justify-between items-start mb-6 gap-2">
-                      <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${order.status === ORDER_STATUS.SHIPPED ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'}`}>
-                        {order.status === ORDER_STATUS.SHIPPED ? 'KARGOLANDI GİTTİ' : 'YENİ SİPARİŞ - HAZIRLA'}
+                    <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
+                      <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${order.status === ORDER_STATUS.SHIPPED ? 'border-blue-200 bg-blue-50 text-blue-800' : 'border-emerald-200 bg-emerald-600 text-white'}`}>
+                        {order.status === ORDER_STATUS.SHIPPED ? 'Kargoda' : 'Hazırlanacak'}
                       </span>
-                      <span className="font-black text-emerald-900 border-2 border-emerald-100 bg-emerald-50 px-3 py-1.5 rounded-xl shadow-sm">
-                        {Number(order.quantity)} Adet
+                      <span className="rounded-lg border border-emerald-100/90 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-900">
+                        {Number(order.quantity)} adet
                       </span>
                     </div>
-                    <h3 className="text-xl sm:text-2xl font-black text-anthracite-900 mb-2 leading-tight break-words">{order.product_name || "Silinmiş Ürün"}</h3>
-                    <p className="text-sm font-black text-emerald-600 mb-6 tracking-widest uppercase">Hesaba Geçecek Ciro: {Number(order.wholesaler_earning).toLocaleString('tr-TR')} ₺</p>
+                    <h3 className="mb-2 break-words text-lg font-semibold leading-tight text-anthracite-900">{order.product_name || "Silinmiş Ürün"}</h3>
+                    <p className="mb-5 text-sm font-medium text-emerald-700">Net: {Number(order.wholesaler_earning).toLocaleString('tr-TR')} ₺</p>
                     
-                    <div className="bg-white p-5 rounded-2xl border border-anthracite-100 mb-6 shadow-inner">
-                      <p className="text-[10px] font-black uppercase text-anthracite-400 tracking-widest mb-3 border-b border-anthracite-50 pb-2">Teslimat Adresi (İrsaliye)</p>
-                      <p className="font-black text-anthracite-900 text-lg mb-1">{order.buyer_name}</p>
-                      <p className="text-sm font-medium text-anthracite-600 mt-1 leading-relaxed">{order.shipping_address}</p>
-                      <p className="text-xs font-black text-emerald-700 mt-4 bg-emerald-50 p-3 rounded-xl border border-emerald-100">İletişim: {order.buyer_phone}</p>
+                    <div className="mb-5 rounded-xl border border-anthracite-100/90 bg-white p-4">
+                      <p className="mb-2 border-b border-anthracite-100/80 pb-2 text-[10px] font-medium text-anthracite-500">Teslimat</p>
+                      <p className="mb-1 text-base font-semibold text-anthracite-900">{order.buyer_name}</p>
+                      <p className="mt-1 text-sm leading-relaxed text-anthracite-600">{order.shipping_address}</p>
+                      <p className="mt-3 rounded-lg border border-emerald-100/90 bg-emerald-50/80 p-2.5 text-xs font-medium text-emerald-800">{order.buyer_phone}</p>
                     </div>
                   </div>
 
                   {order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? (
                      <div className="flex flex-col gap-2">
-                        <button onClick={() => handleShipOrder(order.id)} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
-                           Kargola ve Takip No Gir
+                        <button type="button" onClick={() => handleShipOrder(order.id)} className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-3 text-sm font-medium text-white transition hover:bg-emerald-700">
+                           Takip no ile kargola
                         </button>
-                        <button onClick={() => exportInvoicePDF(order)} className="w-full bg-white border-2 border-anthracite-200 text-anthracite-900 font-bold text-xs uppercase tracking-widest py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-anthracite-50 transition-all">
-                           <FileText className="w-4 h-4" /> İrsaliye / Fatura (PDF)
+                        <button type="button" onClick={() => exportInvoicePDF(order)} className="flex w-full items-center justify-center gap-2 rounded-lg border border-anthracite-200 bg-white py-2.5 text-xs font-medium text-anthracite-800 transition hover:bg-anthracite-50">
+                           <FileText className="h-4 w-4" strokeWidth={2} /> PDF
                         </button>
                      </div>
                   ) : (
                      <div className="flex flex-col gap-2">
-                        <div className="bg-blue-50 text-blue-800 p-4 rounded-xl border border-blue-200 text-sm font-black text-center tracking-widest flex items-center justify-center gap-2">
-                           <Package className="w-4 h-4"/> KOD: {order.tracking_number || "HATA! NUMARA GİRİLMEDİ"}
+                        <div className="flex items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 p-3 text-center text-sm font-medium text-blue-900">
+                           <Package className="h-4 w-4 shrink-0" strokeWidth={2}/> {order.tracking_number || "Takip no yok"}
                         </div>
-                        <button onClick={() => exportInvoicePDF(order)} className="w-full border border-anthracite-200 text-anthracite-500 font-bold text-[10px] uppercase tracking-widest py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-white transition-all">
-                           <FileText className="w-3 h-3" /> Fatura Kopyası
+                        <button type="button" onClick={() => exportInvoicePDF(order)} className="flex w-full items-center justify-center gap-2 rounded-lg border border-anthracite-200 py-2 text-xs font-medium text-anthracite-600 transition hover:bg-white">
+                           <FileText className="h-3.5 w-3.5" strokeWidth={2} /> PDF
                         </button>
                      </div>
                   )}
@@ -174,6 +178,6 @@ export default function ToptanciSiparisler() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardShell>
   );
 }

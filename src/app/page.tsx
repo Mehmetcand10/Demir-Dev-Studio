@@ -1,180 +1,180 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Gem, TrendingUp, Store, Package, Users, Maximize2 } from "lucide-react";
-import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center w-full min-h-screen">
-      
-      {/* 1. HERO SECTION (Devasa Tipografi ve Karşılama) */}
-      <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-center text-center px-4 bg-anthracite-50 overflow-hidden">
-        
-        {/* Arka plan Lüks Efektleri */}
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-anthracite-900/10 blur-[120px] rounded-full pointer-events-none"></div>
+    <div className="flex w-full flex-col">
+      <section className="relative overflow-hidden border-b border-anthracite-200/60 bg-white/40 px-4 py-16 sm:py-24 lg:py-28">
+        <div className="pointer-events-none absolute -left-20 top-0 h-64 w-64 rounded-full bg-emerald-400/15 blur-3xl" />
+        <div className="pointer-events-none absolute -right-20 bottom-0 h-64 w-64 rounded-full bg-anthracite-400/10 blur-3xl" />
 
-        <div className="relative z-10 flex flex-col items-center">
-          <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-anthracite-200 bg-white/50 backdrop-blur-md px-4 py-1.5 text-xs font-black uppercase tracking-widest text-anthracite-800 shadow-sm">
-            <Gem className="w-3.5 h-3.5 text-emerald-600" /> Yeni Nesil B2B Tekstil Ekosistemi
+        <div className="relative mx-auto max-w-3xl text-center">
+          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-anthracite-200/80 bg-white/80 px-3 py-1 text-xs font-medium text-anthracite-600 shadow-sm backdrop-blur-sm">
+            <Gem className="h-3.5 w-3.5 text-emerald-600" strokeWidth={2} />
+            B2B tekstil ağı
           </span>
-          <h1 className="text-4xl sm:text-7xl lg:text-[6rem] font-black tracking-tighter mb-8 max-w-5xl text-anthracite-900 leading-[1.1] drop-shadow-sm">
-            MODANIN YENİ <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-anthracite-900 to-emerald-700">TEDARİK ZİNCİRİ.</span>
+          <h1 className="mb-5 text-3xl font-semibold leading-tight tracking-tight text-anthracite-900 sm:text-4xl lg:text-5xl">
+            Butik ve toptancıyı güvenli, tek vitrinde buluşturur.
           </h1>
-          <p className="text-lg sm:text-xl text-anthracite-600 mb-12 max-w-2xl font-medium leading-relaxed">
-            Demir Dev Studio; kaliteli toptancı üretimiyle vizyoner butikleri aracısız, stoksuz ve %100 güvenli şekilde birleştiren Türkiye&apos;nin en ayrıcalıklı kapalı devre toptan platformudur.
+          <p className="mb-10 text-base leading-relaxed text-anthracite-600 sm:text-lg">
+            Onaylı üyelik, net fiyatlar ve sipariş takibi. Stok ve ödeme süreçleri tek panelden yürür.
           </p>
-          <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto px-4">
-            <Link 
-              href="/register" 
-              className="group flex items-center justify-center gap-3 bg-anthracite-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:scale-105 transition-all shadow-xl shadow-anthracite-900/20"
+          <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center">
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-anthracite-900 px-6 py-3.5 text-sm font-medium text-white shadow-sm transition hover:bg-anthracite-800"
             >
-              Ağımıza Başvuru Yap <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Başvuru yap
+              <ArrowRight className="h-4 w-4" strokeWidth={2} />
             </Link>
-            <Link 
-              href="/katalog" 
-              className="flex items-center justify-center bg-white border-2 border-anthracite-200 px-10 py-5 rounded-2xl font-black text-lg text-anthracite-900 hover:bg-anthracite-50 transition-all shadow-sm"
+            <Link
+              href="/katalog"
+              className="inline-flex items-center justify-center rounded-xl border border-anthracite-200/90 bg-white px-6 py-3.5 text-sm font-medium text-anthracite-800 shadow-sm transition hover:bg-anthracite-50"
             >
-              Kataloğu İncele
+              Kataloğu incele
             </Link>
           </div>
         </div>
 
-        {/* Hero Bottom - Çizgisel İstatistik Barı */}
-        <div className="absolute bottom-0 w-full border-y border-anthracite-200 bg-white/80 backdrop-blur-md py-6">
-           <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-between gap-8 md:gap-0 font-black text-sm uppercase tracking-widest text-anthracite-400">
-             <span className="flex items-center gap-2"><ShieldCheck className="w-5 h-5 text-emerald-500" /> %100 Lojistik Güvencesi</span>
-             <span className="flex items-center gap-2"><Store className="w-5 h-5 text-emerald-500" /> Seçkin Butik Ağı</span>
-             <span className="flex items-center gap-2 hidden md:flex"><Package className="w-5 h-5 text-emerald-500" /> Sıfır Stok Riski</span>
-             <span className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-emerald-500" /> Komisyon Garantisi</span>
-           </div>
-        </div>
-      </section>
-
-      {/* 2. NASIL ÇALIŞIR? (Döngü İşletmesi) */}
-      <section className="w-full bg-white py-32 px-4 relative">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-anthracite-900 mb-4">Sistem Nasıl İşliyor?</h2>
-            <p className="text-anthracite-500 font-medium max-w-2xl mx-auto">Sıradan toptancı sitelerinin karmaşasını siliyoruz. Kuralları belirli, rolleri net, kusursuz çalışan mekanik bir iş ortaklığı.</p>
+        <div className="relative mx-auto mt-14 grid max-w-5xl grid-cols-2 gap-3 border-t border-anthracite-100/90 pt-10 sm:grid-cols-4 sm:gap-4">
+          <div className="flex items-center gap-2 text-xs font-medium text-anthracite-500 sm:text-sm">
+            <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+            Güvenli ödeme akışı
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-             {/* Adım 1 */}
-             <div className="bg-anthracite-50 rounded-[3rem] p-10 relative overflow-hidden group hover:bg-white border-2 border-transparent hover:border-anthracite-100 hover:shadow-2xl transition-all duration-500">
-                <div className="text-7xl font-black text-anthracite-100 absolute top-8 right-8 z-0 group-hover:text-emerald-50 transition-colors">01</div>
-                <div className="relative z-10">
-                   <div className="w-16 h-16 bg-anthracite-900 text-white rounded-2xl flex items-center justify-center mb-6 shadow-xl">
-                      <Package className="w-8 h-8" />
-                   </div>
-                   <h3 className="text-2xl font-black text-anthracite-900 mb-3">Toptancı Sadece Üretir</h3>
-                   <p className="text-anthracite-500 font-medium leading-relaxed text-sm">Katılımcı üreticiler/toptancılar lüks stüdyo panelinden mallarını (seri/adet) olarak sisteme ekler. Pazar arama, müşteri bulma derdiyle uğraşmaz, kargo numarasını işlemekle sorumludur.</p>
-                </div>
-             </div>
-
-             {/* Adım 2 */}
-             <div className="bg-emerald-50 rounded-[3rem] p-10 relative overflow-hidden group hover:bg-emerald-500 border-2 border-transparent hover:shadow-2xl transition-all duration-500">
-                <div className="text-7xl font-black text-emerald-100 absolute top-8 right-8 z-0 group-hover:text-emerald-400 transition-colors">02</div>
-                <div className="relative z-10 group-hover:text-white transition-colors">
-                   <div className="w-16 h-16 bg-emerald-600 text-white rounded-2xl flex items-center justify-center mb-6 shadow-xl group-hover:bg-white group-hover:text-emerald-600 transition-colors">
-                      <ShieldCheck className="w-8 h-8" />
-                   </div>
-                   <h3 className="text-2xl font-black text-emerald-900 group-hover:text-white mb-3">Demir Dev Denetler</h3>
-                   <p className="text-emerald-700 font-medium leading-relaxed text-sm group-hover:text-emerald-50">Sistemin kalbi. Ürünlerin kalite kontrollerini yapar, uygun kar marjını belirleyip yayına alır. Sipariş ödemesinin havalesini bizzat toplayıp ticareti %100 güvenceye kavuşturur.</p>
-                </div>
-             </div>
-
-             {/* Adım 3 */}
-             <div className="bg-anthracite-50 rounded-[3rem] p-10 relative overflow-hidden group hover:bg-white border-2 border-transparent hover:border-anthracite-100 hover:shadow-2xl transition-all duration-500">
-                <div className="text-7xl font-black text-anthracite-100 absolute top-8 right-8 z-0 group-hover:text-blue-50 transition-colors">03</div>
-                <div className="relative z-10">
-                   <div className="w-16 h-16 bg-anthracite-900 text-white rounded-2xl flex items-center justify-center mb-6 shadow-xl">
-                      <Store className="w-8 h-8" />
-                   </div>
-                   <h3 className="text-2xl font-black text-anthracite-900 mb-3">Butik Satar & Kazanır</h3>
-                   <p className="text-anthracite-500 font-medium leading-relaxed text-sm">Girişi onaylanmış butik müşterisi, devasa bir lüks vitrine kavuşur. Sıfır toptancı pazarlığı ile aradığı ürünü bulur, tıkla siparişini oluşturur ve kargosunu direkt takip eder.</p>
-                </div>
-             </div>
+          <div className="flex items-center gap-2 text-xs font-medium text-anthracite-500 sm:text-sm">
+            <Store className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+            Onaylı butik ağı
+          </div>
+          <div className="hidden items-center gap-2 text-sm font-medium text-anthracite-500 sm:flex">
+            <Package className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+            Net MOQ bilgisi
+          </div>
+          <div className="flex items-center gap-2 text-xs font-medium text-anthracite-500 sm:text-sm">
+            <TrendingUp className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+            Şeffaf komisyon
           </div>
         </div>
       </section>
 
-      {/* 3. NEDEN BİZ? (Value Propositiion & Görsel Şov) */}
-      <section className="w-full bg-anthracite-900 py-20 sm:py-32 px-4 relative text-white overflow-hidden">
-        {/* Dekoratif Işıklar */}
-        <div className="absolute top-1/2 left-1/4 w-[50%] h-[50%] bg-emerald-500/20 blur-[150px] -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"></div>
-
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center relative z-10">
-          <div className="lg:w-1/2 flex flex-col justify-center">
-            <span className="text-emerald-500 font-black tracking-widest uppercase text-sm mb-4">Lüksün Standartları</span>
-            <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-8 leading-[1.1]">Sıfır Risk. <br/>Maksimum Kalite.</h2>
-            <p className="text-anthracite-400 font-medium text-lg leading-relaxed mb-10">
-              Butik sahipleri için günlerce toptancı aramak, güven sorunu yaşamak ve stok yükü altına girmek bitti. Toptancı için de müşteri kovalama dönemi sona erdi. Biz, ortadaki tüm riskleri alan ve ticareti hızlandıran merkezi bir köprüyüz.
+      <section className="px-4 py-16 sm:py-20 lg:py-24">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center sm:mb-14">
+            <h2 className="mb-3 text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">
+              Nasıl çalışır?
+            </h2>
+            <p className="mx-auto max-w-xl text-sm text-anthracite-600 sm:text-base">
+              Roller net; ürün yayını, sipariş ve kargo adımları tek düzen içinde.
             </p>
-            
-            <ul className="space-y-6">
-               <li className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 border border-white/20"><Maximize2 className="w-5 h-5 text-emerald-400"/></div>
-                  <div>
-                    <h4 className="font-bold text-xl mb-1">Geniş Vana, Titiz Filtre</h4>
-                    <p className="text-sm text-anthracite-400">Piyasadaki her ürün değil, sadece kârlı, trend olan ve satışı garanti olan ürünler elit ağdan geçerek vitrine düşer.</p>
-                  </div>
-               </li>
-               <li className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center shrink-0 border border-white/20"><Users className="w-5 h-5 text-emerald-400"/></div>
-                  <div>
-                    <h4 className="font-bold text-xl mb-1">Gatekeeping (Kapalı Devre Üyelik)</h4>
-                    <p className="text-sm text-anthracite-400">Toptancı fiyatlarının perakende müşterisinin eline düşmesini engelliyoruz. Fiyatları sadece merkezin (Admin) onayladığı resmi butikler görebilir.</p>
-                  </div>
-               </li>
+          </div>
+
+          <div className="grid gap-5 md:grid-cols-3 md:gap-6">
+            <div className="rounded-2xl border border-anthracite-200/70 bg-white/80 p-6 shadow-sm transition hover:border-anthracite-300/80 hover:shadow-md sm:p-8">
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-anthracite-900 text-white shadow-sm">
+                <Package className="h-5 w-5" strokeWidth={2} />
+              </div>
+              <p className="mb-2 text-xs font-medium text-anthracite-400">1</p>
+              <h3 className="mb-2 text-lg font-semibold text-anthracite-900">Toptancı vitrine ekler</h3>
+              <p className="text-sm leading-relaxed text-anthracite-600">
+                Ürün ve stok bilgileri panelden girilir; yayın ve fiyatlandırma merkez onayıyla netleşir.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/40 p-6 shadow-sm transition hover:shadow-md sm:p-8">
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+                <ShieldCheck className="h-5 w-5" strokeWidth={2} />
+              </div>
+              <p className="mb-2 text-xs font-medium text-emerald-700/80">2</p>
+              <h3 className="mb-2 text-lg font-semibold text-emerald-950">Merkez denetler</h3>
+              <p className="text-sm leading-relaxed text-emerald-900/80">
+                Kalite ve marj çizgisi kontrol edilir; ödeme teyidi sonrası sipariş üretim ve kargoya bağlanır.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-anthracite-200/70 bg-white/80 p-6 shadow-sm transition hover:border-anthracite-300/80 hover:shadow-md sm:p-8">
+              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-anthracite-900 text-white shadow-sm">
+                <Store className="h-5 w-5" strokeWidth={2} />
+              </div>
+              <p className="mb-2 text-xs font-medium text-anthracite-400">3</p>
+              <h3 className="mb-2 text-lg font-semibold text-anthracite-900">Butik sipariş verir</h3>
+              <p className="text-sm leading-relaxed text-anthracite-600">
+                Onaylı butikler vitrindeki fiyatlarla seri sipariş oluşturur; teslimat ve durum panelden izlenir.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-anthracite-200/60 bg-anthracite-900 px-4 py-16 text-white sm:py-20">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-12 lg:flex-row lg:items-start lg:gap-16">
+          <div className="flex-1">
+            <p className="mb-3 text-xs font-medium uppercase tracking-wide text-emerald-400/90">Neden bu ağ?</p>
+            <h2 className="mb-5 text-2xl font-semibold leading-tight tracking-tight sm:text-3xl">
+              Riski azaltan, sade bir iş modeli
+            </h2>
+            <p className="mb-8 text-sm leading-relaxed text-anthracite-400 sm:text-base">
+              Kapalı devre üyelik ile fiyatlar yalnızca onaylı işletmelere açılır; sipariş ve ödeme adımları tek çatı altında toplanır.
+            </p>
+            <ul className="space-y-5">
+              <li className="flex gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/5">
+                  <Maximize2 className="h-4 w-4 text-emerald-400" strokeWidth={2} />
+                </div>
+                <div>
+                  <h4 className="mb-1 text-sm font-semibold sm:text-base">Seçilmiş vitrin</h4>
+                  <p className="text-sm text-anthracite-400">
+                    Yayına alınan ürünler marj ve uygunluk kontrolünden geçer.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/5">
+                  <Users className="h-4 w-4 text-emerald-400" strokeWidth={2} />
+                </div>
+                <div>
+                  <h4 className="mb-1 text-sm font-semibold sm:text-base">Üyelik kontrolü</h4>
+                  <p className="text-sm text-anthracite-400">
+                    Toptancı fiyatları yalnızca onaylı butik hesaplarına gösterilir.
+                  </p>
+                </div>
+              </li>
             </ul>
           </div>
-          
-          {/* Aslında Fotoğraf Girmesi Gereken Estetik Card */}
-          <div className="lg:w-1/2 w-full h-[420px] sm:h-[600px] bg-gradient-to-tr from-anthracite-800 to-anthracite-900 rounded-[2rem] sm:rounded-[3rem] border border-white/10 p-3 sm:p-4 relative shadow-2xl flex items-center justify-center">
-             <div className="w-full h-full border border-white/5 rounded-[1.5rem] sm:rounded-[2.5rem] bg-black/40 flex flex-col items-center justify-center text-center p-5 sm:p-10 overflow-hidden relative">
-               <div className="w-full h-full absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80')] bg-cover bg-center opacity-30 mix-blend-luminosity"></div>
-               <div className="relative z-10 w-full flex flex-col items-center">
-                 <div className="backdrop-blur-xl bg-black/50 border border-white/10 p-8 rounded-[2rem] w-full max-w-sm shadow-2xl transform -rotate-2 hover:rotate-0 transition-all duration-500">
-                    <span className="bg-emerald-500 text-white text-[10px] uppercase font-black tracking-widest px-3 py-1 rounded-full mb-4 inline-block">Sipariş Onaylandı</span>
-                    <h3 className="text-2xl font-black text-white mb-2">Bahar Koleksiyonu 2026</h3>
-                    <p className="text-anthracite-400 text-xs font-bold mb-4">Tedarikçi: Premium Tekstil</p>
-                    <div className="w-full h-2 bg-anthracite-700 rounded-full overflow-hidden">
-                       <div className="w-2/3 h-full bg-emerald-500"></div>
-                    </div>
-                    <p className="text-right text-[10px] text-white/50 mt-2 tracking-widest">Kargoya Hazırlanıyor</p>
-                 </div>
-                 
-                 <div className="backdrop-blur-xl bg-white/10 border border-white/20 p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] w-full max-w-[14rem] sm:max-w-[16rem] shadow-2xl transform sm:translate-x-12 -translate-y-6 sm:-translate-y-8 rotate-3 hover:rotate-0 transition-all duration-500 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] text-white/60 font-black uppercase tracking-widest">Demir Dev Kasası</p>
-                      <p className="text-xl font-black text-white">+ % Kar Marjı</p>
-                    </div>
-                    <ShieldCheck className="w-8 h-8 text-emerald-400" />
-                 </div>
-               </div>
-             </div>
+
+          <div className="w-full max-w-md flex-1 rounded-2xl border border-white/10 bg-white/5 p-5 shadow-xl backdrop-blur-sm sm:p-6">
+            <div className="rounded-xl border border-white/10 bg-anthracite-950/50 p-5">
+              <span className="mb-3 inline-block rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-medium text-emerald-300">
+                Örnek durum
+              </span>
+              <h3 className="mb-1 text-lg font-semibold">Sipariş onaylandı</h3>
+              <p className="mb-4 text-xs text-anthracite-500">Koleksiyon sevkiyatı</p>
+              <div className="h-1.5 overflow-hidden rounded-full bg-anthracite-800">
+                <div className="h-full w-2/3 rounded-full bg-emerald-500" />
+              </div>
+              <p className="mt-2 text-right text-[10px] text-anthracite-500">Hazırlanıyor</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 4. FOOTER / CALL TO ACTION (Aksiyon Çağrısı) */}
-      <section className="w-full bg-white py-32 px-4 flex flex-col items-center text-center">
-         <span className="w-20 h-20 bg-anthracite-50 rounded-full flex items-center justify-center mb-8 border border-anthracite-100">
-           <Gem className="w-10 h-10 text-anthracite-900" />
-         </span>
-         <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-anthracite-900 mb-6 max-w-3xl">Tekstil Ekosistemindeki Yerinizi Hemen Alın.</h2>
-         <p className="text-base sm:text-xl text-anthracite-500 font-medium mb-10 max-w-2xl">
-            Sisteme giriş yapmak sadece davetliler ve onayı geçen ticari hesaplar içindir. Üyelik oluşturduktan sonra onay ekranını bekleyin.
-         </p>
-         <Link 
-            href="/register" 
-            className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 sm:px-12 py-4 sm:py-6 rounded-full font-black text-base sm:text-xl shadow-xl shadow-emerald-500/30 transition-all hover:scale-105"
-         >
-            Ücretsiz Ticari Hesap Oluştur
-         </Link>
+      <section className="px-4 py-16 text-center sm:py-20">
+        <div className="mx-auto max-w-lg">
+          <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-anthracite-200/80 bg-white shadow-sm">
+            <Gem className="h-7 w-7 text-anthracite-700" strokeWidth={1.5} />
+          </div>
+          <h2 className="mb-3 text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">
+            Davet ve onaylı üyelik
+          </h2>
+          <p className="mb-8 text-sm text-anthracite-600 sm:text-base">
+            Başvurunuz incelenir; e-posta doğrulamasından sonra hesabınız açılır.
+          </p>
+          <Link
+            href="/register"
+            className="inline-flex rounded-xl bg-emerald-600 px-8 py-3.5 text-sm font-medium text-white shadow-sm transition hover:bg-emerald-700"
+          >
+            Hesap oluştur
+          </Link>
+        </div>
       </section>
-
     </div>
   );
 }
