@@ -1,0 +1,17 @@
+---
+description: Commit and push to GitHub after code changes without waiting for user to ask
+alwaysApply: true
+---
+
+# GitHub otomatik senkron
+
+Bu repoda (`b2b-portal`) kod veya içerik değişikliği yapan bir görevi bitirdiğinde, kullanıcı ayrıca söylemese bile:
+
+1. `git status` ile durumu kontrol et.
+2. Anlamlı değişiklik varsa: ilgili dosyaları stage et (tercihen yaptığın değişiklikler; gereksiz yere tüm repo yerine mantıklı `git add`). `public/sw.js` gibi build çıktıları projede takip ediliyorsa ve görevle ilgiliyse dahil et.
+3. `git commit -m "..."` ile açıklayıcı bir İngilizce veya Türkçe mesaj kullan.
+4. `git push origin main` çalıştır.
+
+**Asla commit/push etme:** `.env`, `.env.local`, gerçek anahtarlar veya kullanıcının özellikle dışarıda tutmak istediği dosyalar.
+
+Push başarısız olursa (auth, ağ): alternatif dene veya kullanıcıya net hata ile bildir.
