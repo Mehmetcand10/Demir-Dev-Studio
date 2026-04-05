@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { 
   PackageSearch, PackageCheck, Clock, Truck, FileText, 
   Search, ArrowRight, CheckCircle2, History as HistoryIcon, CreditCard,
-  Package, ShoppingBag, Loader2, Info
+  Package, ShoppingBag, Loader2, Info, Printer
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
@@ -266,7 +266,12 @@ export default function Siparislerim() {
                          ) : <div className="text-xs font-medium text-anthracite-400">Sipariş takipte.</div>}
 
                          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
-                            {(order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING || order.status === ORDER_STATUS.SHIPPED) && (
+                            {order.status !== ORDER_STATUS.CANCELLED && (
+                                <Link href={`/siparislerim/${order.id}/ozet`} className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-anthracite-200 bg-white px-4 py-2.5 text-xs font-medium text-anthracite-800 transition hover:bg-anthracite-50 sm:flex-none">
+                                   <Printer className="h-4 w-4" /> Özet / yazdır
+                                </Link>
+                            )}
+                            {(order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING || order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && (
                                 <button onClick={() => exportInvoicePDF(order)} className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-anthracite-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-anthracite-800 sm:flex-none">
                                    <FileText className="h-4 w-4" /> Fatura
                                 </button>

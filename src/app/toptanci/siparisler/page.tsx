@@ -5,6 +5,7 @@ import { Package, ArrowLeft, Loader2, FileText, Scale, Truck } from 'lucide-reac
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { ORDER_STATUS } from '@/utils/orderStatus';
+import { notify } from '@/utils/notifications';
 import { getDisputeStatusLabel, isDisputeOpen } from '@/utils/disputeStatus';
 import Link from 'next/link';
 import { DashboardShell } from '@/components/dashboard/DashboardShell';
@@ -55,13 +56,28 @@ export default function ToptanciSiparisler() {
   const handleShipOrder = async (orderId: string) => {
     const trackingCode = window.prompt("Lütfen kargoya verdiğiniz paketin Geçerli Takip Numarasını (Örn: YK-109232) yazınız:");
     if (!trackingCode) return;
-    
+
+    const { data: ord } = await supabase
+      .from('orders')
+      .select('buyer_id, product_name')
+      .eq('id', orderId)
+      .single();
+
     const { error } = await supabase.from('orders').update({
        status: ORDER_STATUS.SHIPPED,
        tracking_number: trackingCode
     }).eq('id', orderId);
     
     if(!error) {
+       const pn = ord?.product_name || 'Sipariş';
+       if (ord?.buyer_id) {
+         await notify(
+           ord.buyer_id,
+           'Kargoya verildi',
+           `«${pn}» siparişiniz kargolandı. Takip numarası: ${trackingCode.trim()}. Siparişlerim ekranından izleyebilirsiniz.`,
+           'success'
+         );
+       }
        alert("Mükemmel! Kargo takip numarası sisteme işlendi ve Müşterinin (Butik) sayfasına anında mavi bantla yansıtıldı.");
        fetchMyOrders(user.id);
     } else {

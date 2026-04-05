@@ -15,7 +15,8 @@ import { DashboardShell } from '@/components/dashboard/DashboardShell';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 import { ORDER_STATUS } from '@/utils/orderStatus';
-import { hasPositiveStockLine } from '@/utils/productStocks';
+import { hasPositiveStockLine, isLowStockProduct } from '@/utils/productStocks';
+import BulkProductCsvPanel from '@/components/toptanci/BulkProductCsvPanel';
 
 type TabType = 'studio' | 'inventory' | 'orders' | 'finance';
 
@@ -115,7 +116,8 @@ export default function ToptanciDashboard() {
 
       const { error: dbError } = await supabase.from('products').insert([{
         wholesaler_id: user.id, name, category, gender, stocks: stocksJson, fabric_type: fabricType, gsm: gsm || null, images: uploadedUrls,
-        base_wholesale_price: Number(wholesalePrice), margin_price: Number(wholesalePrice) * 0.15, stock_status: 'In Stock', min_order_quantity: Number(minOrder)
+        base_wholesale_price: Number(wholesalePrice), margin_price: Number(wholesalePrice) * 0.15, stock_status: 'In Stock', min_order_quantity: Number(minOrder),
+        low_stock_threshold: 5,
       }]);
 
       if (dbError) throw dbError;
@@ -174,6 +176,12 @@ export default function ToptanciDashboard() {
                         <button type="button" onClick={() => setActiveTab('studio')} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-xs font-medium text-white shadow-sm transition hover:bg-emerald-700">Yeni ürün ekle</button>
                     </div>
 
+                    {user && (
+                      <div className="mb-8">
+                        <BulkProductCsvPanel userId={user.id} onImported={() => fetchData(user.id)} />
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
                        {products.length === 0 ? (
                            <div className="col-span-full py-20 text-center bg-anthracite-50 rounded-xl border-2 border-dashed border-anthracite-100">
@@ -183,6 +191,11 @@ export default function ToptanciDashboard() {
                        ) : products.map(p => (
                            <div key={p.id} className="group bg-white rounded-xl sm:rounded-2xl border border-anthracite-100/90 shadow-sm hover:shadow-md overflow-hidden transition-all relative text-left">
                                <div className="relative aspect-[4/5] sm:aspect-[5/6] bg-anthracite-50 overflow-hidden">
+                                  {isLowStockProduct(p) && (
+                                    <span className="absolute left-2 top-2 z-10 rounded-md bg-amber-500 px-1.5 py-0.5 text-[8px] font-black uppercase text-white shadow-sm">
+                                      Düşük stok
+                                    </span>
+                                  )}
                                   <Image src={p.images?.[0]} alt="p" fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                                   <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                       <button type="button" onClick={() => handleDelete(p.id)} className="p-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-all">

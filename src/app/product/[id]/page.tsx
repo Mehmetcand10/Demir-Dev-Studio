@@ -107,8 +107,8 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
           adminRows.map((row: { id: string }) =>
             notify(
               row.id,
-              "🆕 Yeni Sipariş Bildirimi",
-              `${currentUserProfile.business_name || currentUserProfile.full_name} tarafından '${product.name}' için ${totalItems} adet sipariş oluşturuldu.`,
+              "Yeni sipariş",
+              `${currentUserProfile.business_name || currentUserProfile.full_name}: «${product.name}» · ${totalItems} adet · ${totalPrice.toLocaleString("tr-TR")} ₺. Ödeme teyidi bekleniyor.`,
               "info"
             )
           )

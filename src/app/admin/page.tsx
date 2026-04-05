@@ -6,7 +6,7 @@ import {
   TrendingUp, Package, Clock, ShieldCheck, 
   Archive, FolderArchive, Trash2, LayoutDashboard,
   FileText, History as HistoryIcon, Info, Printer, Megaphone, Send,
-  ArrowRight, BarChart3, Receipt, UserCheck, ShoppingBag, Loader2
+  ArrowRight, BarChart3, Receipt, UserCheck, ShoppingBag, Loader2, ClipboardList, AlertTriangle
 } from 'lucide-react';
 import { 
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
@@ -18,6 +18,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import NotificationBell from '@/components/NotificationBell';
 import { notify } from '@/utils/notifications';
 import { ORDER_STATUS, getOrderStatusLabel } from '@/utils/orderStatus';
+import { isLowStockProduct } from '@/utils/productStocks';
 import { DISPUTE_STATUS, getDisputeStatusLabel, isDisputeOpen } from '@/utils/disputeStatus';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -25,7 +26,7 @@ import { DashboardShell } from '@/components/dashboard/DashboardShell';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 
-type TabType = 'overview' | 'orders' | 'payments' | 'approvals' | 'announcements' | 'archive';
+type TabType = 'overview' | 'orders' | 'payments' | 'approvals' | 'announcements' | 'reports' | 'archive';
 
 export default function AdminDashboard() {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -39,6 +40,7 @@ export default function AdminDashboard() {
   // Duyuru State'leri
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [disputes, setDisputes] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [disputeNotes, setDisputeNotes] = useState<Record<string, string>>({});
   const [annTitle, setAnnTitle] = useState('');
   const [annContent, setAnnContent] = useState('');
@@ -71,6 +73,26 @@ export default function AdminDashboard() {
       .select('*')
       .order('created_at', { ascending: false });
     if (data) setAnnouncements(data);
+  }, [supabase]);
+
+  const fetchProducts = useCallback(async () => {
+    const { data: prods } = await supabase.from('products').select('*').order('created_at', { ascending: false });
+    if (!prods) {
+      setProducts([]);
+      return;
+    }
+    const ids = Array.from(new Set(prods.map((p: { wholesaler_id: string }) => p.wholesaler_id).filter(Boolean)));
+    const map: Record<string, string> = {};
+    if (ids.length > 0) {
+      const { data: profs } = await supabase.from('profiles').select('id, business_name').in('id', ids);
+      for (const p of profs || []) map[p.id] = p.business_name || '—';
+    }
+    setProducts(
+      prods.map((p: { wholesaler_id: string }) => ({
+        ...p,
+        _wholesalerLabel: map[p.wholesaler_id] || 'Toptancı',
+      }))
+    );
   }, [supabase]);
 
   const fetchDisputes = useCallback(async () => {
@@ -107,10 +129,10 @@ export default function AdminDashboard() {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
     if (profile?.role === 'admin') {
       setIsAdmin(true);
-      await Promise.all([fetchPendingUsers(), fetchOrders(), fetchAnnouncements(), fetchDisputes()]);
+      await Promise.all([fetchPendingUsers(), fetchOrders(), fetchAnnouncements(), fetchDisputes(), fetchProducts()]);
     }
     setLoading(false);
-  }, [supabase, fetchPendingUsers, fetchOrders, fetchAnnouncements, fetchDisputes]);
+  }, [supabase, fetchPendingUsers, fetchOrders, fetchAnnouncements, fetchDisputes, fetchProducts]);
 
   useEffect(() => {
     setMounted(true);
@@ -129,7 +151,7 @@ export default function AdminDashboard() {
     if(!confirm("Müşterinin IBAN adresinize ödeme geçtiğini teyit ettiniz mi? Sipariş üretim/stok için Toptancı deposuna yönlendirilecek!")) return;
     
     // Stok düşme ve bildirim mantığı (Aynı kalıyor)
-    const { data: order } = await supabase.from('orders').select('product_id, selected_size, quantity, buyer_id, product_name').eq('id', orderId).single();
+    const { data: order } = await supabase.from('orders').select('product_id, selected_size, quantity, buyer_id, product_name, wholesaler_id').eq('id', orderId).single();
     if (order && order.selected_size) {
       const { data: product } = await supabase.from('products').select('stocks').eq('id', order.product_id).single();
       if (product && product.stocks) {
@@ -141,9 +163,24 @@ export default function AdminDashboard() {
 
     const { error } = await supabase.from('orders').update({ status: ORDER_STATUS.PREPARING }).eq('id', orderId);
     if (!error) {
-      await notify(order?.buyer_id, "✅ Ödemeniz Onaylandı!", `'${order?.product_name}' siparişiniz onaylandı ve toptancıya kargo emri iletildi.`, 'success');
+      const pn = order?.product_name || 'Sipariş';
+      await notify(
+        order?.buyer_id,
+        'Ödeme onaylandı',
+        `«${pn}» için ödemeniz teyit edildi. Sipariş toptancıya hazırlık için iletildi. Siparişlerim’den durumu takip edebilirsiniz.`,
+        'success'
+      );
+      if (order?.wholesaler_id) {
+        await notify(
+          order.wholesaler_id,
+          'Ödeme onaylandı — hazırlık',
+          `«${pn}» siparişi için ödeme teyit edildi. Paketleyip Kargo sayfasından takip numarası girmeniz bekleniyor.`,
+          'success'
+        );
+      }
       alert(`Sipariş Onaylandı! ${wholesalerName || 'Toptancı'} tarafına kargolama emri iletildi.`);
       fetchOrders();
+      fetchProducts();
     }
   };
 
@@ -339,6 +376,7 @@ export default function AdminDashboard() {
           { id: "payments", label: "Hakediş", icon: Wallet },
           { id: "approvals", label: "Onaylar", icon: UserCheck },
           { id: "announcements", label: "Duyuru", icon: Megaphone },
+          { id: "reports", label: "Raporlar", icon: ClipboardList },
           { id: "archive", label: "Arşiv", icon: HistoryIcon },
         ]}
       />
@@ -758,6 +796,115 @@ export default function AdminDashboard() {
                 </div>
             </div>
         )}
+
+        {/* REPORTS TAB */}
+        {activeTab === 'reports' && (() => {
+          const dayStart = new Date();
+          dayStart.setHours(0, 0, 0, 0);
+          const dayMs = dayStart.getTime();
+          const todayOrders = activeOrders.filter((o) => new Date(o.created_at).getTime() >= dayMs);
+          const todaySum = todayOrders.reduce((a, o) => a + Number(o.total_price || 0), 0);
+          const waitingList = activeOrders.filter((o) => o.status === ORDER_STATUS.WAITING_PAYMENT);
+          const delayedPrep = activeOrders.filter((o) => {
+            if (o.status !== ORDER_STATUS.PREPARING) return false;
+            const h = (Date.now() - new Date(o.created_at).getTime()) / (1000 * 60 * 60);
+            return h >= 72;
+          });
+          const shippedNoTrack = activeOrders.filter(
+            (o) => o.status === ORDER_STATUS.SHIPPED && !String(o.tracking_number || '').trim()
+          );
+          const lowStock = products.filter((p) => isLowStockProduct(p));
+          return (
+            <div className="space-y-8 text-left">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-2xl border border-anthracite-200/80 bg-white p-5 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-anthracite-500">Bugün (sipariş)</p>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{todayOrders.length}</p>
+                  <p className="mt-1 text-xs text-anthracite-500">{todaySum.toLocaleString('tr-TR')} ₺ ciro</p>
+                </div>
+                <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-5 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800">Ödeme bekliyor</p>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{waitingList.length}</p>
+                  <button type="button" onClick={() => setActiveTab('orders')} className="mt-2 text-xs font-semibold text-emerald-700 hover:underline">
+                    Siparişler sekmesine git
+                  </button>
+                </div>
+                <div className="rounded-2xl border border-red-200/80 bg-red-50/40 p-5 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-red-800">Hazırlık 3+ gün</p>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{delayedPrep.length}</p>
+                </div>
+                <div className="rounded-2xl border border-blue-200/80 bg-blue-50/40 p-5 shadow-sm">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-blue-800">Kargoda takipsiz</p>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{shippedNoTrack.length}</p>
+                </div>
+              </div>
+
+              <div className="grid gap-8 lg:grid-cols-2">
+                <div className="rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm">
+                  <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-anthracite-900">
+                    <Clock className="h-4 w-4 text-amber-600" strokeWidth={2} />
+                    Bekleyen ödeme (özet)
+                  </h3>
+                  <ul className="max-h-72 space-y-2 overflow-y-auto text-xs">
+                    {waitingList.length === 0 ? (
+                      <li className="text-anthracite-400">Kayıt yok.</li>
+                    ) : (
+                      waitingList.slice(0, 25).map((o) => (
+                        <li key={o.id} className="flex justify-between gap-2 rounded-lg border border-anthracite-100 bg-anthracite-50/50 px-3 py-2">
+                          <span className="min-w-0 truncate font-medium text-anthracite-800">{o.product_name}</span>
+                          <span className="shrink-0 tabular-nums text-anthracite-600">{Number(o.total_price).toLocaleString('tr-TR')} ₺</span>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+                <div className="rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm">
+                  <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-anthracite-900">
+                    <AlertTriangle className="h-4 w-4 text-red-600" strokeWidth={2} />
+                    Geciken / risk (hazırlık)
+                  </h3>
+                  <ul className="max-h-72 space-y-2 overflow-y-auto text-xs">
+                    {delayedPrep.length === 0 ? (
+                      <li className="text-anthracite-400">72 saati aşan hazırlık yok.</li>
+                    ) : (
+                      delayedPrep.map((o) => (
+                        <li key={o.id} className="rounded-lg border border-red-100 bg-red-50/50 px-3 py-2">
+                          <span className="font-medium text-anthracite-900">{o.product_name}</span>
+                          <span className="mt-0.5 block text-[10px] text-anthracite-500">
+                            {o.buyer_name} · {new Date(o.created_at).toLocaleString('tr-TR')}
+                          </span>
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/30 p-6 shadow-sm">
+                <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-anthracite-900">
+                  <Package className="h-4 w-4 text-emerald-600" strokeWidth={2} />
+                  Düşük stok (ürün)
+                </h3>
+                <p className="mb-4 text-xs text-anthracite-600">
+                  Toplam adet, ürün satırındaki eşiğin altına indiyse listelenir. E-posta entegrasyonu yok; toptancı panelinde de etiket görünür. Kolon için{" "}
+                  <code className="rounded bg-white px-1 text-[10px]">product_bulk_and_alerts.sql</code> gerekir.
+                </p>
+                <ul className="max-h-64 space-y-2 overflow-y-auto text-xs">
+                  {lowStock.length === 0 ? (
+                    <li className="text-anthracite-500">Düşük stoklu ürün yok veya veri çekilemedi.</li>
+                  ) : (
+                    lowStock.map((p) => (
+                      <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-emerald-100 bg-white px-3 py-2">
+                        <span className="font-medium text-anthracite-900">{p.name}</span>
+                        <span className="text-anthracite-500">{p._wholesalerLabel}</span>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ARCHIVE TAB */}
         {activeTab === 'archive' && (

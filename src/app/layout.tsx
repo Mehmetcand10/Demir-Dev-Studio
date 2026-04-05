@@ -40,6 +40,7 @@ export default async function RootLayout({
   return (
     <html lang="tr">
       <body className={`${inter.className} min-h-screen flex flex-col antialiased overflow-x-hidden`}>
+        <div className="no-print">
         <AnnouncementBanner />
         <script
           dangerouslySetInnerHTML={{
@@ -109,12 +110,15 @@ export default async function RootLayout({
             </div>
           </div>
         </nav>
-        
+        </div>
+
         <main className="flex flex-grow flex-col">
           <SiteBackground>{children}</SiteBackground>
         </main>
 
+        <div className="no-print">
         <SiteFooter />
+        </div>
       </body>
     </html>
   );

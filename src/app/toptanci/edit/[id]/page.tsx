@@ -24,6 +24,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   const [gsm, setGsm] = useState('');
   const [wholesalePrice, setWholesalePrice] = useState('');
   const [minOrder, setMinOrder] = useState('');
+  const [lowStockThreshold, setLowStockThreshold] = useState('5');
   const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
@@ -57,6 +58,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       setGsm(data.gsm || '');
       setWholesalePrice(data.base_wholesale_price?.toString() || '');
       setMinOrder(data.min_order_quantity?.toString() || '');
+      setLowStockThreshold(
+        data.low_stock_threshold !== null && data.low_stock_threshold !== undefined
+          ? String(data.low_stock_threshold)
+          : '5'
+      );
       setImages(data.images || []);
       setLoading(false);
     }
@@ -78,7 +84,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         gsm: gsm || null,
         base_wholesale_price: Number(wholesalePrice),
         margin_price: Number(wholesalePrice) * 0.15, // Demir Dev Payı (%15 Otomatik)
-        min_order_quantity: Number(minOrder)
+        min_order_quantity: Number(minOrder),
+        low_stock_threshold: Math.max(0, Math.floor(Number(lowStockThreshold) || 5)),
       })
       .eq('id', params.id)
       .eq('wholesaler_id', user.id);
@@ -182,6 +189,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                     <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Toptan fiyat (₺)</label>
                     <input required type="number" min="1" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-white px-3.5 py-2.5 text-sm tabular-nums outline-none focus:ring-2 focus:ring-emerald-500/15" />
                   </div>
+               </div>
+
+               <div>
+                  <label className="mb-1.5 block text-xs font-medium text-amber-800">Düşük stok uyarı eşiği (toplam adet)</label>
+                  <input type="number" min="0" value={lowStockThreshold} onChange={e=>setLowStockThreshold(e.target.value)} className="w-full max-w-xs rounded-xl border border-amber-200/90 bg-amber-50/50 px-3.5 py-2.5 text-sm tabular-nums outline-none focus:ring-2 focus:ring-amber-500/20" />
+                  <p className="mt-1 text-[11px] text-anthracite-500">Toplam stok bu sayının altına inince vitrinde &quot;Düşük stok&quot; gösterilir; admin raporunda listelenir.</p>
                </div>
 
                <button disabled={saving} type="submit" className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-anthracite-900 py-3.5 text-sm font-medium text-white transition hover:bg-anthracite-800 disabled:opacity-50">

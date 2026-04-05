@@ -197,6 +197,67 @@ export default function Home() {
         </div>
       </section>
 
+      {/* —— Güven bandı + davetli beta —— */}
+      <section className="border-y border-anthracite-200/70 bg-gradient-to-b from-white to-emerald-50/25 px-4 py-14 sm:py-16">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-emerald-700">Güven</p>
+          <h2 className="mt-3 text-center text-2xl font-bold tracking-tight text-anthracite-950 sm:text-3xl">
+            {process.env.NEXT_PUBLIC_TRUST_CITY || "Ankara"} · B2B tekstil vitrini
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm font-medium leading-relaxed text-neutral-700">
+            {process.env.NEXT_PUBLIC_TRUST_APPROVED_BOUTIQUES || process.env.NEXT_PUBLIC_TRUST_APPROVED_WHOLESALERS ? (
+              <>
+                Ağ büyüdükçe burada onaylı ortak sayılarını güncel tutabilirsiniz (ortam değişkenleri ile).
+              </>
+            ) : (
+              <>
+                Onaylı butik ve üretici sayısı sürekli artıyor; vitrin davetli büyüme modeliyle kontrollü şekilde
+                genişletiliyor.
+              </>
+            )}
+          </p>
+          <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                label: "Onaylı butik",
+                value: process.env.NEXT_PUBLIC_TRUST_APPROVED_BOUTIQUES,
+                fallback: "Davetli kayıt",
+              },
+              {
+                label: "Üretici / toptancı",
+                value: process.env.NEXT_PUBLIC_TRUST_APPROVED_WHOLESALERS,
+                fallback: "Seçilmiş ortaklar",
+              },
+              {
+                label: "Operasyon",
+                value: null,
+                fallback: "İlk hafta yoğun destek",
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="rounded-2xl border border-anthracite-200/80 bg-white px-5 py-5 text-center shadow-sm"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-wider text-anthracite-500">{item.label}</p>
+                <p className="mt-2 text-xl font-bold tabular-nums text-anthracite-900 sm:text-2xl">
+                  {item.value ? `${item.value}+` : item.fallback}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-neutral-600">
+            <strong className="text-anthracite-900">Davetli beta:</strong> Yeni toptancılar tek tek onboard edilir; ürün
+            yükleme, stok ve kargo adımlarında ilk hafta operasyon tarafından sıkı yönlendirme yapılır. Gerçek ortak
+            sayılarınızı göstermek için{" "}
+            <code className="rounded bg-anthracite-100 px-1.5 py-0.5 text-xs">NEXT_PUBLIC_TRUST_APPROVED_BOUTIQUES</code>{" "}
+            ve{" "}
+            <code className="rounded bg-anthracite-100 px-1.5 py-0.5 text-xs">NEXT_PUBLIC_TRUST_APPROVED_WHOLESALERS</code>{" "}
+            ortam değişkenlerini doldurun; şehir için{" "}
+            <code className="rounded bg-anthracite-100 px-1.5 py-0.5 text-xs">NEXT_PUBLIC_TRUST_CITY</code>.
+          </p>
+        </div>
+      </section>
+
       {/* —— Arka plan: mağaza görseli görünsün; sol metin ayrı opak kutuda —— */}
       <section className="relative isolate min-h-0 overflow-hidden bg-anthracite-900 text-white">
         <div className="pointer-events-none absolute inset-0">

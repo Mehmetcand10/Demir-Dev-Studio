@@ -152,7 +152,10 @@ export default function NotificationBell({ userId }: { userId: string }) {
           </div>
           
           <div className="border-t border-anthracite-100/90 bg-anthracite-50/30 p-3 text-center">
-            <p className="text-[10px] text-anthracite-400">Demir Dev Studio</p>
+            <p className="text-[10px] font-medium leading-relaxed text-anthracite-500">
+              Ödeme onaylandığında ve kargoya verildiğinde burada kısa bilgi görürsünüz. E-posta gönderilmez; paneli zaman zaman kontrol edin.
+            </p>
+            <p className="mt-1.5 text-[10px] text-anthracite-400">Demir Dev Studio</p>
           </div>
         </div>
       )}

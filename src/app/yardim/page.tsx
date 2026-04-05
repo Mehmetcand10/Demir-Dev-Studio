@@ -107,6 +107,13 @@ export default function YardimPage() {
           <p className="mt-4 text-xs font-medium text-anthracite-500">
             Panel: üst menüden <strong>Siparişlerim</strong> — sekmelerde aktif siparişler, ödeme ve arşiv ayrılır.
           </p>
+          <p className="mt-4 rounded-xl border border-amber-200/80 bg-amber-50/60 p-4 text-sm leading-relaxed text-anthracite-800">
+            <strong className="text-anthracite-900">Uyuşmazlık ne zaman?</strong> Sipariş{" "}
+            <strong>kargoya verildikten sonra</strong> veya <strong>teslim edildikten sonra</strong> yanlış ürün, eksik adet,
+            ciddi kalite sapması gibi durumlarda Siparişlerim’deki <strong>Sorun bildir</strong> ile kayıt açın; yönetim ve
+            toptancı tarafına bildirim gider. Ödeme beklerken veya henüz kargolanmadan önce önce WhatsApp / merkez hattı ile
+            iletişim önerilir.
+          </p>
         </section>
 
         <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">

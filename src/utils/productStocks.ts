@@ -44,3 +44,26 @@ export function usesFallbackStocks(product: ProductLike): boolean {
       : {};
   return !Object.entries(raw).some(([, v]) => Number(v) > 0);
 }
+
+export type ProductWithThreshold = ProductLike & { low_stock_threshold?: number | null };
+
+/** Gerçek stok satırlarının toplamı (fallback modda büyük sayı döner). */
+export function totalStockUnits(product: ProductWithThreshold): number {
+  if (usesFallbackStocks(product)) return FALLBACK_STOCK_QTY;
+  const raw =
+    product.stocks && typeof product.stocks === "object" && !Array.isArray(product.stocks)
+      ? (product.stocks as Record<string, unknown>)
+      : {};
+  return Object.values(raw).reduce((acc: number, v) => acc + Math.max(0, Number(v) || 0), 0);
+}
+
+export function getLowStockThreshold(product: ProductWithThreshold): number {
+  const t = product.low_stock_threshold;
+  if (t === null || t === undefined || Number.isNaN(Number(t))) return 5;
+  return Math.max(0, Math.floor(Number(t)));
+}
+
+export function isLowStockProduct(product: ProductWithThreshold): boolean {
+  if (usesFallbackStocks(product)) return false;
+  return totalStockUnits(product) <= getLowStockThreshold(product);
+}
