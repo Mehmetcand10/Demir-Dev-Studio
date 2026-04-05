@@ -197,9 +197,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* —— Koyu bant: güven + görsel —— */}
-      <section className="relative overflow-hidden bg-neutral-950 text-white">
-        <div className="absolute inset-0 opacity-[0.12]">
+      {/* —— Koyu bant: güven + görsel (sol metin: tam opak kutu, görsel URL aynı) —— */}
+      <section
+        className="relative isolate overflow-hidden text-white"
+        style={{ backgroundColor: "#09090b" }}
+      >
+        <div className="pointer-events-none absolute inset-0 opacity-[0.14]">
           <Image
             src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1400&auto=format&fit=crop"
             alt=""
@@ -208,41 +211,50 @@ export default function Home() {
             sizes="100vw"
           />
         </div>
-        <div className="absolute inset-0 bg-neutral-950" />
+        {/* Tam opak katman: cam/şeffaflık yok */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ backgroundColor: "rgba(9, 9, 11, 0.97)" }}
+          aria-hidden
+        />
 
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:gap-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:py-24">
-          <div className="rounded-2xl border-2 border-zinc-700 bg-neutral-950 p-6 shadow-2xl sm:p-9">
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:gap-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:py-24">
+          {/* Sol: sadece bu kutu üzerinde metin — arka plan kesin koyu */}
+          <div
+            className="rounded-2xl border-2 border-anthracite-600 p-6 shadow-[0_12px_48px_rgba(0,0,0,0.55)] sm:p-9"
+            style={{ backgroundColor: "#09090b" }}
+          >
             <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em] text-emerald-400">
               Neden bu platform?
             </p>
-            <h2 className="mb-6 text-3xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-[2.35rem]">
+            <h2 className="mb-6 text-3xl font-bold leading-[1.15] tracking-tight text-white sm:text-4xl lg:text-[2.35rem] [text-shadow:0_2px_8px_rgba(0,0,0,0.85)]">
               Sıfır stres.
               <br />
               Maksimum şeffaflık.
             </h2>
-            <p className="mb-10 max-w-lg text-base font-medium leading-relaxed text-zinc-100">
+            <p className="mb-10 max-w-lg text-base font-semibold leading-relaxed text-anthracite-100">
               Butik için günlerce toptancı aramak; üretici için müşteri kovalamak bitti. Tek kapı, net kurallar,
               ölçülebilir sipariş.
             </p>
             <ul className="space-y-6">
               <li className="flex gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-500/50 bg-emerald-950">
-                  <Users className="h-5 w-5 text-emerald-400" strokeWidth={2} />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-emerald-500/60 bg-emerald-950">
+                  <Users className="h-5 w-5 text-emerald-300" strokeWidth={2} />
                 </div>
                 <div>
-                  <h4 className="mb-1 text-base font-bold text-white">Kapalı devre üyelik</h4>
-                  <p className="text-sm font-medium leading-relaxed text-zinc-200">
+                  <h4 className="mb-1.5 text-base font-bold text-white">Kapalı devre üyelik</h4>
+                  <p className="text-sm font-semibold leading-relaxed text-anthracite-200">
                     Fiyatlar yalnızca onaylı işletmelere açılır; perakende sızması engellenir.
                   </p>
                 </div>
               </li>
               <li className="flex gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-500/50 bg-emerald-950">
-                  <Package className="h-5 w-5 text-emerald-400" strokeWidth={2} />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-emerald-500/60 bg-emerald-950">
+                  <Package className="h-5 w-5 text-emerald-300" strokeWidth={2} />
                 </div>
                 <div>
-                  <h4 className="mb-1 text-base font-bold text-white">Seçilmiş vitrin</h4>
-                  <p className="text-sm font-medium leading-relaxed text-zinc-200">
+                  <h4 className="mb-1.5 text-base font-bold text-white">Seçilmiş vitrin</h4>
+                  <p className="text-sm font-semibold leading-relaxed text-anthracite-200">
                     Yayına alınan her ürün marj ve operasyon uygunluğundan geçer.
                   </p>
                 </div>
@@ -250,7 +262,7 @@ export default function Home() {
             </ul>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+          <div className="relative z-10 mx-auto w-full max-w-md lg:max-w-none">
             <div className="rounded-[1.75rem] border-2 border-zinc-600 bg-zinc-900 p-4 shadow-2xl sm:p-5">
               <div className="overflow-hidden rounded-2xl border-2 border-zinc-700 bg-black">
                 <div className="relative aspect-[4/5] max-h-[340px] sm:max-h-[400px]">
