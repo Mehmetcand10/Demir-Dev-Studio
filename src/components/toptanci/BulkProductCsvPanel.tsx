@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { Upload, Download, AlertTriangle, CheckCircle2, Loader2 } from "lucide-react";
+import { Upload, Download, AlertTriangle, CheckCircle2, Loader2, ChevronDown, ChevronUp, FileSpreadsheet } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import {
-  BULK_CSV_HEADER,
-  buildBulkTemplateCsv,
+  BULK_CSV_HEADER_TR,
+  BULK_COLUMN_HELP,
+  buildBulkTemplateCsvTr,
+  buildBulkTemplateCsvEn,
   parseBulkCsv,
   parseBulkProductRow,
   rowsFromParsed,
@@ -19,12 +21,22 @@ type Props = {
 export default function BulkProductCsvPanel({ userId, onImported }: Props) {
   const [busy, setBusy] = useState(false);
   const [log, setLog] = useState<string[]>([]);
+  const [showCols, setShowCols] = useState(false);
 
-  const downloadTemplate = useCallback(() => {
-    const blob = new Blob([buildBulkTemplateCsv()], { type: "text/csv;charset=utf-8" });
+  const downloadTr = useCallback(() => {
+    const blob = new Blob([buildBulkTemplateCsvTr()], { type: "text/csv;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "demir-dev-urun-sablonu.csv";
+    a.download = "demir-dev-urun-excel-turkiye.csv";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, []);
+
+  const downloadEn = useCallback(() => {
+    const blob = new Blob([buildBulkTemplateCsvEn()], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "demir-dev-urun-virgul-ingilizce.csv";
     a.click();
     URL.revokeObjectURL(a.href);
   }, []);
@@ -38,9 +50,13 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
       const matrix = parseBulkCsv(text);
       const { header, dataRows } = rowsFromParsed(matrix);
 
-      const h = header.join(",");
-      if (!h.toLowerCase().includes("name") || !h.toLowerCase().includes("image_urls")) {
-        setLog(["Geçersiz dosya: ilk satır şablon başlığı olmalı. Şablonu indirip düzenleyin."]);
+      const hasName = header.includes("name");
+      const hasImg = header.includes("image_urls");
+      if (!hasName || !hasImg) {
+        setLog([
+          "Dosya tanınmadı: ilk satırda urun_adi (veya name) ve gorsel_url (veya image_urls) sütunları olmalı.",
+          "Excel’de tüm metin tek sütunda görünüyorsa «Excel (Türkiye)» şablonunu indirip onu düzenleyin (noktalı virgül).",
+        ]);
         setBusy(false);
         return;
       }
@@ -96,33 +112,79 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
 
   return (
     <div className="rounded-2xl border border-dashed border-emerald-200/90 bg-emerald-50/40 p-5 sm:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h3 className="text-sm font-semibold text-anthracite-900">Toplu ürün (CSV)</h3>
-          <p className="mt-1 max-w-xl text-xs leading-relaxed text-anthracite-600">
-            Şablonu indirin; her satır bir ürün. <strong>image_urls</strong> alanına en az bir{" "}
-            <code className="rounded bg-white/90 px-1">https://</code> görsel adresi yazın (birden fazlaysa{" "}
-            <code className="rounded bg-white/90 px-1">|</code> ile ayırın). Stok sütunları:{" "}
-            <strong>s, m, l, xl</strong>. Veritabanında{" "}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-semibold text-anthracite-900">Toplu ürün (Excel / CSV)</h3>
+          <p className="mt-2 text-xs leading-relaxed text-anthracite-600">
+            <strong className="text-anthracite-800">Nasıl çalışır?</strong> Şablonda her <strong>satır = bir ürün</strong>.
+            Dosyayı kaydedip buradan yükleyin; sistem satırları okuyup vitrine ekler. Önce Supabase’de{" "}
             <code className="rounded bg-white/90 px-1 text-[10px]">product_bulk_and_alerts.sql</code> çalışmış olmalı.
           </p>
-          <p className="mt-2 font-mono text-[10px] text-anthracite-500">{BULK_CSV_HEADER}</p>
-        </div>
-        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+          <p className="mt-2 text-xs leading-relaxed text-amber-900/90">
+            <strong>Excel Türkiye ipucu:</strong> Virgüllü CSV bazen tüm hücreyi <strong>tek sütunda</strong> açar. Bu yüzden
+            varsayılan şablon <strong>noktalı virgül (;)</strong> ve <strong>Türkçe sütun adları</strong> kullanır — sütunlar
+            doğru hizalanır.
+          </p>
+          <p className="mt-2 break-all font-mono text-[10px] text-anthracite-500 sm:break-normal">
+            {BULK_CSV_HEADER_TR}
+          </p>
+
           <button
             type="button"
-            onClick={downloadTemplate}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-white px-4 py-2.5 text-xs font-semibold text-emerald-800 shadow-sm transition hover:bg-emerald-50"
+            onClick={() => setShowCols((v) => !v)}
+            className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:underline"
+          >
+            {showCols ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
+            Sütunların anlamı
+          </button>
+
+          {showCols && (
+            <div className="mt-3 overflow-x-auto rounded-xl border border-emerald-100/90 bg-white/90">
+              <table className="w-full min-w-[280px] text-left text-[11px]">
+                <thead>
+                  <tr className="border-b border-anthracite-100 bg-anthracite-50/80">
+                    <th className="px-3 py-2 font-semibold text-anthracite-800">Sütun</th>
+                    <th className="px-3 py-2 font-semibold text-anthracite-800">Ne yazılır?</th>
+                    <th className="px-3 py-2 font-semibold text-anthracite-800">Örnek</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {BULK_COLUMN_HELP.map((row) => (
+                    <tr key={row.key} className="border-b border-anthracite-50 last:border-0">
+                      <td className="px-3 py-2 font-mono font-medium text-emerald-900">{row.key}</td>
+                      <td className="px-3 py-2 text-anthracite-700">{row.tr}</td>
+                      <td className="px-3 py-2 text-anthracite-500">{row.ornek}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="flex shrink-0 flex-col gap-2 sm:min-w-[200px] sm:items-stretch">
+          <button
+            type="button"
+            onClick={downloadTr}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-white px-4 py-2.5 text-xs font-semibold text-emerald-900 shadow-sm transition hover:bg-emerald-50"
+          >
+            <FileSpreadsheet className="h-4 w-4" strokeWidth={2} />
+            Excel (Türkiye) şablonu
+          </button>
+          <button
+            type="button"
+            onClick={downloadEn}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-anthracite-200 bg-white px-4 py-2.5 text-xs font-semibold text-anthracite-700 shadow-sm transition hover:bg-anthracite-50"
           >
             <Download className="h-4 w-4" strokeWidth={2} />
-            Şablon indir
+            Virgül + İngilizce başlık
           </button>
           <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" strokeWidth={2} />}
-            CSV yükle
+            Dosyayı yükle
             <input
               type="file"
-              accept=".csv,text/csv"
+              accept=".csv,text/csv,.txt"
               className="sr-only"
               disabled={busy}
               onChange={(e) => {
@@ -134,6 +196,7 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
           </label>
         </div>
       </div>
+
       {log.length > 0 && (
         <ul className="mt-4 space-y-1.5 rounded-xl border border-anthracite-100 bg-white/90 p-3 text-xs">
           {log.map((line, i) => (

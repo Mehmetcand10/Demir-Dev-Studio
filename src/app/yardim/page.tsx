@@ -134,6 +134,22 @@ export default function YardimPage() {
             </Link>{" "}
             sayfasını kullanın.
           </p>
+          <div className="mt-5 rounded-xl border border-emerald-200/80 bg-emerald-50/50 p-4 text-sm leading-relaxed text-anthracite-800">
+            <p className="font-semibold text-anthracite-900">Toplu ürün (Excel / CSV)</p>
+            <p className="mt-2 text-xs text-anthracite-700">
+              <strong>Vitrin</strong> sekmesinde şablon indirip doldurursunuz: her satır bir ürün. Görsel için en az bir{" "}
+              <code className="rounded bg-white/90 px-1">https://</code> adresi gerekir (kendi sunucunuz, CDN veya geçici
+              placeholder). Stok, <strong>s / m / l / xl</strong> sütunlarına adet olarak yazılır.
+            </p>
+            <p className="mt-2 text-xs text-anthracite-700">
+              <strong>Excel Türkiye:</strong> Virgüllü dosyalar bazen tek sütunda açılır. Platform{" "}
+              <strong>noktalı virgüllü (;)</strong> ve <strong>Türkçe başlıklı</strong> şablon önerir; açılışta sütunlar düzgün
+              görünür. İngilizce virgüllü alternatif şablon da indirilebilir.
+            </p>
+            <p className="mt-2 text-xs text-anthracite-600">
+              Sütun sözlüğü panelde <strong>«Sütunların anlamı»</strong> altında tablo halindedir.
+            </p>
+          </div>
         </section>
 
         <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
