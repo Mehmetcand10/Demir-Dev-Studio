@@ -46,8 +46,14 @@ export function getSitePublicContact(): SitePublicContact {
 
   const supportPhoneDisplay = (process.env.NEXT_PUBLIC_SUPPORT_PHONE || "").trim();
   const phoneDigits = digitsOnly(supportPhoneDisplay);
+  let telDigits = phoneDigits;
+  if (telDigits.startsWith("0") && telDigits.length === 11) {
+    telDigits = `90${telDigits.slice(1)}`;
+  } else if (telDigits.startsWith("5") && telDigits.length === 10) {
+    telDigits = `90${telDigits}`;
+  }
   const supportPhoneHref =
-    phoneDigits.length >= 10 ? `tel:+${phoneDigits}` : null;
+    telDigits.length >= 10 ? `tel:+${telDigits}` : null;
 
   const kvkkExternal = (process.env.NEXT_PUBLIC_KVKK_URL || "").trim();
   const mesafeliExternal = (process.env.NEXT_PUBLIC_MESAFELI_SATIS_URL || "").trim();
