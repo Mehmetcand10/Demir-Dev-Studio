@@ -168,7 +168,14 @@ export default function Siparislerim() {
         <div className="rounded-2xl border border-dashed border-anthracite-200/80 bg-white py-20 text-center shadow-sm">
             <PackageSearch className="mx-auto mb-3 h-12 w-12 text-anthracite-200" />
             <h3 className="mb-1 text-lg font-semibold text-anthracite-900">Kayıt yok</h3>
-            <p className="mb-6 text-sm text-anthracite-500">Bu sekmede sipariş bulunmuyor.</p>
+            <p className="mb-2 text-sm text-anthracite-500">Bu sekmede sipariş bulunmuyor.</p>
+            <p className="mb-6 text-xs text-anthracite-400">
+              Sipariş ve ödeme süreci için{" "}
+              <Link href="/yardim" className="font-medium text-emerald-700 hover:underline">
+                Yardım
+              </Link>
+              .
+            </p>
             <Link href="/katalog" className="inline-flex items-center gap-2 rounded-lg bg-anthracite-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-anthracite-800">Kataloga git</Link>
         </div>
       ) : (

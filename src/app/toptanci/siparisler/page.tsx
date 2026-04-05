@@ -99,9 +99,23 @@ export default function ToptanciSiparisler() {
              <p className="text-sm font-medium text-anthracite-500">Yükleniyor…</p>
           </div>
         ) : orders.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-anthracite-200/90 bg-anthracite-50/40 py-16 text-center">
-             <h3 className="mb-2 text-sm font-medium text-anthracite-700">Sipariş yok</h3>
-             <p className="mx-auto max-w-md text-sm text-anthracite-500">Ödeme onayı sonrası siparişler burada listelenir.</p>
+          <div className="rounded-2xl border border-dashed border-anthracite-200/90 bg-anthracite-50/40 px-4 py-14 text-center sm:px-8">
+             <h3 className="mb-3 text-base font-semibold text-anthracite-900">Henüz kargolanacak sipariş yok</h3>
+             <p className="mx-auto max-w-lg text-sm leading-relaxed text-anthracite-600">
+               Butik siparişi oluşturduktan sonra yönetim ödemeyi teyit eder; onay sonrası işlemler burada listelenir.
+               Ürünlerinizi{" "}
+               <Link href="/toptanci" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+                 panelden
+               </Link>{" "}
+               ekleyip yayına aldığınızdan emin olun.
+             </p>
+             <p className="mx-auto mt-4 max-w-lg text-xs text-anthracite-500">
+               Sürecin tamamı için{" "}
+               <Link href="/yardim" className="font-medium text-emerald-700 hover:underline">
+                 Yardım
+               </Link>{" "}
+               sayfasına bakın.
+             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">

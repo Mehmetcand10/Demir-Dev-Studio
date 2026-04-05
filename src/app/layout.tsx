@@ -62,6 +62,9 @@ export default async function RootLayout({
               <Link href="/katalog" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Katalog
               </Link>
+              <Link href="/yardim" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+                Yardım
+              </Link>
               {userRole === 'butik' && user ? (
                 <>
                   <Link href="/favorites" className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50">
@@ -111,9 +114,17 @@ export default async function RootLayout({
         </main>
 
         <footer className="mt-auto border-t border-anthracite-200/70 bg-white/60 py-6 text-center backdrop-blur-sm">
-          <p className="text-xs text-anthracite-500 sm:text-sm">
-            Demir Dev Studio © {new Date().getFullYear()}
-          </p>
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 sm:flex-row sm:gap-6">
+            <Link href="/yardim" className="text-sm font-medium text-anthracite-600 transition hover:text-emerald-700 hover:underline">
+              Yardım ve süreçler
+            </Link>
+            <span className="hidden text-anthracite-300 sm:inline" aria-hidden>
+              |
+            </span>
+            <p className="text-xs text-anthracite-500 sm:text-sm">
+              Demir Dev Studio © {new Date().getFullYear()}
+            </p>
+          </div>
         </footer>
       </body>
     </html>
