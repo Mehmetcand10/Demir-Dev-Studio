@@ -9,5 +9,4 @@ ALTER TABLE public.profiles
 COMMENT ON COLUMN public.profiles.tax_id IS 'Kayıt sırasında raw_user_meta_data.tax_id';
 COMMENT ON COLUMN public.profiles.iban IS 'Toptancı ödemesi için IBAN; admin panelde gösterilir';
 
--- IBAN kaydı için: profiles üzerinde RLS açıksa authenticated kullanıcının kendi satırını UPDATE edebildiğinden emin olun
--- (Supabase Dashboard > Authentication > Policies veya mevcut şablonunuz).
+-- Sonra: profiles_rls_policies.sql — kendi profilini SELECT/UPDATE + adminin tüm profilleri SELECT (IBAN embed).
