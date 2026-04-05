@@ -87,12 +87,12 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       if(error) throw error;
 
       // 1.5 Admin (Yönetim) tarafına sistem bildirimi düş
-      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin');
-      if (admins && admins.length > 0) {
+      const { data: adminRows } = await supabase.rpc('get_admin_profile_ids');
+      if (adminRows && adminRows.length > 0) {
         await Promise.all(
-          admins.map((admin) =>
+          adminRows.map((row: { id: string }) =>
             notify(
-              admin.id,
+              row.id,
               "🆕 Yeni Sipariş Bildirimi",
               `${currentUserProfile.business_name || currentUserProfile.full_name} tarafından '${product.name}' için ${totalItems} adet sipariş oluşturuldu.`,
               "info"

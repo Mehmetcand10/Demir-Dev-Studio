@@ -32,9 +32,11 @@ export default function Siparislerim() {
   const cancelOrder = async (orderId: string) => {
     if (!confirm("Bu siparişi ödeme öncesinde iptal etmek istiyor musunuz?")) return;
     const { error } = await supabase.from('orders').update({ status: ORDER_STATUS.CANCELLED }).eq('id', orderId);
-    if (!error) {
-      setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED } : o)));
+    if (error) {
+      alert("İptal başarısız: " + error.message + "\n\nSupabase'de critical_rls_patches.sql (butik iptal politikası) çalıştırıldı mı kontrol edin.");
+      return;
     }
+    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: ORDER_STATUS.CANCELLED } : o)));
   };
 
   const createDispute = async (e: React.FormEvent) => {
@@ -51,12 +53,12 @@ export default function Siparislerim() {
       });
       if (error) throw error;
 
-      const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin');
-      if (admins && admins.length > 0) {
+      const { data: adminRows } = await supabase.rpc('get_admin_profile_ids');
+      if (adminRows && adminRows.length > 0) {
         await Promise.all(
-          admins.map((admin) =>
+          adminRows.map((row: { id: string }) =>
             notify(
-              admin.id,
+              row.id,
               "⚠️ Yeni Uyuşmazlık Kaydı",
               `${disputeOrder.product_name} siparişi için butik tarafından uyuşmazlık bildirildi.`,
               "warning"
