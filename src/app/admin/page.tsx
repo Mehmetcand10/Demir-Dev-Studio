@@ -18,6 +18,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import NotificationBell from '@/components/NotificationBell';
 import { notify } from '@/utils/notifications';
 import { ORDER_STATUS, getOrderStatusLabel } from '@/utils/orderStatus';
+import { DISPUTE_STATUS, getDisputeStatusLabel, isDisputeOpen } from '@/utils/disputeStatus';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -35,6 +36,7 @@ export default function AdminDashboard() {
   // Duyuru State'leri
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [disputes, setDisputes] = useState<any[]>([]);
+  const [disputeNotes, setDisputeNotes] = useState<Record<string, string>>({});
   const [annTitle, setAnnTitle] = useState('');
   const [annContent, setAnnContent] = useState('');
   const [annTarget, setAnnTarget] = useState('all');
@@ -73,8 +75,21 @@ export default function AdminDashboard() {
       .from('order_disputes')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(30);
-    if (data) setDisputes(data);
+      .limit(80);
+    if (data) {
+      setDisputes(data);
+      setDisputeNotes((prev) => {
+        const next = { ...prev };
+        for (const d of data) {
+          if (d.status === DISPUTE_STATUS.RESOLVED || d.status === DISPUTE_STATUS.REJECTED) {
+            next[d.id] = d.admin_note || '';
+          } else if (!(d.id in next)) {
+            next[d.id] = d.admin_note || '';
+          }
+        }
+        return next;
+      });
+    }
   }, [supabase]);
 
   const checkAdminAccess = useCallback(async () => {
@@ -140,14 +155,6 @@ export default function AdminDashboard() {
     if (!error) fetchOrders();
   };
 
-  const resolveDispute = async (id: string) => {
-    const { error } = await supabase
-      .from('order_disputes')
-      .update({ status: 'resolved', resolved_at: new Date().toISOString() })
-      .eq('id', id);
-    if (!error) fetchDisputes();
-  };
-
   const handlePublishAnnouncement = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsPublishing(true);
@@ -176,7 +183,70 @@ export default function AdminDashboard() {
       }).length,
     [orders]
   );
-  const openDisputeCount = useMemo(() => disputes.filter((d) => d.status === 'open' || d.status === 'reviewing').length, [disputes]);
+  const openDisputeCount = useMemo(
+    () => disputes.filter((d) => isDisputeOpen(d.status)).length,
+    [disputes]
+  );
+
+  const disputeProductName = useCallback(
+    (orderId: string) => orders.find((o) => o.id === orderId)?.product_name || 'Sipariş',
+    [orders]
+  );
+
+  const setDisputeReviewing = async (id: string) => {
+    const d = disputes.find((x) => x.id === id);
+    if (!d || d.status !== DISPUTE_STATUS.OPEN) return;
+    const { error } = await supabase.from('order_disputes').update({ status: DISPUTE_STATUS.REVIEWING }).eq('id', id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    const pn = disputeProductName(d.order_id);
+    await notify(
+      d.buyer_id,
+      'Uyuşmazlık inceleniyor',
+      `"${pn}" siparişi için talebiniz yönetim tarafından incelenmektedir.`,
+      'info'
+    );
+    if (d.wholesaler_id) {
+      await notify(
+        d.wholesaler_id,
+        'Uyuşmazlık inceleniyor',
+        `"${pn}" siparişi için bir uyuşmazlık kaydı incelenmektedir.`,
+        'info'
+      );
+    }
+    fetchDisputes();
+  };
+
+  const finalizeDispute = async (id: string, outcome: typeof DISPUTE_STATUS.RESOLVED | typeof DISPUTE_STATUS.REJECTED) => {
+    const note = (disputeNotes[id] || '').trim();
+    if (note.length < 8) {
+      alert('Taraflara iletilecek yönetim notunu yazın (en az 8 karakter).');
+      return;
+    }
+    const d = disputes.find((x) => x.id === id);
+    if (!d || !isDisputeOpen(d.status)) return;
+    const { error } = await supabase
+      .from('order_disputes')
+      .update({
+        status: outcome,
+        admin_note: note,
+        resolved_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+    if (error) {
+      alert(error.message);
+      return;
+    }
+    const pn = disputeProductName(d.order_id);
+    const title = outcome === DISPUTE_STATUS.RESOLVED ? 'Uyuşmazlık çözüldü' : 'Uyuşmazlık kararı';
+    const type = outcome === DISPUTE_STATUS.RESOLVED ? 'success' : 'warning';
+    const msg = `${pn}: ${note}`;
+    await notify(d.buyer_id, title, msg, type);
+    if (d.wholesaler_id) await notify(d.wholesaler_id, title, msg, type);
+    fetchDisputes();
+  };
 
   const chartData = useMemo(() => orders
     .filter(o => !o.is_archived)
@@ -430,30 +500,92 @@ export default function AdminDashboard() {
 
                 <div className="mt-10 pt-8 border-t border-anthracite-100">
                   <h3 className="text-lg font-black text-anthracite-900 mb-4 flex items-center gap-2">
-                    <Info className="w-5 h-5 text-amber-500" /> Uyuşmazlık / İade Talepleri ({openDisputeCount})
+                    <Info className="w-5 h-5 text-amber-500" /> Uyuşmazlık / İade Talepleri ({openDisputeCount} açık)
                   </h3>
+                  <p className="text-xs font-medium text-anthracite-500 mb-4 text-left">
+                    İncelemeye alındığında butik ve toptancıya bilgi gider. Çözüldü / Reddet için not zorunludur; not her iki tarafa bildirim olarak iletilir.
+                  </p>
                   {disputes.length === 0 ? (
-                    <p className="text-sm font-bold text-anthracite-300">Açık uyuşmazlık kaydı yok.</p>
+                    <p className="text-sm font-bold text-anthracite-300">Henüz uyuşmazlık kaydı yok.</p>
                   ) : (
-                    <div className="space-y-3">
-                      {disputes.slice(0, 8).map((d) => (
-                        <div key={d.id} className="p-4 rounded-2xl border border-anthracite-100 bg-anthracite-50 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
-                          <div className="min-w-0">
-                            <p className="text-xs font-black text-anthracite-500 uppercase tracking-widest">Order: {d.order_id?.slice(0, 8)}</p>
-                            <p className="text-sm font-bold text-anthracite-800 break-words">{d.reason}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase ${d.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                              {d.status}
-                            </span>
-                            {d.status !== 'resolved' && (
-                              <button onClick={() => resolveDispute(d.id)} className="px-3 py-2 rounded-xl text-[10px] font-black uppercase bg-anthracite-900 text-white hover:bg-black transition-all">
-                                Çözüldü
-                              </button>
+                    <div className="space-y-4 max-h-[min(70vh,720px)] overflow-y-auto pr-1">
+                      {disputes.map((d) => {
+                        const closed = !isDisputeOpen(d.status);
+                        const badgeClass =
+                          d.status === DISPUTE_STATUS.RESOLVED
+                            ? 'bg-emerald-100 text-emerald-700'
+                            : d.status === DISPUTE_STATUS.REJECTED
+                              ? 'bg-red-100 text-red-800'
+                              : d.status === DISPUTE_STATUS.REVIEWING
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-amber-100 text-amber-800';
+                        return (
+                          <div key={d.id} className="p-5 rounded-2xl border border-anthracite-100 bg-anthracite-50 flex flex-col gap-4 text-left">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-black text-anthracite-900">{disputeProductName(d.order_id)}</p>
+                                <p className="text-[10px] font-bold text-anthracite-400 mt-0.5">Sipariş: {d.order_id?.slice(0, 8)}…</p>
+                                <p className="text-sm font-bold text-anthracite-800 break-words mt-3">
+                                  <span className="text-anthracite-400 font-black text-[10px] uppercase tracking-widest block mb-1">Butik talebi</span>
+                                  {d.reason}
+                                </p>
+                              </div>
+                              <span className={`shrink-0 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase ${badgeClass}`}>
+                                {getDisputeStatusLabel(d.status)}
+                              </span>
+                            </div>
+                            <div>
+                              <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2">
+                                {closed ? 'Yönetim notu (kayıtlı — taraflara iletildi)' : 'Yönetim notu / karar metni (Çözüldü veya Reddet ile taraflara gider)'}
+                              </label>
+                              <textarea
+                                disabled={closed}
+                                rows={closed ? 3 : 4}
+                                value={disputeNotes[d.id] ?? ''}
+                                onChange={(e) => setDisputeNotes((prev) => ({ ...prev, [d.id]: e.target.value }))}
+                                className="w-full px-4 py-3 rounded-xl border border-anthracite-200 bg-white text-sm font-medium text-anthracite-800 outline-none focus:ring-2 focus:ring-anthracite-200 disabled:bg-anthracite-100/80 disabled:text-anthracite-600 resize-y min-h-[88px]"
+                                placeholder={
+                                  closed
+                                    ? ''
+                                    : 'Örn: İade onaylandı; toptancı 48 saat içinde değişim gönderecek.'
+                                }
+                              />
+                            </div>
+                            {!closed && (
+                              <div className="flex flex-wrap gap-2">
+                                {d.status === DISPUTE_STATUS.OPEN && (
+                                  <button
+                                    type="button"
+                                    onClick={() => setDisputeReviewing(d.id)}
+                                    className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase bg-blue-600 text-white hover:bg-blue-700 transition-all"
+                                  >
+                                    İncelemeye al
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => finalizeDispute(d.id, DISPUTE_STATUS.RESOLVED)}
+                                  className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+                                >
+                                  Çözüldü — bildir
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => finalizeDispute(d.id, DISPUTE_STATUS.REJECTED)}
+                                  className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase bg-white border-2 border-red-200 text-red-800 hover:bg-red-50 transition-all"
+                                >
+                                  Reddet — bildir
+                                </button>
+                              </div>
+                            )}
+                            {closed && d.resolved_at && (
+                              <p className="text-[10px] font-bold text-anthracite-400">
+                                Kapanış: {new Date(d.resolved_at).toLocaleString('tr-TR')}
+                              </p>
                             )}
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>

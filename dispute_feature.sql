@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS public.order_disputes (
     buyer_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
     wholesaler_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
     reason TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'open', -- open, reviewing, resolved, rejected
-    admin_note TEXT,
+    status TEXT NOT NULL DEFAULT 'open', -- open → reviewing (incelemede) → resolved | rejected
+    admin_note TEXT, -- çözüm / ret gerekçesi; admin panelden girilir, butik+toptancıya bildirimle gider
     created_at TIMESTAMPTZ DEFAULT now(),
     resolved_at TIMESTAMPTZ
 );

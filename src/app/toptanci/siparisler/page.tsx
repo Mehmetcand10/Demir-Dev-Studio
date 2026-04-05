@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { Package, ArrowLeft, Loader2, FileText } from 'lucide-react';
+import { Package, ArrowLeft, Loader2, FileText, Scale } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { ORDER_STATUS } from '@/utils/orderStatus';
+import { getDisputeStatusLabel, isDisputeOpen } from '@/utils/disputeStatus';
 import Link from 'next/link';
 
 export default function ToptanciSiparisler() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [disputesByOrder, setDisputesByOrder] = useState<Record<string, any>>({});
   const supabase = createClient();
 
   const fetchMyOrders = useCallback(async (userId: string) => {
@@ -22,6 +24,18 @@ export default function ToptanciSiparisler() {
       .order('created_at', { ascending: false });
     
     if (data) setOrders(data);
+
+    const { data: disputeRows } = await supabase
+      .from('order_disputes')
+      .select('*')
+      .eq('wholesaler_id', userId)
+      .order('created_at', { ascending: false });
+    const map: Record<string, any> = {};
+    for (const row of disputeRows || []) {
+      if (map[row.order_id] === undefined) map[row.order_id] = row;
+    }
+    setDisputesByOrder(map);
+
     setLoadingOrders(false);
   }, [supabase]);
 
@@ -87,9 +101,35 @@ export default function ToptanciSiparisler() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {orders.map(order => (
+            {orders.map(order => {
+              const dispute = disputesByOrder[order.id];
+              return (
                <div key={order.id} className="bg-anthracite-50 border border-anthracite-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between transition-all hover:bg-white hover:shadow-xl hover:-translate-y-1">
                   <div>
+                    {dispute && (
+                      <div
+                        className={`mb-4 p-4 rounded-2xl border text-left ${
+                          isDisputeOpen(dispute.status)
+                            ? 'bg-amber-50 border-amber-200 text-amber-900'
+                            : dispute.status === 'resolved'
+                              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                              : 'bg-anthracite-50 border-anthracite-200 text-anthracite-800'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <Scale className="w-4 h-4 shrink-0 opacity-70" />
+                          <p className="text-[10px] font-black uppercase tracking-widest opacity-70">Uyuşmazlık</p>
+                        </div>
+                        <p className="text-sm font-black">{getDisputeStatusLabel(dispute.status)}</p>
+                        <p className="text-xs font-medium mt-2 opacity-90 leading-relaxed">{dispute.reason}</p>
+                        {dispute.admin_note && (
+                          <p className="text-xs font-bold mt-2 pt-2 border-t border-black/10 leading-relaxed">
+                            <span className="uppercase text-[10px] tracking-wider block mb-1 text-anthracite-500">Yönetim kararı</span>
+                            {dispute.admin_note}
+                          </p>
+                        )}
+                      </div>
+                    )}
                     <div className="flex flex-wrap justify-between items-start mb-6 gap-2">
                       <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${order.status === ORDER_STATUS.SHIPPED ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'}`}>
                         {order.status === ORDER_STATUS.SHIPPED ? 'KARGOLANDI GİTTİ' : 'YENİ SİPARİŞ - HAZIRLA'}
@@ -129,7 +169,8 @@ export default function ToptanciSiparisler() {
                      </div>
                   )}
                </div>
-            ))}
+            );
+            })}
           </div>
         )}
       </div>

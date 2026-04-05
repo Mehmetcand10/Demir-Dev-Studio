@@ -9,6 +9,7 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { ORDER_STATUS, isProductionActive } from '@/utils/orderStatus';
+import { getDisputeStatusLabel, isDisputeOpen } from '@/utils/disputeStatus';
 import { notify } from '@/utils/notifications';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,6 +25,7 @@ export default function Siparislerim() {
   const [disputeOrder, setDisputeOrder] = useState<any>(null);
   const [disputeReason, setDisputeReason] = useState('');
   const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
+  const [disputesByOrder, setDisputesByOrder] = useState<Record<string, any>>({});
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -67,6 +69,16 @@ export default function Siparislerim() {
       setShowDisputeModal(false);
       setDisputeReason('');
       setDisputeOrder(null);
+      const { data: rows } = await supabase
+        .from('order_disputes')
+        .select('*')
+        .eq('buyer_id', user.id)
+        .order('created_at', { ascending: false });
+      const map: Record<string, any> = {};
+      for (const row of rows || []) {
+        if (map[row.order_id] === undefined) map[row.order_id] = row;
+      }
+      setDisputesByOrder(map);
     } catch (err: any) {
       alert("Uyuşmazlık kaydı oluşturulamadı: " + err.message);
     } finally {
@@ -85,8 +97,20 @@ export default function Siparislerim() {
         .select('*, product:product_id(images, category)')
         .eq('buyer_id', user.id)
         .order('created_at', { ascending: false });
-        
-      if(data) setOrders(data);
+
+      if (data) setOrders(data);
+
+      const { data: disputeRows } = await supabase
+        .from('order_disputes')
+        .select('*')
+        .eq('buyer_id', user.id)
+        .order('created_at', { ascending: false });
+      const map: Record<string, any> = {};
+      for (const row of disputeRows || []) {
+        if (map[row.order_id] === undefined) map[row.order_id] = row;
+      }
+      setDisputesByOrder(map);
+
       setLoading(false);
     }
     loadData();
@@ -158,6 +182,8 @@ export default function Siparislerim() {
         <div className="flex flex-col gap-8 text-left">
           {filteredOrders.map((order) => {
             const date = new Date(order.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            const dispute = disputesByOrder[order.id];
+            const canOpenNewDispute = !dispute || !isDisputeOpen(dispute.status);
             
             // STATUS TRACKER LOGIC
             const steps = [
@@ -204,6 +230,27 @@ export default function Siparislerim() {
                           </div>
                       </div>
 
+                      {dispute && (
+                        <div
+                          className={`rounded-2xl border p-4 text-left ${
+                            isDisputeOpen(dispute.status)
+                              ? 'bg-amber-50 border-amber-200 text-amber-900'
+                              : dispute.status === 'resolved'
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                                : 'bg-anthracite-50 border-anthracite-200 text-anthracite-800'
+                          }`}
+                        >
+                          <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Uyuşmazlık</p>
+                          <p className="text-sm font-black">{getDisputeStatusLabel(dispute.status)}</p>
+                          {dispute.admin_note && (
+                            <p className="text-xs font-bold mt-2 leading-relaxed opacity-90">
+                              <span className="uppercase text-[10px] tracking-wider block mb-1 text-anthracite-500">Yönetim</span>
+                              {dispute.admin_note}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
                       {/* AKSİYONLAR VE BİLGİ BANTLARI */}
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-anthracite-50">
                          {order.status === ORDER_STATUS.WAITING_PAYMENT ? (
@@ -229,13 +276,18 @@ export default function Siparislerim() {
                                    İptal Et
                                 </button>
                             )}
-                            {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && (
+                            {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && canOpenNewDispute && (
                                 <button
                                   onClick={() => { setDisputeOrder(order); setShowDisputeModal(true); }}
                                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-amber-50 text-amber-700 border border-amber-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all"
                                 >
                                   Sorun Bildir
                                 </button>
+                            )}
+                            {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && !canOpenNewDispute && (
+                                <span className="flex-1 sm:flex-none text-center px-4 py-3 text-[10px] font-black uppercase text-anthracite-400 border border-dashed border-anthracite-200 rounded-2xl">
+                                  Uyuşmazlık süreci devam ediyor
+                                </span>
                             )}
                             <Link href="/katalog" className="p-4 bg-white border border-anthracite-200 rounded-2xl text-anthracite-400 hover:text-black transition-all">
                                <ArrowRight className="w-5 h-5" />
