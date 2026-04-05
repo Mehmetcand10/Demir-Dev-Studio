@@ -13,6 +13,9 @@ import { getDisputeStatusLabel, isDisputeOpen } from '@/utils/disputeStatus';
 import { notify } from '@/utils/notifications';
 import Image from 'next/image';
 import Link from 'next/link';
+import { DashboardShell } from '@/components/dashboard/DashboardShell';
+import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
+import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 
 type OrderTab = 'active' | 'waiting' | 'archive';
 
@@ -132,56 +135,44 @@ export default function Siparislerim() {
   if(!user && !loading) return null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen bg-anthracite-50/10">
-      
-      {/* ÜST BAŞLIK VE ÖZET */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6 text-left">
-        <div>
-           <div className="flex items-center gap-2 text-emerald-600 mb-1">
-              <ShoppingBag className="w-5 h-5" />
-              <span className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 px-2 py-0.5 rounded">LOJİSTİK TAKİP</span>
-           </div>
-           <h1 className="text-4xl sm:text-6xl font-black tracking-tighter text-anthracite-900 leading-none">Siparişlerim</h1>
+    <DashboardShell>
+      <DashboardHeader icon={ShoppingBag} eyebrow="Butik" title="Siparişlerim" />
+
+      <div className="mb-8 flex flex-wrap gap-3">
+        <div className="min-w-[140px] flex-1 rounded-xl border border-anthracite-200/80 bg-white px-4 py-3 shadow-sm">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-anthracite-500">Toplam alım</p>
+          <p className="text-lg font-semibold tabular-nums text-anthracite-900">{totalSpent.toLocaleString("tr-TR")} ₺</p>
         </div>
-      <div className="flex flex-wrap gap-4 w-full md:w-auto">
-            <div className="bg-white px-6 py-4 rounded-[2rem] border border-anthracite-100 shadow-sm min-w-[150px]">
-                <p className="text-[9px] font-black text-anthracite-400 uppercase tracking-widest mb-1">Toplam Alım</p>
-                <p className="text-2xl font-black text-anthracite-900">{totalSpent.toLocaleString('tr-TR')} ₺</p>
-            </div>
-            <div className="bg-emerald-500 px-6 py-4 rounded-[2rem] shadow-xl shadow-emerald-500/20 min-w-[120px] text-white">
-                <p className="text-[9px] font-black text-white/60 uppercase tracking-widest mb-1">Aktif Kargo</p>
-                <p className="text-2xl font-black">{activeCount} PAKET</p>
-            </div>
+        <div className="min-w-[120px] flex-1 rounded-xl border border-emerald-200/50 bg-gradient-to-br from-emerald-600 to-emerald-700 px-4 py-3 text-white shadow-sm">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-white/75">Aktif kargo</p>
+          <p className="text-lg font-semibold tabular-nums">{activeCount} paket</p>
         </div>
       </div>
 
-      {/* TABS NAVIGATION */}
-      <div className="flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 rounded-[2.5rem] border border-anthracite-100 shadow-lg w-max mb-10 overflow-x-auto max-w-full">
-          <button onClick={() => setActiveTab('active')} className={`flex items-center gap-2 px-5 sm:px-8 py-3.5 rounded-[2rem] font-black text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'active' ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black'}`}>
-              <Truck className="w-4 h-4" /> Aktif Takip ({activeCount})
-          </button>
-          <button onClick={() => setActiveTab('waiting')} className={`flex items-center gap-2 px-5 sm:px-8 py-3.5 rounded-[2rem] font-black text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'waiting' ? 'bg-white border-2 border-amber-400 text-amber-600 shadow-md scale-105' : 'text-anthracite-400 hover:text-black'}`}>
-              <CreditCard className="w-4 h-4" /> Ödeme Bekleyen ({waitingCount})
-          </button>
-          <button onClick={() => setActiveTab('archive')} className={`flex items-center gap-2 px-5 sm:px-8 py-3.5 rounded-[2rem] font-black text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'archive' ? 'bg-anthracite-900 text-white shadow-xl scale-105' : 'text-anthracite-400 hover:text-black'}`}>
-              <HistoryIcon className="w-4 h-4" /> Arşiv
-          </button>
-      </div>
+      <DashboardTabs
+        value={activeTab}
+        onChange={(id) => setActiveTab(id as OrderTab)}
+        items={[
+          { id: "active", label: `Aktif (${activeCount})`, icon: Truck },
+          { id: "waiting", label: `Ödeme (${waitingCount})`, icon: CreditCard },
+          { id: "archive", label: "Arşiv", icon: HistoryIcon },
+        ]}
+      />
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-32 opacity-30 animate-pulse text-left">
-            <Loader2 className="w-12 h-12 animate-spin mb-4" />
-            <p className="font-black text-xs uppercase tracking-[0.3em]">Lojistik Ağ Taranıyor</p>
+        <div className="flex flex-col items-center justify-center py-24 text-anthracite-400">
+            <Loader2 className="mb-3 h-9 w-9 animate-spin text-emerald-600/70" />
+            <p className="text-xs font-medium">Yükleniyor…</p>
         </div>
       ) : filteredOrders.length === 0 ? (
-        <div className="bg-white rounded-[3rem] border-2 border-dashed border-anthracite-100 py-32 text-center">
-            <PackageSearch className="w-20 h-20 mx-auto text-anthracite-100 mb-4" />
-            <h3 className="text-2xl font-black text-anthracite-900 mb-2">Gösterilecek Kayıt Yok</h3>
-            <p className="text-anthracite-400 font-medium mb-8">Henüz bu kategoride bir işlem bulunmuyor.</p>
-            <Link href="/katalog" className="inline-flex items-center gap-2 bg-anthracite-900 text-white px-8 py-4 rounded-2xl font-black shadow-xl hover:scale-105 transition-all">HEMEN ALIŞVERİŞE BAŞLA</Link>
+        <div className="rounded-2xl border border-dashed border-anthracite-200/80 bg-white py-20 text-center shadow-sm">
+            <PackageSearch className="mx-auto mb-3 h-12 w-12 text-anthracite-200" />
+            <h3 className="mb-1 text-lg font-semibold text-anthracite-900">Kayıt yok</h3>
+            <p className="mb-6 text-sm text-anthracite-500">Bu sekmede sipariş bulunmuyor.</p>
+            <Link href="/katalog" className="inline-flex items-center gap-2 rounded-lg bg-anthracite-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-anthracite-800">Kataloga git</Link>
         </div>
       ) : (
-        <div className="flex flex-col gap-8 text-left">
+        <div className="flex flex-col gap-5 text-left">
           {filteredOrders.map((order) => {
             const date = new Date(order.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
             const dispute = disputesByOrder[order.id];
@@ -195,38 +186,38 @@ export default function Siparislerim() {
             ];
 
             return (
-              <div key={order.id} className="group bg-white border border-anthracite-100 rounded-[3rem] p-8 lg:p-10 shadow-sm hover:shadow-2xl transition-all relative overflow-hidden">
-                <div className="flex flex-col lg:flex-row items-center gap-10">
+              <div key={order.id} className="group relative overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6">
+                <div className="flex flex-col items-center gap-6 lg:flex-row lg:gap-8">
                    
                    {/* ÜRÜN GÖRSELO VE ÖZET */}
-                   <div className="w-32 h-44 shrink-0 bg-anthracite-50 rounded-[2rem] overflow-hidden relative shadow-lg border border-anthracite-100">
+                   <div className="relative h-40 w-28 shrink-0 overflow-hidden rounded-xl border border-anthracite-100 bg-anthracite-50 shadow-sm">
                      <Image src={order.product?.images?.[0] || ''} alt="p" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
                    </div>
                    
-                   <div className="flex-1 w-full flex flex-col gap-8">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-anthracite-50 pb-6 gap-4">
-                         <div>
-                            <h3 className="text-3xl font-black text-anthracite-900 leading-tight">{order.product_name}</h3>
-                            <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-[0.2em] mt-1">{order.quantity} Adet • {order.selected_size} BEDEN • {date}</p>
+                   <div className="flex w-full flex-1 flex-col gap-5">
+                      <div className="flex flex-col gap-3 border-b border-anthracite-100/80 pb-4 sm:flex-row sm:items-start sm:justify-between">
+                         <div className="min-w-0">
+                            <h3 className="text-lg font-semibold leading-snug text-anthracite-900 sm:text-xl">{order.product_name}</h3>
+                            <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-anthracite-500">{order.quantity} adet · {order.selected_size} · {date}</p>
                          </div>
-                         <div className="text-right">
-                             <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">Toplam Tutar</p>
-                             <span className="text-4xl font-black text-anthracite-900 tracking-tighter">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
+                         <div className="text-left sm:text-right">
+                             <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-700/90">Tutar</p>
+                             <span className="text-xl font-semibold tabular-nums text-anthracite-900 sm:text-2xl">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
                          </div>
                       </div>
 
-                      {/* CANLI STATUS TRACKER (TIMELINE) */}
-                      <div className="relative w-full py-4 px-4 sm:px-10">
-                          <div className="absolute top-1/2 left-10 right-10 h-1 bg-anthracite-100 -translate-y-1/2 rounded-full hidden sm:block">
-                              <div className={`h-full bg-emerald-500 transition-all duration-1000 rounded-full`} style={{ width: order.status === ORDER_STATUS.WAITING_PAYMENT ? '0%' : order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? '50%' : '100%' }}></div>
+                      {/* Durum */}
+                      <div className="relative w-full px-1 py-2 sm:px-6">
+                          <div className="absolute top-1/2 left-8 right-8 hidden h-0.5 -translate-y-1/2 rounded-full bg-anthracite-100 sm:block">
+                              <div className={`h-full rounded-full bg-emerald-500 transition-all duration-700`} style={{ width: order.status === ORDER_STATUS.WAITING_PAYMENT ? '0%' : order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? '50%' : '100%' }}></div>
                           </div>
-                          <div className="flex justify-between items-center relative z-10 w-full">
-                              {steps.map((step, idx) => (
-                                  <div key={step.id} className="flex flex-col items-center gap-3">
-                                      <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center border-4 transition-all duration-500 ${step.active ? 'bg-emerald-500 text-white border-white shadow-xl scale-110' : 'bg-white text-anthracite-200 border-anthracite-100'}`}>
-                                          <step.icon className="w-6 h-6 sm:w-8 sm:h-8" />
+                          <div className="relative z-10 flex w-full justify-between">
+                              {steps.map((step) => (
+                                  <div key={step.id} className="flex flex-col items-center gap-2">
+                                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all sm:h-11 sm:w-11 ${step.active ? 'border-emerald-500 bg-emerald-500 text-white shadow-sm' : 'border-anthracite-100 bg-white text-anthracite-300'}`}>
+                                          <step.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                                       </div>
-                                      <span className={`text-[10px] sm:text-xs font-black uppercase tracking-tighter ${step.active ? 'text-anthracite-900' : 'text-anthracite-300'}`}>{step.label}</span>
+                                      <span className={`max-w-[4.5rem] text-center text-[9px] font-medium uppercase leading-tight sm:max-w-none sm:text-[10px] ${step.active ? 'text-anthracite-800' : 'text-anthracite-400'}`}>{step.label}</span>
                                   </div>
                               ))}
                           </div>
@@ -234,16 +225,16 @@ export default function Siparislerim() {
 
                       {dispute && (
                         <div
-                          className={`rounded-2xl border p-4 text-left ${
+                          className={`rounded-xl border p-3 text-left text-sm ${
                             isDisputeOpen(dispute.status)
-                              ? 'bg-amber-50 border-amber-200 text-amber-900'
+                              ? 'border-amber-200/80 bg-amber-50/90 text-amber-950'
                               : dispute.status === 'resolved'
-                                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                                : 'bg-anthracite-50 border-anthracite-200 text-anthracite-800'
+                                ? 'border-emerald-200/80 bg-emerald-50/80 text-emerald-950'
+                                : 'border-anthracite-200/80 bg-anthracite-50/90 text-anthracite-900'
                           }`}
                         >
-                          <p className="text-[10px] font-black uppercase tracking-widest opacity-70 mb-1">Uyuşmazlık</p>
-                          <p className="text-sm font-black">{getDisputeStatusLabel(dispute.status)}</p>
+                          <p className="mb-0.5 text-[10px] font-medium uppercase tracking-wider opacity-80">Uyuşmazlık</p>
+                          <p className="font-semibold">{getDisputeStatusLabel(dispute.status)}</p>
                           {dispute.admin_note && (
                             <p className="text-xs font-bold mt-2 leading-relaxed opacity-90">
                               <span className="uppercase text-[10px] tracking-wider block mb-1 text-anthracite-500">Yönetim</span>
@@ -254,45 +245,45 @@ export default function Siparislerim() {
                       )}
 
                       {/* AKSİYONLAR VE BİLGİ BANTLARI */}
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 pt-8 border-t border-anthracite-50">
+                      <div className="flex flex-col gap-4 border-t border-anthracite-100/80 pt-4 sm:flex-row sm:items-center sm:justify-between">
                          {order.status === ORDER_STATUS.WAITING_PAYMENT ? (
-                            <div className="bg-amber-50 text-amber-700 p-4 rounded-2xl border border-amber-200 text-xs font-bold flex items-center gap-3 w-full sm:w-auto">
-                               <Info className="w-5 h-5 shrink-0" />
-                               Lütfen dekontunuzu WhatsApp (Merkez) hattına iletin.
+                            <div className="flex w-full items-center gap-2 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2.5 text-xs font-medium text-amber-900 sm:w-auto">
+                               <Info className="h-4 w-4 shrink-0 text-amber-600" />
+                               Dekontu WhatsApp (merkez) hattına iletin.
                             </div>
                          ) : order.status === ORDER_STATUS.SHIPPED && order.tracking_number ? (
-                            <div className="bg-blue-50 text-blue-700 p-4 rounded-xl border border-blue-100 text-center w-full sm:w-auto">
-                               <p className="text-[9px] font-black uppercase tracking-widest opacity-60">Resmi Kargo Takip No</p>
-                               <p className="text-xl font-black font-mono">{order.tracking_number}</p>
+                            <div className="w-full rounded-xl border border-blue-100 bg-blue-50/90 px-3 py-2.5 text-center text-blue-900 sm:w-auto sm:text-left">
+                               <p className="text-[9px] font-medium uppercase tracking-wider text-blue-600/80">Takip no</p>
+                               <p className="font-mono text-sm font-semibold">{order.tracking_number}</p>
                             </div>
-                         ) : <div className="text-anthracite-300 font-bold text-xs">Süreçler titizlikle takip ediliyor.</div>}
+                         ) : <div className="text-xs font-medium text-anthracite-400">Sipariş takipte.</div>}
 
-                         <div className="flex items-center gap-3 w-full sm:w-auto">
+                         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
                             {(order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING || order.status === ORDER_STATUS.SHIPPED) && (
-                                <button onClick={() => exportInvoicePDF(order)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-8 py-4 bg-anthracite-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 transition-all">
-                                   <FileText className="w-5 h-5" /> Fatura İndir
+                                <button onClick={() => exportInvoicePDF(order)} className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-anthracite-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-anthracite-800 sm:flex-none">
+                                   <FileText className="h-4 w-4" /> Fatura
                                 </button>
                             )}
                             {order.status === ORDER_STATUS.WAITING_PAYMENT && (
-                                <button onClick={() => cancelOrder(order.id)} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-red-50 text-red-700 border border-red-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-100 transition-all">
-                                   İptal Et
+                                <button onClick={() => cancelOrder(order.id)} className="inline-flex flex-1 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-medium text-red-800 transition hover:bg-red-100 sm:flex-none">
+                                   İptal
                                 </button>
                             )}
                             {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && canOpenNewDispute && (
                                 <button
                                   onClick={() => { setDisputeOrder(order); setShowDisputeModal(true); }}
-                                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-amber-50 text-amber-700 border border-amber-200 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-100 transition-all"
+                                  className="inline-flex flex-1 items-center justify-center rounded-lg border border-amber-200/90 bg-amber-50 px-4 py-2.5 text-xs font-medium text-amber-900 transition hover:bg-amber-100/80 sm:flex-none"
                                 >
-                                  Sorun Bildir
+                                  Sorun bildir
                                 </button>
                             )}
                             {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && !canOpenNewDispute && (
-                                <span className="flex-1 sm:flex-none text-center px-4 py-3 text-[10px] font-black uppercase text-anthracite-400 border border-dashed border-anthracite-200 rounded-2xl">
-                                  Uyuşmazlık süreci devam ediyor
+                                <span className="flex-1 rounded-lg border border-dashed border-anthracite-200 px-3 py-2 text-center text-[10px] font-medium uppercase text-anthracite-500 sm:flex-none">
+                                  Uyuşmazlık süreci
                                 </span>
                             )}
-                            <Link href="/katalog" className="p-4 bg-white border border-anthracite-200 rounded-2xl text-anthracite-400 hover:text-black transition-all">
-                               <ArrowRight className="w-5 h-5" />
+                            <Link href="/katalog" className="inline-flex rounded-lg border border-anthracite-200 bg-white p-2.5 text-anthracite-500 transition hover:border-anthracite-300 hover:text-anthracite-900">
+                               <ArrowRight className="h-4 w-4" />
                             </Link>
                          </div>
                       </div>
@@ -305,11 +296,11 @@ export default function Siparislerim() {
       )}
 
       {showDisputeModal && disputeOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-[2rem] p-8 w-full max-w-xl shadow-2xl relative">
-            <h3 className="text-2xl font-black mb-2 text-anthracite-900">Uyuşmazlık / İade Talebi</h3>
-            <p className="text-anthracite-500 mb-6 text-sm font-medium">
-              Sipariş: <span className="font-black text-anthracite-900">{disputeOrder.product_name}</span>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-xl">
+            <h3 className="mb-1 text-lg font-semibold text-anthracite-900">Uyuşmazlık talebi</h3>
+            <p className="mb-4 text-sm text-anthracite-600">
+              Sipariş: <span className="font-medium text-anthracite-900">{disputeOrder.product_name}</span>
             </p>
             <form onSubmit={createDispute} className="flex flex-col gap-4">
               <textarea
@@ -318,21 +309,21 @@ export default function Siparislerim() {
                 rows={5}
                 value={disputeReason}
                 onChange={(e) => setDisputeReason(e.target.value)}
-                className="w-full px-5 py-4 border border-anthracite-200 rounded-2xl bg-anthracite-50 focus:bg-white focus:ring-4 focus:ring-anthracite-100 outline-none font-medium text-anthracite-900 resize-none transition-all"
-                placeholder="Sorunu detaylıca yazın (eksik ürün, hatalı beden, hasarlı teslim vb.)"
+                className="w-full resize-none rounded-xl border border-anthracite-200 bg-anthracite-50/50 px-4 py-3 text-sm text-anthracite-900 outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+                placeholder="Sorunu kısaca açıklayın (eksik ürün, beden, hasar vb.)"
               />
-              <div className="flex gap-3 mt-2">
-                <button type="button" onClick={() => { setShowDisputeModal(false); setDisputeReason(''); setDisputeOrder(null); }} className="flex-1 py-3 rounded-2xl font-bold text-anthracite-500 hover:bg-anthracite-100 transition-colors">
+              <div className="flex gap-2">
+                <button type="button" onClick={() => { setShowDisputeModal(false); setDisputeReason(''); setDisputeOrder(null); }} className="flex-1 rounded-lg border border-anthracite-200 py-2.5 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-50">
                   Vazgeç
                 </button>
-                <button disabled={isSubmittingDispute} type="submit" className="flex-[2] py-3 bg-amber-500 hover:bg-amber-600 text-white font-black rounded-2xl shadow-xl transition-all disabled:opacity-50">
-                  {isSubmittingDispute ? 'Gönderiliyor...' : 'Talebi Gönder'}
+                <button disabled={isSubmittingDispute} type="submit" className="flex-[1.3] rounded-lg bg-emerald-600 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50">
+                  {isSubmittingDispute ? 'Gönderiliyor…' : 'Gönder'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-    </div>
+    </DashboardShell>
   );
 }
