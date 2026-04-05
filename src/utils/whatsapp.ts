@@ -1,8 +1,5 @@
 /**
- * Ülke kodu dahil, sadece rakamlar (örn: 905551234567).
- * .env.local: NEXT_PUBLIC_WHATSAPP_E164=905551234567
+ * Sipariş WhatsApp yönlendirmesi — numara `siteContact` ile aynı kaynaktan.
+ * .env.local: NEXT_PUBLIC_WHATSAPP_E164=905551234567 (ülke kodu dahil, sadece rakamlar)
  */
-export function getWhatsAppOrderDigits(): string {
-  const raw = process.env.NEXT_PUBLIC_WHATSAPP_E164 || "905528323906";
-  return String(raw).replace(/\D/g, "") || "905528323906";
-}
+export { getWhatsAppOrderDigits } from "@/utils/siteContact";

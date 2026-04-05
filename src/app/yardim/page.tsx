@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -9,7 +10,12 @@ import {
   Bell,
   Package,
   CircleHelp,
+  MessageCircle,
+  Mail,
+  Phone,
+  Scale,
 } from "lucide-react";
+import { getSitePublicContact } from "@/utils/siteContact";
 
 export const metadata: Metadata = {
   title: "Yardım ve süreçler | Demir Dev Studio",
@@ -33,7 +39,24 @@ const stepsToptanci = [
   "Hakediş / IBAN bilgilerinizi panelden güncel tutun.",
 ];
 
+function LegalLink({ href, children }: { href: string; children: ReactNode }) {
+  if (href.startsWith("http://") || href.startsWith("https://")) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+      {children}
+    </Link>
+  );
+}
+
 export default function YardimPage() {
+  const contact = getSitePublicContact();
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
       <Link
@@ -126,6 +149,80 @@ export default function YardimPage() {
           </ul>
         </section>
 
+        <section
+          id="iletisim"
+          className="rounded-2xl border border-emerald-200/80 bg-emerald-50/40 p-6 shadow-sm sm:p-8"
+        >
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
+            <Mail className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+            İletişim ve yasal
+          </h2>
+          <ul className="space-y-3 text-sm leading-relaxed text-anthracite-700">
+            <li className="flex gap-2">
+              <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+              <span>
+                <strong className="text-anthracite-900">Sipariş / dekont WhatsApp:</strong>{" "}
+                <a
+                  href={contact.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-emerald-800 underline-offset-2 hover:underline"
+                >
+                  {contact.whatsappDisplay}
+                </a>{" "}
+                (ortam değişkeni: <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_WHATSAPP_E164</code>)
+              </span>
+            </li>
+            {contact.supportEmailHref ? (
+              <li className="flex gap-2">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+                <span>
+                  <strong className="text-anthracite-900">Destek e-posta:</strong>{" "}
+                  <a href={contact.supportEmailHref} className="font-semibold text-emerald-800 underline-offset-2 hover:underline">
+                    {contact.supportEmail}
+                  </a>
+                </span>
+              </li>
+            ) : (
+              <li className="flex gap-2 text-anthracite-600">
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-anthracite-400" strokeWidth={2} />
+                <span>
+                  <strong className="text-anthracite-800">Destek e-posta:</strong> Canlı ortamda{" "}
+                  <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_SUPPORT_EMAIL</code> tanımlayın; footer ve bu alan otomatik dolar.
+                </span>
+              </li>
+            )}
+            {contact.supportPhoneDisplay ? (
+              <li className="flex gap-2">
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+                <span>
+                  <strong className="text-anthracite-900">Telefon:</strong>{" "}
+                  {contact.supportPhoneHref ? (
+                    <a href={contact.supportPhoneHref} className="font-semibold text-emerald-800 underline-offset-2 hover:underline">
+                      {contact.supportPhoneDisplay}
+                    </a>
+                  ) : (
+                    contact.supportPhoneDisplay
+                  )}
+                </span>
+              </li>
+            ) : null}
+            <li className="flex gap-2">
+              <Scale className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+              <span>
+                <strong className="text-anthracite-900">KVKK</strong> ve{" "}
+                <strong className="text-anthracite-900">mesafeli satış</strong> metinleri:{" "}
+                <LegalLink href={contact.kvkkHref}>KVKK sayfası</LegalLink>
+                {" · "}
+                <LegalLink href={contact.mesafeliHref}>Mesafeli satış</LegalLink>
+                . Harici PDF veya site için{" "}
+                <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_KVKK_URL</code> /{" "}
+                <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_MESAFELI_SATIS_URL</code> kullanılabilir.
+              </span>
+            </li>
+          </ul>
+        </section>
+
         <section className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-6 sm:p-8">
           <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
             <Wallet className="h-5 w-5 text-amber-600" strokeWidth={2} />
@@ -133,10 +230,10 @@ export default function YardimPage() {
           </h2>
           <ul className="space-y-2 text-sm text-anthracite-800">
             <li>• Toptancılara net MOQ, seri fiyat ve stok girişi konusunda kısa eğitim / PDF verin.</li>
-            <li>• WhatsApp sipariş hattı numarasının doğru ve açık olduğundan emin olun (kodda yapılandırılmış olmalı).</li>
+            <li>• WhatsApp sipariş hattı: <code className="rounded bg-white/80 px-1 text-xs">NEXT_PUBLIC_WHATSAPP_E164</code> canlıda doğru olmalı.</li>
             <li>• İlk hafta için yönetimde sipariş onayı ve ödeme teyidi süresi tanımlayın (SLA).</li>
-            <li>• Hukuki: mesafeli satış / B2B şartnamesi ve KVKK metinlerini siteye eklemeyi planlayın.</li>
-            <li>• Destek: iletişim e-postası veya telefonu footer’da paylaşın (isteğe bağlı ekleyebiliriz).</li>
+            <li>• KVKK ve mesafeli satış metinlerini hukuk danışmanınızla netleştirip sayfaları veya PDF bağlantılarını güncelleyin.</li>
+            <li>• Destek kanalı: footer’da e-posta / telefon için env değişkenlerini doldurun.</li>
           </ul>
         </section>
 

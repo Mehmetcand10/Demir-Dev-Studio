@@ -65,6 +65,11 @@ export default function Register() {
         <Link href="/login" className="rounded-xl bg-anthracite-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800">
            Girişe dön
         </Link>
+        <p className="mt-6 text-xs text-anthracite-500">
+          <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">
+            Süreçler için Yardım
+          </Link>
+        </p>
       </div>
     );
   }
@@ -157,6 +162,11 @@ export default function Register() {
           <p className="text-sm text-anthracite-600">
             Zaten üye misiniz?{' '}
             <Link href="/login" className="font-medium text-emerald-700 hover:underline">Giriş</Link>
+          </p>
+          <p className="mt-3 text-xs text-anthracite-500">
+            <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">
+              Süreçler için Yardım
+            </Link>
           </p>
         </div>
       </AuthCard>

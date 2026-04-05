@@ -96,6 +96,11 @@ export default function Login() {
             Hesabınız yok mu?{' '}
             <Link href="/register" className="font-medium text-emerald-700 hover:underline">Başvuru</Link>
           </p>
+          <p className="mt-3 text-xs text-anthracite-500">
+            <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">
+              Süreçler için Yardım
+            </Link>
+          </p>
         </div>
       </AuthCard>
     </div>

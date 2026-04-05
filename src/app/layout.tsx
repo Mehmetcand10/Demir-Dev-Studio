@@ -6,6 +6,7 @@ import { Package, Heart } from 'lucide-react';
 import { createClient } from '@/utils/supabase/server';
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { SiteBackground } from "@/components/layout/SiteBackground";
+import SiteFooter from "@/components/layout/SiteFooter";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -113,19 +114,7 @@ export default async function RootLayout({
           <SiteBackground>{children}</SiteBackground>
         </main>
 
-        <footer className="mt-auto border-t border-anthracite-200/70 bg-white/60 py-6 text-center backdrop-blur-sm">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-2 px-4 sm:flex-row sm:gap-6">
-            <Link href="/yardim" className="text-sm font-medium text-anthracite-600 transition hover:text-emerald-700 hover:underline">
-              Yardım ve süreçler
-            </Link>
-            <span className="hidden text-anthracite-300 sm:inline" aria-hidden>
-              |
-            </span>
-            <p className="text-xs text-anthracite-500 sm:text-sm">
-              Demir Dev Studio © {new Date().getFullYear()}
-            </p>
-          </div>
-        </footer>
+        <SiteFooter />
       </body>
     </html>
   );
