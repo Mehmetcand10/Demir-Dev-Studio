@@ -14,13 +14,14 @@ import {
   Mail,
   Phone,
   Scale,
+  Clock,
 } from "lucide-react";
 import { getSitePublicContact } from "@/utils/siteContact";
 
 export const metadata: Metadata = {
   title: "Yardım ve süreçler | Demir Dev Studio",
   description:
-    "Butik ve toptancılar için sipariş, ödeme, kargo ve panel kullanımı özeti.",
+    "Butik ve toptancılar için sipariş, ödeme, kargo, SLA (hizmet süreleri) ve panel kullanımı özeti.",
 };
 
 const stepsButik = [
@@ -157,6 +158,46 @@ export default function YardimPage() {
         </section>
 
         <section
+          id="sla"
+          className="rounded-2xl border border-indigo-200/80 bg-indigo-50/35 p-6 shadow-sm sm:p-8"
+        >
+          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
+            <Clock className="h-5 w-5 text-indigo-600" strokeWidth={2} />
+            Hizmet süreleri (SLA)
+          </h2>
+          <p className="mb-4 text-sm leading-relaxed text-anthracite-700">
+            Aşağıdaki süreler <strong>hedef</strong> niteliğindedir; stok yokluğu, bayram, yoğunluk veya müşteriden eksik bilgi
+            gibi durumlarda yönetim veya toptancı sizi bilgilendirir. Süreleri kendi operasyonunuza göre değiştirmek için bu
+            metni güncellemeniz yeterlidir.
+          </p>
+          <ul className="space-y-3 text-sm leading-relaxed text-anthracite-800">
+            <li>
+              <strong className="text-anthracite-900">Ödeme teyidi (yönetim):</strong> Sipariş kaydı ve dekontun ulaşmasını
+              takiben, <strong>en geç 2 iş günü</strong> içinde ödeme teyidi veya ek bilgi talebi yapılır.{" "}
+              <span className="text-anthracite-600">İş günü: Pazartesi–Cuma; resmi tatiller dahil değildir.</span>
+            </li>
+            <li>
+              <strong className="text-anthracite-900">Hazırlık ve kargo (toptancı):</strong> Ödeme onayından sonra ürünün
+              paketlenip kargoya verilmesi <strong>hedefi 3 iş günüdür</strong>. Özel üretim veya stok beklemesi varsa toptancı
+              veya yönetim ile iletişime geçilir.
+            </li>
+            <li>
+              <strong className="text-anthracite-900">Takip numarası:</strong> Kargoya verildikten sonra takip numarası{" "}
+              <strong>aynı iş günü içinde</strong> panele işlenir; geç saatlerde ertesi iş gününe sarkabilir.
+            </li>
+            <li>
+              <strong className="text-anthracite-900">Destek (ilk yanıt):</strong> Footer’daki e-posta veya telefon hattına
+              yazılan talepler için <strong>1 iş günü içinde</strong> ilk dönüş hedeflenir. Acil sipariş sorunlarında WhatsApp
+              hattı önceliklidir.
+            </li>
+          </ul>
+          <p className="mt-4 text-xs text-anthracite-600">
+            Bu metin hukuki taahhüt değildir; şeffaflık ve beklenti yönetimi içindir. Resmi süreler sözleşme veya mesafeli satış
+            metninizde tanımlanmalıdır.
+          </p>
+        </section>
+
+        <section
           id="iletisim"
           className="rounded-2xl border border-emerald-200/80 bg-emerald-50/40 p-6 shadow-sm sm:p-8"
         >
@@ -238,7 +279,13 @@ export default function YardimPage() {
           <ul className="space-y-2 text-sm text-anthracite-800">
             <li>• Toptancılara net MOQ, seri fiyat ve stok girişi konusunda kısa eğitim / PDF verin.</li>
             <li>• WhatsApp sipariş hattı: <code className="rounded bg-white/80 px-1 text-xs">NEXT_PUBLIC_WHATSAPP_E164</code> canlıda doğru olmalı.</li>
-            <li>• İlk hafta için yönetimde sipariş onayı ve ödeme teyidi süresi tanımlayın (SLA).</li>
+            <li>
+              • Operasyon SLA metnini yayınlayın:{" "}
+              <Link href="/yardim#sla" className="font-semibold text-emerald-800 underline-offset-2 hover:underline">
+                Hizmet süreleri (SLA)
+              </Link>
+              .
+            </li>
             <li>• KVKK ve mesafeli satış metinlerini hukuk danışmanınızla netleştirip sayfaları veya PDF bağlantılarını güncelleyin.</li>
             <li>• Destek kanalı: footer’da e-posta / telefon için env değişkenlerini doldurun.</li>
           </ul>
