@@ -260,16 +260,35 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                 </div>
               </div>
 
-              <div className="mt-auto border-t border-anthracite-100 dark:border-anthracite-800 pt-8 flex flex-col gap-6">
+              <div className="mt-auto flex flex-col gap-6 border-t border-anthracite-100 pt-8 dark:border-anthracite-800">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex flex-col">
-                    <span className="font-bold text-anthracite-900 dark:text-white">Sipariş Miktarı</span>
-                    <span className="text-[10px] text-anthracite-400 font-medium">Minimum {product.min_order_quantity} adet ve katları</span>
+                    <span className="font-bold text-anthracite-900 dark:text-white">Sipariş miktarı</span>
+                    <span className="text-[10px] font-medium text-anthracite-500 dark:text-anthracite-400">
+                      Paket sayısı (her paket {product.min_order_quantity} adet)
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1 rounded-xl border border-anthracite-200/90 bg-white p-1 dark:border-anthracite-700 dark:bg-anthracite-900">
-                    <button type="button" onClick={() => setSeriCount(Math.max(1, seriCount - 1))} className="flex h-9 w-9 items-center justify-center rounded-lg bg-anthracite-50 text-lg font-medium transition hover:bg-anthracite-100 dark:bg-anthracite-800">−</button>
-                    <span className="w-11 text-center text-lg font-semibold">{seriCount}<span className="block text-[10px] font-normal text-anthracite-400">paket</span></span>
-                    <button type="button" onClick={() => setSeriCount(seriCount + 1)} className="flex h-9 w-9 items-center justify-center rounded-lg bg-anthracite-50 text-lg font-medium transition hover:bg-anthracite-100 dark:bg-anthracite-800">+</button>
+                  <div className="flex items-center gap-0.5 rounded-xl border border-anthracite-200 bg-white p-1 shadow-sm ring-1 ring-anthracite-100/80">
+                    <button
+                      type="button"
+                      aria-label="Paket azalt"
+                      onClick={() => setSeriCount(Math.max(1, seriCount - 1))}
+                      className="flex h-10 w-10 items-center justify-center rounded-lg bg-anthracite-100 text-xl font-semibold leading-none text-anthracite-900 transition hover:bg-anthracite-200"
+                    >
+                      −
+                    </button>
+                    <div className="min-w-[3rem] px-1 text-center">
+                      <span className="block text-xl font-bold tabular-nums text-anthracite-900">{seriCount}</span>
+                      <span className="block text-[10px] font-semibold uppercase tracking-wide text-anthracite-500">paket</span>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="Paket artır"
+                      onClick={() => setSeriCount(seriCount + 1)}
+                      className="flex h-10 w-10 items-center justify-center rounded-lg bg-anthracite-100 text-xl font-semibold leading-none text-anthracite-900 transition hover:bg-anthracite-200"
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
 
