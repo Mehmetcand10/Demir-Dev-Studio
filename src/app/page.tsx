@@ -45,7 +45,7 @@ export default function Home() {
               </span>
             </h1>
 
-            <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-anthracite-600 sm:text-lg lg:mx-0">
+            <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-anthracite-700 sm:text-lg lg:mx-0">
               Onaylı butikler ve üreticileri aracısız buluşturur; net fiyat, MOQ ve sipariş takibi tek
               platformda. İlk günden profesyonel bir B2B deneyimi.
             </p>
@@ -53,10 +53,10 @@ export default function Home() {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Link
                 href="/register"
-                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-anthracite-950 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-anthracite-900/20 transition hover:bg-anthracite-900 active:scale-[0.99]"
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border-2 border-zinc-900 bg-zinc-900 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-black/30 transition hover:border-black hover:bg-black hover:text-white active:scale-[0.99]"
               >
                 Ağa başvur
-                <ArrowRight className="h-4 w-4" strokeWidth={2} />
+                <ArrowRight className="h-4 w-4 text-white" strokeWidth={2} />
               </Link>
               <Link
                 href="/katalog"
@@ -97,25 +97,31 @@ export default function Home() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-anthracite-950/90 via-anthracite-950/35 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-anthracite-950/50 to-transparent lg:from-anthracite-950/70" />
+              <div className="absolute inset-0 bg-gradient-to-t from-anthracite-950 via-anthracite-950/55 to-anthracite-950/20" />
+              <div className="absolute inset-0 bg-gradient-to-r from-anthracite-950/80 to-transparent lg:from-anthracite-950/85" />
             </div>
 
             <div className="relative flex h-full min-h-[inherit] flex-col justify-end p-4 sm:p-6 lg:justify-center lg:p-8">
-              <div className="mb-3 max-w-[16rem] rounded-2xl border border-white/20 bg-white/12 p-4 shadow-xl backdrop-blur-md sm:max-w-xs lg:mb-4">
-                <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+              <div className="mb-3 max-w-[16rem] rounded-2xl border border-white/25 bg-black/70 p-4 shadow-xl shadow-black/40 backdrop-blur-xl sm:max-w-xs lg:mb-4">
+                <span className="mb-2 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
                   <Sparkles className="h-3 w-3" strokeWidth={2} />
                   Canlı vitrin
                 </span>
-                <p className="text-sm font-semibold text-white">Yeni sezon serileri eklendi</p>
-                <p className="mt-1 text-xs text-white/70">Onaylı üreticilerden doğrudan B2B fiyat</p>
+                <p className="text-sm font-bold leading-snug text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+                  Yeni sezon serileri eklendi
+                </p>
+                <p className="mt-1.5 text-xs font-medium leading-relaxed text-white/95 [text-shadow:0_1px_2px_rgba(0,0,0,0.85)]">
+                  Onaylı üreticilerden doğrudan B2B fiyat
+                </p>
               </div>
-              <div className="ml-auto max-w-[13rem] rounded-2xl border border-white/15 bg-anthracite-950/55 p-3 shadow-xl backdrop-blur-md sm:max-w-[14rem]">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-400/90">
+              <div className="ml-auto max-w-[13rem] rounded-2xl border border-white/20 bg-black/75 p-3.5 shadow-xl shadow-black/40 backdrop-blur-xl sm:max-w-[14rem]">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">
                   Sipariş akışı
                 </p>
-                <p className="mt-1 text-lg font-bold tabular-nums text-white">Hazırlanıyor</p>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                <p className="mt-1 text-lg font-bold tabular-nums text-white [text-shadow:0_1px_3px_rgba(0,0,0,0.9)]">
+                  Hazırlanıyor
+                </p>
+                <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-white/20">
                   <div className="h-full w-[55%] rounded-full bg-emerald-400" />
                 </div>
               </div>
@@ -189,50 +195,52 @@ export default function Home() {
 
       {/* —— Koyu bant: güven + görsel —— */}
       <section className="relative overflow-hidden bg-anthracite-950 text-white">
-        <div className="absolute inset-0 opacity-40">
+        <div className="absolute inset-0 opacity-25">
           <Image
             src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1400&auto=format&fit=crop"
             alt=""
             fill
-            className="object-cover mix-blend-overlay"
+            className="object-cover"
             sizes="100vw"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-r from-anthracite-950 via-anthracite-950/95 to-anthracite-950/88" />
+        {/* Metin tarafını okunaklı tutan koyu katman */}
+        <div className="absolute inset-0 bg-gradient-to-br from-anthracite-950 via-anthracite-950 to-anthracite-900/98" />
+        <div className="absolute inset-0 bg-anthracite-950/80 sm:bg-gradient-to-r sm:from-anthracite-950 sm:via-anthracite-950/92 sm:to-anthracite-950/75" />
 
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:gap-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:py-24">
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400/95">
+          <div className="rounded-2xl border border-white/10 bg-anthracite-950/60 p-6 shadow-lg backdrop-blur-sm sm:p-8 lg:border-white/5 lg:bg-anthracite-950/40">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-emerald-300">
               Neden bu platform?
             </p>
-            <h2 className="mb-6 text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[2.35rem]">
+            <h2 className="mb-6 text-3xl font-bold leading-tight tracking-tight text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.45)] sm:text-4xl lg:text-[2.35rem]">
               Sıfır stres.
               <br />
-              <span className="text-white/90">Maksimum şeffaflık.</span>
+              <span className="text-white">Maksimum şeffaflık.</span>
             </h2>
-            <p className="mb-10 max-w-lg text-base leading-relaxed text-anthracite-400">
+            <p className="mb-10 max-w-lg text-base leading-relaxed text-zinc-200">
               Butik için günlerce toptancı aramak; üretici için müşteri kovalamak bitti. Tek kapı, net kurallar,
               ölçülebilir sipariş.
             </p>
             <ul className="space-y-6">
               <li className="flex gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                  <Users className="h-5 w-5 text-emerald-400" strokeWidth={2} />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-950/50">
+                  <Users className="h-5 w-5 text-emerald-300" strokeWidth={2} />
                 </div>
                 <div>
-                  <h4 className="mb-1 font-semibold">Kapalı devre üyelik</h4>
-                  <p className="text-sm text-anthracite-400">
+                  <h4 className="mb-1 font-semibold text-white">Kapalı devre üyelik</h4>
+                  <p className="text-sm leading-relaxed text-zinc-300">
                     Fiyatlar yalnızca onaylı işletmelere açılır; perakende sızması engellenir.
                   </p>
                 </div>
               </li>
               <li className="flex gap-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5">
-                  <Package className="h-5 w-5 text-emerald-400" strokeWidth={2} />
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-950/50">
+                  <Package className="h-5 w-5 text-emerald-300" strokeWidth={2} />
                 </div>
                 <div>
-                  <h4 className="mb-1 font-semibold">Seçilmiş vitrin</h4>
-                  <p className="text-sm text-anthracite-400">
+                  <h4 className="mb-1 font-semibold text-white">Seçilmiş vitrin</h4>
+                  <p className="text-sm leading-relaxed text-zinc-300">
                     Yayına alınan her ürün marj ve operasyon uygunluğundan geçer.
                   </p>
                 </div>
@@ -241,37 +249,39 @@ export default function Home() {
           </div>
 
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div className="rounded-[1.75rem] border border-white/10 bg-white/5 p-4 shadow-2xl backdrop-blur-md sm:p-5">
-              <div className="overflow-hidden rounded-2xl border border-white/5 bg-black/30">
+            <div className="rounded-[1.75rem] border border-white/15 bg-black/35 p-4 shadow-2xl backdrop-blur-md sm:p-5">
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/50">
                 <div className="relative aspect-[4/5] max-h-[340px] sm:max-h-[400px]">
                   <Image
                     src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800&auto=format&fit=crop"
                     alt=""
                     fill
-                    className="object-cover opacity-80"
+                    className="object-cover opacity-85"
                     sizes="(max-width: 1024px) 100vw, 400px"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5">
-                    <div className="rounded-xl border border-white/10 bg-black/45 px-4 py-3 backdrop-blur-md">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
+                    <div className="rounded-xl border border-white/15 bg-black/80 px-4 py-3.5 backdrop-blur-md">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">
                         Örnek sipariş
                       </span>
-                      <p className="mt-1 font-bold text-white">Sezon serisi · Seri fiyat</p>
-                      <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/15">
+                      <p className="mt-1 font-bold text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.8)]">
+                        Sezon serisi · Seri fiyat
+                      </p>
+                      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/20">
                         <div className="h-full w-2/3 rounded-full bg-emerald-400" />
                       </div>
-                      <p className="mt-2 text-right text-[10px] text-white/50">Kargoya hazırlanıyor</p>
+                      <p className="mt-2 text-right text-[11px] font-medium text-zinc-200">Kargoya hazırlanıyor</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="mt-3 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
+              <div className="mt-3 flex items-center justify-between rounded-xl border border-white/15 bg-black/50 px-4 py-3.5">
                 <div>
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-white/45">Ağ kasası</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">Ağ kasası</p>
                   <p className="text-sm font-bold text-white">Net marj görünürlüğü</p>
                 </div>
-                <ShieldCheck className="h-8 w-8 text-emerald-400" strokeWidth={1.5} />
+                <ShieldCheck className="h-8 w-8 shrink-0 text-emerald-300" strokeWidth={1.5} />
               </div>
             </div>
           </div>
