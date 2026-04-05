@@ -86,28 +86,28 @@ export default function WholesalerProfile() {
         {products.length === 0 ? (
           <div className="py-32 text-center text-anthracite-400 font-bold">Bu toptancının henüz aktif ürünü bulunmuyor.</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
              {products.map((p) => {
                const displayedPrice = Number(p.base_wholesale_price) + Number(p.margin_price || 0);
                return (
-                 <div key={p.id} className="group bg-white rounded-[2.5rem] border border-anthracite-100 overflow-hidden hover:shadow-2xl transition-all">
-                    <div className="relative aspect-[3/4] overflow-hidden bg-anthracite-50">
-                      <Image src={p.images?.[0]} alt={p.name} fill className="object-cover group-hover:scale-110 transition-all duration-700" />
+                 <div key={p.id} className="group bg-white rounded-xl sm:rounded-2xl border border-anthracite-100/90 overflow-hidden shadow-sm hover:shadow-md transition-all">
+                    <div className="relative aspect-[4/5] sm:aspect-[5/6] overflow-hidden bg-anthracite-50">
+                      <Image src={p.images?.[0]} alt={p.name} fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
-                    <div className="p-6 text-left">
-                      <h3 className="font-black text-lg text-anthracite-900 mb-1 leading-tight line-clamp-1">{p.name}</h3>
-                      <div className="flex gap-2 mb-4">
-                         <span className="text-[8px] font-black bg-emerald-50 text-emerald-600 px-2 py-1 rounded border border-emerald-100 uppercase">{p.gender}</span>
-                         <span className="text-[8px] font-black bg-anthracite-50 text-anthracite-500 px-2 py-1 rounded border border-anthracite-100 uppercase">{p.category}</span>
+                    <div className="p-2.5 sm:p-3 text-left">
+                      <h3 className="font-bold text-xs sm:text-sm text-anthracite-900 mb-1 line-clamp-2 leading-snug">{p.name}</h3>
+                      <div className="flex flex-wrap gap-1 mb-2">
+                         <span className="text-[7px] sm:text-[8px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-100 uppercase">{p.gender}</span>
+                         <span className="text-[7px] sm:text-[8px] font-bold bg-anthracite-50 text-anthracite-500 px-1.5 py-0.5 rounded uppercase truncate max-w-[5rem]">{p.category}</span>
                       </div>
                       
-                      <div className="flex items-center justify-between pt-5 border-t border-anthracite-50">
-                          <div className="flex flex-col">
-                              <span className="text-[10px] font-black text-anthracite-400 uppercase leading-none mb-1">B2B Fiyat</span>
-                              <span className="font-black text-xl text-anthracite-900">{(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")} ₺</span>
+                      <div className="flex items-end justify-between gap-1 pt-2 border-t border-anthracite-100/80">
+                          <div className="flex flex-col min-w-0">
+                              <span className="text-[8px] font-bold text-anthracite-400 uppercase">B2B</span>
+                              <span className="font-black text-sm sm:text-base text-anthracite-900 tabular-nums">{(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")} ₺</span>
                           </div>
-                          <Link href={`/product/${p.id}`} className="p-3 bg-anthracite-900 text-white rounded-xl shadow-lg hover:bg-emerald-600 transition-all">
-                              <ShoppingBag className="w-5 h-5" />
+                          <Link href={`/product/${p.id}`} className="shrink-0 p-2 bg-anthracite-900 text-white rounded-lg sm:rounded-xl shadow-sm">
+                              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           </Link>
                       </div>
                     </div>

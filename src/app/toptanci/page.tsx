@@ -164,39 +164,37 @@ export default function ToptanciDashboard() {
                         <button onClick={() => setActiveTab('studio')} className="px-8 py-3 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-emerald-500/20 hover:scale-105 transition-all">+ YENİ MODEL EKLE</button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
                        {products.length === 0 ? (
                            <div className="col-span-full py-20 text-center bg-anthracite-50 rounded-[2.5rem] border-2 border-dashed border-anthracite-100">
                                <Package className="w-16 h-16 mx-auto text-anthracite-200 mb-4" />
                                <p className="font-black text-anthracite-400 uppercase tracking-widest text-xs">Henüz Ürün Yüklemediniz.</p>
                            </div>
                        ) : products.map(p => (
-                           <div key={p.id} className="group bg-white rounded-[2.5rem] border border-anthracite-100 shadow-sm hover:shadow-2xl overflow-hidden transition-all relative text-left">
-                               <div className="relative aspect-[3/4] bg-anthracite-50 overflow-hidden">
-                                  <Image src={p.images?.[0]} alt="p" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
-                                  <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                      <button onClick={() => handleDelete(p.id)} className="p-3 bg-red-500 text-white rounded-2xl shadow-xl hover:bg-red-600 transition-all">
-                                          <Trash2 className="w-4 h-4" />
+                           <div key={p.id} className="group bg-white rounded-xl sm:rounded-2xl border border-anthracite-100/90 shadow-sm hover:shadow-md overflow-hidden transition-all relative text-left">
+                               <div className="relative aspect-[4/5] sm:aspect-[5/6] bg-anthracite-50 overflow-hidden">
+                                  <Image src={p.images?.[0]} alt="p" fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                                  <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                      <button type="button" onClick={() => handleDelete(p.id)} className="p-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-all">
+                                          <Trash2 className="w-3.5 h-3.5" />
                                       </button>
                                   </div>
                                </div>
-                               <div className="p-6">
-                                   <div className="flex justify-between items-start mb-4 gap-3">
-                                       <h3 className="font-black text-lg text-anthracite-900 leading-tight line-clamp-1">{p.name}</h3>
-                                   </div>
-                                   <div className="flex flex-wrap gap-1.5 mb-6">
+                               <div className="p-2.5 sm:p-3">
+                                   <h3 className="font-bold text-xs sm:text-sm text-anthracite-900 leading-snug line-clamp-2 mb-2">{p.name}</h3>
+                                   <div className="flex flex-wrap gap-1 mb-2 max-h-14 overflow-y-auto">
                                       {Object.entries(p.stocks || {}).map(([size, qty]: [string, any]) => (
-                                          <span key={size} className={`text-[9px] font-black px-2 py-0.5 rounded border ${Number(qty) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-500'}`}>
-                                              {size}: {qty}
+                                          <span key={size} className={`text-[7px] sm:text-[8px] font-bold px-1.5 py-0.5 rounded border ${Number(qty) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-red-50 border-red-100 text-red-600'}`}>
+                                              {size}:{qty}
                                           </span>
                                       ))}
                                    </div>
-                                   <div className="pt-5 border-t border-anthracite-50 flex items-center justify-between">
-                                       <div className="flex flex-col">
-                                           <span className="text-[9px] font-black text-anthracite-400 uppercase leading-none mb-1">Net Kazanç</span>
-                                           <span className="font-black text-xl text-emerald-600">{p.base_wholesale_price.toLocaleString('tr-TR')} ₺</span>
+                                   <div className="pt-2 border-t border-anthracite-100/80 flex items-end justify-between gap-1">
+                                       <div className="flex flex-col min-w-0">
+                                           <span className="text-[8px] font-bold text-anthracite-400 uppercase">Net</span>
+                                           <span className="font-black text-sm sm:text-base text-emerald-600 tabular-nums">{p.base_wholesale_price.toLocaleString('tr-TR')} ₺</span>
                                        </div>
-                                       <div className="bg-anthracite-900 text-white px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest shrink-0">MOQ: {p.min_order_quantity}</div>
+                                       <div className="bg-anthracite-900 text-white px-2 py-1 rounded-md text-[8px] font-black uppercase shrink-0">MOQ {p.min_order_quantity}</div>
                                    </div>
                                </div>
                            </div>

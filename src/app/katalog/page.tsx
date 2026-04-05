@@ -161,78 +161,77 @@ export default function Katalog() {
            <button onClick={() => { setSearchTerm(""); setSelectedCategory("Tümü"); setSelectedGender("Tümü"); }} className="mt-4 text-sm font-bold text-blue-600 underline">Filtreleri Temizle</button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
           {filteredProducts.map((p) => {
             const displayedPrice = Number(p.base_wholesale_price) + Number(p.margin_price || 0);
             const isFav = favorites.includes(p.id);
 
             return (
-              <div key={p.id} className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-anthracite-100 transition-all hover:shadow-2xl hover:-translate-y-1 relative">
+              <div key={p.id} className="group flex flex-col bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-anthracite-100/90 shadow-sm transition-all hover:shadow-md hover:border-anthracite-200 relative">
                 
-                {/* Ürün Görseli ve Hızlı Aksiyonlar */}
-                <div className="relative aspect-[3/4] overflow-hidden bg-anthracite-50">
+                {/* Ürün Görseli — daha kısa oran, vitrinde daha çok ürün görünsün */}
+                <div className="relative aspect-[4/5] sm:aspect-[5/6] overflow-hidden bg-anthracite-50">
                   <Image 
                     src={p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'} 
                     alt={p.name} 
                     fill 
-                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   
-                  {/* FAVORİ VE HIZLI BAKIŞ BUTONLARI */}
-                  <div className="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                  <div className="absolute top-2 right-2 flex flex-col gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
                     <button 
+                        type="button"
                         onClick={(e) => { e.preventDefault(); toggleFavorite(p.id); }}
-                        className={`p-3 rounded-2xl backdrop-blur-md shadow-xl transition-all ${isFav ? 'bg-red-500 text-white' : 'bg-white/80 text-anthracite-900 hover:bg-white'}`}
+                        className={`p-2 rounded-xl backdrop-blur-md shadow-md transition-all ${isFav ? 'bg-red-500 text-white' : 'bg-white/90 text-anthracite-900'}`}
                     >
-                        <Heart className={`w-5 h-5 ${isFav ? 'fill-current' : ''}`} />
+                        <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? 'fill-current' : ''}`} />
                     </button>
                     <button 
+                        type="button"
                         onClick={() => setShowQuickView(p)}
-                        className="p-3 bg-white/80 backdrop-blur-md text-anthracite-900 rounded-2xl shadow-xl hover:bg-white transition-all"
+                        className="p-2 bg-white/90 backdrop-blur-md text-anthracite-900 rounded-xl shadow-md"
                     >
-                        <Eye className="w-5 h-5" />
+                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                   </div>
 
                   {!isApproved && (
-                    <div className="absolute inset-0 bg-anthracite-900/60 backdrop-blur-[2px] flex flex-col items-center justify-center">
-                      <Lock className="w-10 h-10 text-white mb-3" />
-                      <span className="text-xs font-black text-white bg-black/40 px-4 py-2 rounded-full uppercase tracking-tighter">Fiyat için Onay Bekleniyor</span>
+                    <div className="absolute inset-0 bg-anthracite-900/55 backdrop-blur-[1px] flex flex-col items-center justify-center p-2">
+                      <Lock className="w-6 h-6 sm:w-8 sm:h-8 text-white mb-1" />
+                      <span className="text-[8px] sm:text-[10px] font-black text-white bg-black/35 px-2 py-1 rounded-full uppercase tracking-tight text-center leading-tight">Onay Bekleniyor</span>
                     </div>
                   )}
                 </div>
 
-                {/* Ürün Bilgileri */}
-                <div className="p-6 flex flex-col flex-grow text-left">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                        <h3 className="font-black text-lg text-anthracite-900 line-clamp-1 leading-tight">{p.name}</h3>
-                        <Link href={`/wholesaler/${p.wholesaler_id}`} className="text-[10px] font-bold text-anthracite-400 hover:text-anthracite-900 transition-colors uppercase tracking-widest">Mağazayı Gör</Link>
-                    </div>
+                <div className="p-2.5 sm:p-3 flex flex-col flex-grow text-left min-h-0">
+                  <div className="mb-1 min-w-0">
+                        <h3 className="font-bold text-xs sm:text-sm text-anthracite-900 line-clamp-2 leading-snug">{p.name}</h3>
+                        <Link href={`/wholesaler/${p.wholesaler_id}`} className="text-[8px] sm:text-[9px] font-semibold text-anthracite-400 hover:text-anthracite-700 uppercase tracking-wide truncate block">Mağaza</Link>
                   </div>
                   
-                  <div className="flex flex-wrap items-center gap-1.5 my-3">
-                     <span className="text-[9px] font-black tracking-widest text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100 uppercase">{p.gender}</span>
-                     <span className="text-[9px] font-black tracking-widest text-anthracite-500 bg-anthracite-50 px-2 py-1 rounded-md uppercase">{p.category}</span>
+                  <div className="flex flex-wrap items-center gap-1 my-1.5">
+                     <span className="text-[7px] sm:text-[8px] font-bold tracking-wide text-emerald-700 bg-emerald-50/90 px-1.5 py-0.5 rounded border border-emerald-100/80 uppercase">{p.gender}</span>
+                     <span className="text-[7px] sm:text-[8px] font-bold text-anthracite-500 bg-anthracite-50 px-1.5 py-0.5 rounded uppercase truncate max-w-[5rem] sm:max-w-none">{p.category}</span>
                   </div>
                   
-                  <p className="text-[11px] font-bold text-anthracite-400 mb-6">Paket: {p.min_order_quantity} Adet • {p.gsm || "Standart"}</p>
+                  <p className="text-[9px] sm:text-[10px] font-medium text-anthracite-400 mb-2 line-clamp-1">MOQ {p.min_order_quantity}</p>
                   
-                  <div className="mt-auto pt-5 border-t border-anthracite-50 flex items-center justify-between">
+                  <div className="mt-auto pt-2 border-t border-anthracite-100/80 flex items-end justify-between gap-1">
                     {isApproved ? (
                       <>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest leading-none mb-1">Seri Fiyatı</span>
-                          <span className="font-black text-2xl text-anthracite-900">
-                             {(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")} <span className="text-sm font-bold">₺</span>
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[8px] font-bold text-anthracite-400 uppercase tracking-wide">Seri</span>
+                          <span className="font-black text-sm sm:text-base text-anthracite-900 tabular-nums leading-tight">
+                             {(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")}<span className="text-[10px] font-bold"> ₺</span>
                           </span>
                         </div>
-                        <Link href={`/product/${p.id}`} className="bg-anthracite-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg shadow-anthracite-900/20">
-                          <ShoppingBag className="w-5 h-5" />
+                        <Link href={`/product/${p.id}`} className="shrink-0 bg-anthracite-900 text-white w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                          <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Link>
                       </>
                     ) : (
-                      <div className="w-full text-center py-2 bg-anthracite-50 rounded-xl text-[10px] font-black text-anthracite-400 uppercase tracking-widest">Görmek İçin Giriş Yapın</div>
+                      <div className="w-full text-center py-1.5 bg-anthracite-50 rounded-lg text-[8px] sm:text-[9px] font-bold text-anthracite-400 uppercase">Giriş</div>
                     )}
                   </div>
                 </div>

@@ -68,31 +68,32 @@ export default function Favoriler() {
             </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
            {favoriteProducts.map((p) => {
              const displayedPrice = Number(p.base_wholesale_price) + Number(p.margin_price || 0);
              return (
-               <div key={p.id} className="group bg-white rounded-[2.5rem] border border-anthracite-100 overflow-hidden hover:shadow-2xl transition-all relative">
-                  <div className="relative aspect-[3/4] overflow-hidden bg-anthracite-50">
-                    <Image src={p.images?.[0]} alt={p.name} fill className="object-cover group-hover:scale-110 transition-all duration-700" />
+               <div key={p.id} className="group bg-white rounded-xl sm:rounded-2xl border border-anthracite-100/90 overflow-hidden shadow-sm hover:shadow-md transition-all relative">
+                  <div className="relative aspect-[4/5] sm:aspect-[5/6] overflow-hidden bg-anthracite-50">
+                    <Image src={p.images?.[0]} alt={p.name} fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                     <button 
+                        type="button"
                         onClick={() => removeFavorite(p.id)}
-                        className="absolute top-4 right-4 p-3 bg-white/80 backdrop-blur-md rounded-2xl text-red-500 shadow-xl hover:bg-white transition-all transform group-hover:scale-110"
+                        className="absolute top-2 right-2 p-2 bg-white/90 backdrop-blur-sm rounded-xl text-red-500 shadow-md hover:bg-white"
                     >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                   </div>
-                  <div className="p-6">
-                    <h3 className="font-black text-xl text-anthracite-900 mb-1 line-clamp-1">{p.name}</h3>
-                    <p className="text-[10px] font-bold text-anthracite-400 uppercase tracking-widest mb-4">{p.category} | {p.gender}</p>
+                  <div className="p-2.5 sm:p-3">
+                    <h3 className="font-bold text-xs sm:text-sm text-anthracite-900 mb-1 line-clamp-2 leading-snug">{p.name}</h3>
+                    <p className="text-[8px] sm:text-[9px] font-semibold text-anthracite-400 uppercase tracking-wide mb-2 truncate">{p.category} · {p.gender}</p>
                     
-                    <div className="flex items-center justify-between pt-5 border-t border-anthracite-50">
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-anthracite-400 uppercase leading-none">Net Fiyat</span>
-                            <span className="font-black text-xl text-anthracite-900">{(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")} ₺</span>
+                    <div className="flex items-end justify-between gap-1 pt-2 border-t border-anthracite-100/80">
+                        <div className="flex flex-col min-w-0">
+                            <span className="text-[8px] font-bold text-anthracite-400 uppercase">Seri</span>
+                            <span className="font-black text-sm sm:text-base text-anthracite-900 tabular-nums">{(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")} ₺</span>
                         </div>
-                        <Link href={`/product/${p.id}`} className="p-3 bg-anthracite-900 text-white rounded-xl shadow-lg hover:bg-black transition-all">
-                            <ShoppingBag className="w-5 h-5" />
+                        <Link href={`/product/${p.id}`} className="shrink-0 p-2 bg-anthracite-900 text-white rounded-lg sm:rounded-xl shadow-sm">
+                            <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Link>
                     </div>
                   </div>
