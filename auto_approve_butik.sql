@@ -7,13 +7,14 @@ LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, role, business_name, full_name, phone_number, is_approved)
+  INSERT INTO public.profiles (id, role, business_name, full_name, phone_number, tax_id, is_approved)
   VALUES (
     NEW.id,
     NEW.raw_user_meta_data ->> 'role',
     NEW.raw_user_meta_data ->> 'business_name',
     NEW.raw_user_meta_data ->> 'full_name',
     NEW.raw_user_meta_data ->> 'phone_number',
+    NEW.raw_user_meta_data ->> 'tax_id',
     CASE WHEN (NEW.raw_user_meta_data ->> 'role') = 'butik' THEN true ELSE false END
   );
   

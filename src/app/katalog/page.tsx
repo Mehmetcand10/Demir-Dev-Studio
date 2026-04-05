@@ -25,35 +25,32 @@ export default function Katalog() {
 
   useEffect(() => {
     async function fetchData() {
-      // 1. Kullanıcı ve Yetki Kontrolü
       const { data: { user: authUser } } = await supabase.auth.getUser();
       setUser(authUser);
 
+      let roleForFilter: string = 'butik';
       if (authUser) {
         const { data: profile } = await supabase.from('profiles').select('*').eq('id', authUser.id).single();
+        roleForFilter = profile?.role || 'butik';
         setIsApproved(profile?.is_approved || false);
-        setUserRole(profile?.role || 'butik');
+        setUserRole(roleForFilter);
 
-        // Favorileri Çek
         const { data: favs } = await supabase.from('favorites').select('product_id').eq('user_id', authUser.id);
-        if (favs) setFavorites(favs.map(f => f.product_id));
+        if (favs) setFavorites(favs.map((f) => f.product_id));
       }
 
-      // 2. Ürünleri Çek
-      let query = supabase.from('products').select('*');
-      
-      const { data: prods } = await query;
+      const { data: prods } = await supabase.from('products').select('*');
       if (prods) {
-        // Toptancı kendi ürünlerini görmesin
-        const displayProds = (authUser && userRole === 'toptanci') 
-          ? prods.filter(p => p.wholesaler_id !== authUser.id)
-          : prods;
+        const displayProds =
+          authUser && roleForFilter === 'toptanci'
+            ? prods.filter((p) => p.wholesaler_id !== authUser.id)
+            : prods;
         setProducts(displayProds);
       }
       setLoading(false);
     }
     fetchData();
-  }, [supabase, userRole]);
+  }, [supabase]);
 
   // FAVORİ İŞLEMİ
   const toggleFavorite = async (productId: string) => {

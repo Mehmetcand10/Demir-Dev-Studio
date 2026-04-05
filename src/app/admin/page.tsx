@@ -57,7 +57,7 @@ export default function AdminDashboard() {
   const fetchOrders = useCallback(async () => {
     const { data } = await supabase
       .from('orders')
-      .select('*, product:product_id(*), wholesaler:wholesaler_id(business_name)')
+      .select('*, product:product_id(*), wholesaler:wholesaler_id(business_name, iban)')
       .order('created_at', { ascending: false });
     if (data) setOrders(data);
   }, [supabase]);
@@ -262,9 +262,10 @@ export default function AdminDashboard() {
     .filter(o => !o.is_archived)
     .reduce((acc: any, order) => {
       const name = order.wholesaler?.business_name || 'Bilinmeyen Toptancı';
-      if (!acc[name]) acc[name] = { total: 0, count: 0 };
+      if (!acc[name]) acc[name] = { total: 0, count: 0, iban: order.wholesaler?.iban || null };
       acc[name].total += Number(order.wholesaler_earning);
       acc[name].count += 1;
+      if (!acc[name].iban && order.wholesaler?.iban) acc[name].iban = order.wholesaler.iban;
       return acc;
     }, {}), [orders]);
 
@@ -633,7 +634,26 @@ export default function AdminDashboard() {
                            <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 leading-none">Net Alacak</p>
                            <span className="text-4xl font-black text-emerald-600 tracking-tighter">{data.total.toLocaleString('tr-TR')} ₺</span>
                         </div>
-                        <button className="absolute top-10 right-10 opacity-0 group-hover:opacity-100 transition-all font-black text-[10px] text-blue-500 underline uppercase">IBAN GÖR</button>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const iban = (data as { iban?: string | null }).iban;
+                            if (iban) {
+                              const clean = iban.replace(/\s/g, '');
+                              try {
+                                await navigator.clipboard.writeText(clean);
+                                alert(`IBAN panoya kopyalandı:\n${iban}`);
+                              } catch {
+                                alert(`IBAN:\n${iban}`);
+                              }
+                            } else {
+                              alert('Bu toptancı için IBAN kayıtlı değil. Toptancı, panelde Hakediş sekmesinden IBAN girebilir (profiles.iban).');
+                            }
+                          }}
+                          className="absolute top-10 right-10 opacity-0 group-hover:opacity-100 transition-all font-black text-[10px] text-blue-600 underline uppercase"
+                        >
+                          IBAN GÖR
+                        </button>
                      </div>
                    ))}
                 </div>

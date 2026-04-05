@@ -1,4 +1,5 @@
 -- FAZ 5: E-Posta Güvenlik Onayı Profil Tetikleyicisi (Trigger)
+-- Gereksinim: public.profiles.tax_id kolonu (profile_extensions.sql ile ekleyin).
 
 -- 1. Önce varsa eski triggerları temizleyelim ki çakışma olmasın
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -12,13 +13,14 @@ SECURITY DEFINER SET search_path = public
 AS $$
 BEGIN
   -- Yeni üyenin rolleri ve şirket adı gibi bilgileri (metadata) alınıp Profiles tablomuza çakılıyor.
-  INSERT INTO public.profiles (id, role, business_name, full_name, phone_number, is_approved)
+  INSERT INTO public.profiles (id, role, business_name, full_name, phone_number, tax_id, is_approved)
   VALUES (
     NEW.id,
     NEW.raw_user_meta_data ->> 'role',
     NEW.raw_user_meta_data ->> 'business_name',
     NEW.raw_user_meta_data ->> 'full_name',
     NEW.raw_user_meta_data ->> 'phone_number',
+    NEW.raw_user_meta_data ->> 'tax_id',
     false -- Herkes Onaysız doğar, Demir Dev Yönetimi açar!
   );
   

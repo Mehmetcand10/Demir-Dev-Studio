@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, MessageCircle, Package, Search, Lock } from "lucide-react";
@@ -8,6 +8,8 @@ import { createClient } from '@/utils/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
 import { ORDER_STATUS } from '@/utils/orderStatus';
 import { notify } from '@/utils/notifications';
+import { getOrderableStocks, usesFallbackStocks } from '@/utils/productStocks';
+import { getWhatsAppOrderDigits } from '@/utils/whatsapp';
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<any>(null);
@@ -27,6 +29,18 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const [isOrdering, setIsOrdering] = useState(false);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [selectedSize, setSelectedSize] = useState<string>('');
+
+  const orderableStocks = useMemo(() => (product ? getOrderableStocks(product) : {}), [product]);
+  const stockIsFallback = useMemo(() => (product ? usesFallbackStocks(product) : false), [product]);
+
+  useEffect(() => {
+    setSelectedSize('');
+  }, [params.id]);
+
+  useEffect(() => {
+    const keys = Object.keys(orderableStocks);
+    if (keys.length === 1) setSelectedSize(keys[0]);
+  }, [orderableStocks]);
 
   const fetchData = useCallback(async () => {
     // 1. Ürünü çek
@@ -105,7 +119,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name} (Beden: ${selectedSize})\n🔢 Miktar: ${totalItems} Adet (MOQ Şartı Sağlandı)\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\n⚠️ Yönetim Notu: Sipariş sisteme kaydoldu, ödeme teyidi sonrası hazırlık sürecine alınabilir.\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
       
       // Demir Dev Studio (Merkez) Resmi WhatsApp Numarası
-      const whatsappNumber = "905528323906"; 
+      const whatsappNumber = getWhatsAppOrderDigits();
       window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
 
       setShowAddressModal(false);
@@ -202,30 +216,34 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-anthracite-900 border-b border-anthracite-100 pb-2"><Package className="w-5 h-5 text-emerald-500"/> Ürün ve Stok Durumu</h3>
                   
                   {/* BEDEN SEÇİMİ VE STOK GÖRÜNÜMÜ */}
+                  {stockIsFallback && (
+                    <p className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-3">
+                      Bu üründe ayrı stok satırı yok; tek seçenek gösteriliyor (eski kayıt veya standart seri). Yeni ürünlerde toptancı panelinden en az bir bedende stok girin.
+                    </p>
+                  )}
                   <div className="flex flex-wrap gap-3 mt-4">
-                    {product.stocks && Object.entries(product.stocks).length > 0 ? (
-                      Object.entries(product.stocks).map(([size, qty]: [string, any]) => (
-                        <button
-                          key={size}
-                          disabled={Number(qty) <= 0}
-                          onClick={() => setSelectedSize(size)}
-                          className={`px-5 py-3 rounded-xl font-black text-sm transition-all border-2 flex flex-col items-center gap-1 min-w-[70px] ${
-                            Number(qty) <= 0 
-                              ? 'bg-anthracite-50 border-anthracite-200 text-anthracite-300 cursor-not-allowed grayscale' 
-                              : selectedSize === size 
-                                ? 'bg-anthracite-900 border-anthracite-900 text-white shadow-lg scale-105' 
-                                : 'bg-white border-anthracite-200 text-anthracite-600 hover:border-anthracite-900'
-                          }`}
+                    {Object.entries(orderableStocks).map(([size, qty]) => (
+                      <button
+                        key={size}
+                        type="button"
+                        disabled={Number(qty) <= 0}
+                        onClick={() => setSelectedSize(size)}
+                        className={`px-5 py-3 rounded-xl font-black text-sm transition-all border-2 flex flex-col items-center gap-1 min-w-[70px] ${
+                          Number(qty) <= 0
+                            ? 'bg-anthracite-50 border-anthracite-200 text-anthracite-300 cursor-not-allowed grayscale'
+                            : selectedSize === size
+                              ? 'bg-anthracite-900 border-anthracite-900 text-white shadow-lg scale-105'
+                              : 'bg-white border-anthracite-200 text-anthracite-600 hover:border-anthracite-900'
+                        }`}
+                      >
+                        <span className="text-center break-words max-w-[100px]">{size}</span>
+                        <span
+                          className={`text-[9px] uppercase ${Number(qty) <= 0 ? 'text-red-400' : selectedSize === size ? 'text-white/60' : 'text-anthracite-400'}`}
                         >
-                          <span>{size}</span>
-                          <span className={`text-[9px] uppercase ${Number(qty) <= 0 ? 'text-red-400' : selectedSize === size ? 'text-white/60' : 'text-anthracite-400'}`}>
-                            {Number(qty) <= 0 ? 'Tükendi' : `${qty} Stok`}
-                          </span>
-                        </button>
-                      ))
-                    ) : (
-                      <span className="text-sm font-bold text-anthracite-400 italic">Bu üründe beden seçeneği yüklü değil.</span>
-                    )}
+                          {Number(qty) <= 0 ? 'Tükendi' : stockIsFallback ? 'Seri' : `${qty} Stok`}
+                        </span>
+                      </button>
+                    ))}
                   </div>
 
                   <div className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed bg-white border border-anthracite-200 p-5 rounded-2xl shadow-sm mt-6 overflow-hidden">

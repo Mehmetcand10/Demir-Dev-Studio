@@ -1,5 +1,7 @@
 "use client";
 
+/* Realtime: Supabase'te realtime_publication.sql ile notifications tablosu publication'a eklenmeli; yoksa liste yine çalışır, sadece anlık push olmaz. */
+
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { Bell, Check, Info, AlertTriangle, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";

@@ -35,6 +35,7 @@ export default function Register() {
           business_name: businessName,
           full_name: businessName, // Opsiyonel (Business Name'i İsim olarak da alıyoruz)
           phone_number: phone,
+          tax_id: taxId,
         }
       }
     });

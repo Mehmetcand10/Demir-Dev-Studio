@@ -12,6 +12,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import NotificationBell from '@/components/NotificationBell';
 import { ORDER_STATUS } from '@/utils/orderStatus';
+import { hasPositiveStockLine } from '@/utils/productStocks';
 
 type TabType = 'studio' | 'inventory' | 'orders' | 'finance';
 
@@ -37,6 +38,8 @@ export default function ToptanciDashboard() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [profileIban, setProfileIban] = useState('');
+  const [ibanSaving, setIbanSaving] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -59,10 +62,21 @@ export default function ToptanciDashboard() {
       if (user) {
         setUser(user);
         fetchData(user.id);
+        const { data: prof } = await supabase.from('profiles').select('iban').eq('id', user.id).single();
+        if (prof?.iban) setProfileIban(prof.iban);
       }
     }
     init();
-  }, [supabase.auth, fetchData]);
+  }, [supabase.auth, fetchData, supabase]);
+
+  const saveProfileIban = async () => {
+    if (!user) return;
+    setIbanSaving(true);
+    const { error } = await supabase.from('profiles').update({ iban: profileIban.trim() || null }).eq('id', user.id);
+    setIbanSaving(false);
+    if (error) alert('IBAN kaydedilemedi: ' + error.message);
+    else alert('IBAN kaydedildi. Admin hakediş ekranında görüntülenebilir.');
+  };
 
   const clearForm = () => {
      setName(''); setFabricType(''); setWholesalePrice(''); setSelectedFiles([]); setPreviewUrls([]); setGsm(''); setSizes(''); setMinOrder('');
@@ -85,10 +99,16 @@ export default function ToptanciDashboard() {
         uploadedUrls.push(publicUrl);
       }
 
-      const stocksJson = stockEntries.reduce((acc: any, curr) => {
+      const stocksJson = stockEntries.reduce((acc: Record<string, number>, curr) => {
         if (curr.size.trim()) acc[curr.size.trim()] = Number(curr.quantity);
         return acc;
       }, {});
+
+      if (!hasPositiveStockLine(stocksJson)) {
+        alert('En az bir bedende stok adedi 1 veya üzeri olmalı. Standart seri için tek beden adı (ör. Standart) ve miktar girin.');
+        setIsAddingProduct(false);
+        return;
+      }
 
       const { error: dbError } = await supabase.from('products').insert([{
         wholesaler_id: user.id, name, category, gender, stocks: stocksJson, fabric_type: fabricType, gsm: gsm || null, images: uploadedUrls,
@@ -431,6 +451,29 @@ export default function ToptanciDashboard() {
             {/* FINANCE TAB */}
             {activeTab === 'finance' && (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 text-left">
+                    <div className="lg:col-span-12 bg-white border border-anthracite-100 rounded-[2rem] p-8 shadow-lg">
+                        <h3 className="text-lg font-black text-anthracite-900 mb-2 flex items-center gap-2">
+                          <Wallet className="w-5 h-5 text-blue-500" /> Ödeme IBAN (admin hakedişte görünür)
+                        </h3>
+                        <p className="text-xs font-medium text-anthracite-500 mb-4">Havale ödemeleri için işletme IBANınızı girin; yönetim bu karttan kopyalayabilir.</p>
+                        <div className="flex flex-col sm:flex-row gap-3 max-w-3xl">
+                          <input
+                            type="text"
+                            value={profileIban}
+                            onChange={(e) => setProfileIban(e.target.value)}
+                            className="flex-1 px-5 py-4 rounded-2xl border border-anthracite-200 bg-anthracite-50 font-mono text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                            placeholder="TR00 0000 0000 0000 0000 0000 00"
+                          />
+                          <button
+                            type="button"
+                            disabled={ibanSaving}
+                            onClick={saveProfileIban}
+                            className="px-8 py-4 rounded-2xl bg-anthracite-900 text-white font-black text-xs uppercase tracking-widest disabled:opacity-50"
+                          >
+                            {ibanSaving ? 'Kaydediliyor...' : 'IBAN Kaydet'}
+                          </button>
+                        </div>
+                    </div>
                     <div className="lg:col-span-4 bg-emerald-500 p-10 rounded-[3rem] text-white shadow-2xl shadow-emerald-500/20 group relative overflow-hidden h-max">
                         <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform">
                             <ChartIcon className="w-48 h-48" />
