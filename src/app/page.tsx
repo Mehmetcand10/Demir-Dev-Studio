@@ -197,12 +197,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* —— Koyu bant: güven + görsel (sol metin: tam opak kutu, görsel URL aynı) —— */}
-      <section
-        className="relative isolate overflow-hidden text-white"
-        style={{ backgroundColor: "#09090b" }}
-      >
-        <div className="pointer-events-none absolute inset-0 opacity-[0.14]">
+      {/* —— Arka plan: mağaza görseli görünsün; sol metin ayrı opak kutuda —— */}
+      <section className="relative isolate min-h-0 overflow-hidden bg-anthracite-900 text-white">
+        <div className="pointer-events-none absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1400&auto=format&fit=crop"
             alt=""
@@ -211,10 +208,9 @@ export default function Home() {
             sizes="100vw"
           />
         </div>
-        {/* Tam opak katman: cam/şeffaflık yok */}
+        {/* Hafif karartma: fotoğraf okunur kalsın, tam siyah değil */}
         <div
-          className="pointer-events-none absolute inset-0"
-          style={{ backgroundColor: "rgba(9, 9, 11, 0.97)" }}
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-black/45 via-black/25 to-black/50"
           aria-hidden
         />
 
