@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/server';
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { SiteBackground } from "@/components/layout/SiteBackground";
 import SiteFooter from "@/components/layout/SiteFooter";
+import SignOutButton from "@/components/auth/SignOutButton";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -106,11 +107,7 @@ export default async function RootLayout({
                   >
                     Şifre
                   </Link>
-                  <form action="/auth/signout" method="post">
-                    <button type="submit" className="rounded-lg border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50">
-                      Çıkış
-                    </button>
-                  </form>
+                  <SignOutButton />
                 </div>
               ) : (
                 <Link href="/login" className="ml-1 flex h-9 items-center rounded-lg bg-anthracite-900 px-4 text-sm font-medium text-white transition hover:bg-anthracite-800">Giriş</Link>
