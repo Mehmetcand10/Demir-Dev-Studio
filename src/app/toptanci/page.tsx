@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { 
   Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck, 
   Loader2, LayoutDashboard, ShoppingBag, Wallet, PieChart as ChartIcon, 
-  ArrowRight, CheckCircle2, QrCode, FileText, MoveRight, Layers, History as HistoryIcon
+  ArrowRight, CheckCircle2, QrCode, FileText, MoveRight, Layers, History as HistoryIcon, Pencil
 } from 'lucide-react';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { createClient } from '@/utils/supabase/client';
@@ -198,6 +198,13 @@ export default function ToptanciDashboard() {
                                   )}
                                   <Image src={p.images?.[0]} alt="p" fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                                   <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                      <Link
+                                        href={`/toptanci/edit/${p.id}`}
+                                        className="flex items-center justify-center rounded-lg bg-emerald-600 p-2 text-white shadow-md transition hover:bg-emerald-700"
+                                        title="Düzenle"
+                                      >
+                                          <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
+                                      </Link>
                                       <button type="button" onClick={() => handleDelete(p.id)} className="p-2 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition-all">
                                           <Trash2 className="w-3.5 h-3.5" />
                                       </button>

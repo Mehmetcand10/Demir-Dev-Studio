@@ -243,6 +243,10 @@ export const BULK_COLUMN_HELP: { key: string; tr: string; ornek: string }[] = [
   { key: "fiyat", tr: "Sizin toptan birim fiyatiniz (TL)", ornek: "450" },
   { key: "moq", tr: "Minimum siparis (seri adedi)", ornek: "6" },
   { key: "s, m, l, xl", tr: "Beden basina stok adedi", ornek: "10; 15; 0; 0" },
-  { key: "gorsel_url", tr: "En az bir https goruntu adresi; birkac ise | ile", ornek: "https://..." },
+  {
+    key: "gorsel_url",
+    tr: "İstediğiniz kadar https adresi (sınır: yükleme sonrası düzenlemede ~24); aynı hücrede | veya alt alta satır",
+    ornek: "url1|url2|url3",
+  },
   { key: "dusuk_stok", tr: "Toplam stok uyari esigi (bos = 5)", ornek: "5" },
 ];

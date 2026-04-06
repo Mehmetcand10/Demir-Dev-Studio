@@ -146,6 +146,12 @@ export default function YardimPage() {
               <strong>noktalı virgüllü (;)</strong> ve <strong>Türkçe başlıklı</strong> şablon önerir; açılışta sütunlar düzgün
               görünür. İngilizce virgüllü alternatif şablon da indirilebilir.
             </p>
+            <p className="mt-2 text-xs text-anthracite-700">
+              <strong>Çoklu görsel:</strong> <code className="rounded bg-white/90 px-1">gorsel_url</code> hücresine birden fazla{" "}
+              <code className="rounded bg-white/90 px-1">https://</code> adresini <strong>|</strong> ile yazabilir veya her
+              adresi alt satıra alabilirsiniz. Yükleme sonrası fiyat/stok/görsel düzeltmek için vitrinde ürün kartındaki{" "}
+              <strong>düzenle</strong> (kalem) ile sayfayı açın.
+            </p>
             <p className="mt-2 text-xs text-anthracite-600">
               Sütun sözlüğü panelde <strong>«Sütunların anlamı»</strong> altında tablo halindedir.
             </p>

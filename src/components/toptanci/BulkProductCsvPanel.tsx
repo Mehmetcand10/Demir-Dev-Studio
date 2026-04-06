@@ -117,7 +117,8 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
           <h3 className="text-sm font-semibold text-anthracite-900">Toplu ürün (Excel / CSV)</h3>
           <p className="mt-2 text-xs leading-relaxed text-anthracite-600">
             <strong className="text-anthracite-800">Nasıl çalışır?</strong> Şablonda her <strong>satır = bir ürün</strong>.
-            Dosyayı kaydedip buradan yükleyin; sistem satırları okuyup vitrine ekler. Önce Supabase’de{" "}
+            Hata olursa vitrinde ürün kartındaki <strong>düzenle</strong> (kalem) ile fiyat/stok/görsel güncelleyin. Dosyayı
+            kaydedip buradan yükleyin; sistem satırları okuyup vitrine ekler. Önce Supabase’de{" "}
             <code className="rounded bg-white/90 px-1 text-[10px]">product_bulk_and_alerts.sql</code> çalışmış olmalı.
           </p>
           <p className="mt-2 text-xs leading-relaxed text-amber-900/90">
