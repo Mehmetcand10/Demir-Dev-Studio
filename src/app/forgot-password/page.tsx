@@ -28,7 +28,7 @@ export default function ForgotPassword() {
       setError(
         detail
           ? `İşlem başarısız: ${detail}`
-          : "E-posta gönderilemedi. Adresin kayıtlı olduğundan veya Supabase yönlendirme URL ayarlarınızın doğru olduğundan emin olun."
+          : "E-posta gönderilemedi. Adresin kayıtlı olduğundan emin olun veya destek ile iletişime geçin."
       );
     } else setSuccess(true);
     
@@ -56,10 +56,8 @@ export default function ForgotPassword() {
         ) : (
           <>
             <p className="mb-6 text-sm text-anthracite-600">
-              Kayıtlı e-postanızı girin; size sıfırlama bağlantısı gönderelim. Bağlantı çalışmazsa
-              Supabase → Authentication → URL Configuration içinde bu site ve{" "}
-              <code className="rounded bg-anthracite-100 px-1 text-[11px]">/reset-password</code>{" "}
-              izinli olmalıdır.
+              Kayıtlı e-postanızı girin; size sıfırlama bağlantısı gönderelim. Bağlantı açılmaz veya e-posta gelmezse spam
+              klasörüne bakın; sorun sürerse site yöneticinizden veya destekten yardım isteyin.
             </p>
             
             {error && <div className="mb-4 rounded-xl border border-red-100 bg-red-50/90 p-3 text-sm text-red-700">{error}</div>}

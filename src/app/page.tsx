@@ -247,13 +247,8 @@ export default function Home() {
           </div>
           <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-neutral-600">
             <strong className="text-anthracite-900">Davetli beta:</strong> Yeni toptancılar tek tek onboard edilir; ürün
-            yükleme, stok ve kargo adımlarında ilk hafta operasyon tarafından sıkı yönlendirme yapılır. Gerçek ortak
-            sayılarınızı göstermek için{" "}
-            <code className="rounded bg-anthracite-100 px-1.5 py-0.5 text-xs">NEXT_PUBLIC_TRUST_APPROVED_BOUTIQUES</code>{" "}
-            ve{" "}
-            <code className="rounded bg-anthracite-100 px-1.5 py-0.5 text-xs">NEXT_PUBLIC_TRUST_APPROVED_WHOLESALERS</code>{" "}
-            ortam değişkenlerini doldurun; şehir için{" "}
-            <code className="rounded bg-anthracite-100 px-1.5 py-0.5 text-xs">NEXT_PUBLIC_TRUST_CITY</code>.
+            yükleme, stok ve kargo adımlarında ilk hafta operasyon tarafından sıkı yönlendirme yapılır. Bu bölümdeki ortak
+            sayıları ve şehir bilgisini güncellemek için yönetim ekibiyle iletişime geçebilirsiniz.
           </p>
         </div>
       </section>

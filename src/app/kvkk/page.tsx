@@ -68,8 +68,7 @@ export default function KvkkPage() {
       </div>
 
       <p className="mt-10 text-center text-xs text-anthracite-500">
-        Harici veya PDF metin kullanmak için ortam değişkeni{" "}
-        <code className="rounded bg-anthracite-100 px-1 py-0.5">NEXT_PUBLIC_KVKK_URL</code> tanımlanabilir.
+        Harici site veya PDF üzerinden KVKK metni göstermek için teknik yapılandırma gerekir; yönetim ekibine danışın.
       </p>
     </div>
   );

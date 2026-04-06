@@ -118,8 +118,8 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
           <p className="mt-2 text-xs leading-relaxed text-anthracite-600">
             <strong className="text-anthracite-800">Nasıl çalışır?</strong> Şablonda her <strong>satır = bir ürün</strong>.
             Hata olursa vitrinde ürün kartındaki <strong>düzenle</strong> (kalem) ile fiyat/stok/görsel güncelleyin. Dosyayı
-            kaydedip buradan yükleyin; sistem satırları okuyup vitrine ekler. Önce Supabase’de{" "}
-            <code className="rounded bg-white/90 px-1 text-[10px]">product_bulk_and_alerts.sql</code> çalışmış olmalı.
+            kaydedip buradan yükleyin; sistem satırları okuyup vitrine ekler. Yükleme çalışmazsa sunucu tarafı ayarları
+            eksik olabilir — destek veya site yöneticinize bildirin.
           </p>
           <p className="mt-2 text-xs leading-relaxed text-amber-900/90">
             <strong>Excel Türkiye ipucu:</strong> Virgüllü CSV bazen tüm hücreyi <strong>tek sütunda</strong> açar. Bu yüzden

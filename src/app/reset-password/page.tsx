@@ -56,7 +56,7 @@ export default function ResetPassword() {
           if (cancelled) return;
           if (exErr) {
             setInitError(
-              "Bağlantı geçersiz veya süresi dolmuş (PKCE). «Şifremi unuttum» ile yeni e-posta isteyin."
+              "Bağlantı geçersiz veya süresi dolmuş. «Şifremi unuttum» ile yeni e-posta isteyin."
             );
             setSessionChecked(true);
             return;

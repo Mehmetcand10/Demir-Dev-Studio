@@ -239,8 +239,7 @@ export default function YardimPage() {
                   className="font-semibold text-emerald-800 underline-offset-2 hover:underline"
                 >
                   {contact.whatsappDisplay}
-                </a>{" "}
-                (ortam değişkeni: <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_WHATSAPP_E164</code>)
+                </a>
               </span>
             </li>
             {contact.supportEmailHref ? (
@@ -257,8 +256,8 @@ export default function YardimPage() {
               <li className="flex gap-2 text-anthracite-600">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-anthracite-400" strokeWidth={2} />
                 <span>
-                  <strong className="text-anthracite-800">Destek e-posta:</strong> Canlı ortamda{" "}
-                  <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_SUPPORT_EMAIL</code> tanımlayın; footer ve bu alan otomatik dolar.
+                  <strong className="text-anthracite-800">Destek e-posta:</strong> Henüz yapılandırılmadı. Footer ve bu
+                  bölümde görünmesi için site yöneticiniz barındırma (hosting) panelinden destek e-postası tanımlayabilir.
                 </span>
               </li>
             )}
@@ -285,9 +284,7 @@ export default function YardimPage() {
                 <LegalLink href={contact.kvkkHref}>KVKK sayfası</LegalLink>
                 {" · "}
                 <LegalLink href={contact.mesafeliHref}>Mesafeli satış</LegalLink>
-                . Harici PDF veya site için{" "}
-                <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_KVKK_URL</code> /{" "}
-                <code className="rounded bg-white/80 px-1 py-0.5 text-xs">NEXT_PUBLIC_MESAFELI_SATIS_URL</code> kullanılabilir.
+                . Bu metinler harici bir adrese veya PDF’e yönlendirilecek şekilde de ayarlanabilir (teknik ekip).
               </span>
             </li>
           </ul>
@@ -296,11 +293,11 @@ export default function YardimPage() {
         <section className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-6 sm:p-8">
           <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
             <Wallet className="h-5 w-5 text-amber-600" strokeWidth={2} />
-            Yayın öncesi kontrol listesi (sizin için)
+            Yayın öncesi kontrol listesi (yönetim / operasyon)
           </h2>
           <ul className="space-y-2 text-sm text-anthracite-800">
             <li>• Toptancılara net MOQ, seri fiyat ve stok girişi konusunda kısa eğitim / PDF verin.</li>
-            <li>• WhatsApp sipariş hattı: <code className="rounded bg-white/80 px-1 text-xs">NEXT_PUBLIC_WHATSAPP_E164</code> canlıda doğru olmalı.</li>
+            <li>• Footer ve sipariş akışındaki WhatsApp numarasının canlı sitede güncel ve doğru olduğunu kontrol edin.</li>
             <li>
               • Operasyon SLA metnini yayınlayın:{" "}
               <Link href="/yardim#sla" className="font-semibold text-emerald-800 underline-offset-2 hover:underline">
@@ -308,8 +305,8 @@ export default function YardimPage() {
               </Link>
               .
             </li>
-            <li>• KVKK ve mesafeli satış metinlerini hukuk danışmanınızla netleştirip sayfaları veya PDF bağlantılarını güncelleyin.</li>
-            <li>• Destek kanalı: footer’da e-posta / telefon için env değişkenlerini doldurun.</li>
+            <li>• KVKK ve mesafeli satış metinlerini hukuk danışmanınızla netleştirip sayfaları veya bağlantıları güncelleyin.</li>
+            <li>• Destek e-postası ve telefonun footer’da görünmesi için barındırma ayarlarında iletişim bilgilerini tanımlayın.</li>
           </ul>
         </section>
 
@@ -319,7 +316,8 @@ export default function YardimPage() {
             Bildirimler
           </h2>
           <p className="text-sm leading-relaxed text-anthracite-700">
-            Giriş yaptıktan sonra bazı ekranlarda bildirim zili görünür; yönetim ve sipariş olayları burada listelenir (Supabase realtime açıksa anlık güncellenir).
+            Giriş yaptıktan sonra bazı ekranlarda bildirim zili görünür; yönetim ve sipariş olayları burada listelenir (anlık
+            güncelleme sunucu ayarına bağlıdır).
           </p>
         </section>
 

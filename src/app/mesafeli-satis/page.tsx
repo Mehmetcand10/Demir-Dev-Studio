@@ -73,8 +73,7 @@ export default function MesafeliSatisPage() {
       </div>
 
       <p className="mt-10 text-center text-xs text-anthracite-500">
-        Harici sözleşme PDF’si için{" "}
-        <code className="rounded bg-anthracite-100 px-1 py-0.5">NEXT_PUBLIC_MESAFELI_SATIS_URL</code> tanımlanabilir.
+        Harici sözleşme PDF’si veya farklı bir adrese yönlendirme için teknik yapılandırma gerekir; yönetim ekibine danışın.
       </p>
     </div>
   );
