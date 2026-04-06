@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
+import { createImplicitRecoveryClient } from "@/utils/supabase/recovery-client";
 import { LockKeyhole, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { AuthCard } from "@/components/layout/AuthCard";
 
 async function waitForSession(
-  supabase: ReturnType<typeof createClient>,
-  maxMs = 6000
+  supabase: SupabaseClient,
+  maxMs = 8000
 ) {
-  const step = 180;
+  const step = 200;
   for (let t = 0; t < maxMs; t += step) {
     const {
       data: { session },
@@ -31,41 +33,55 @@ export default function ResetPassword() {
   const [allowReset, setAllowReset] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  const supabaseRef = useRef<SupabaseClient | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     void (async () => {
       try {
-        if (typeof window !== "undefined") {
-          const url = new URL(window.location.href);
-          if (url.searchParams.has("code")) {
-            const { error: exErr } = await supabase.auth.exchangeCodeForSession(
-              window.location.href
+        if (typeof window === "undefined") return;
+
+        const url = new URL(window.location.href);
+        const hasPkceCode = url.searchParams.has("code");
+
+        let client: SupabaseClient;
+        let session: Session | null = null;
+
+        if (hasPkceCode) {
+          client = createClient();
+          const { error: exErr } = await client.auth.exchangeCodeForSession(
+            window.location.href
+          );
+          if (cancelled) return;
+          if (exErr) {
+            setInitError(
+              "Bağlantı geçersiz veya süresi dolmuş (PKCE). «Şifremi unuttum» ile yeni e-posta isteyin."
             );
-            if (cancelled) return;
-            if (exErr) {
-              setInitError(
-                "Bağlantı geçersiz veya süresi dolmuş. Giriş sayfasından «Şifremi unuttum» ile yeni e-posta isteyin."
-              );
-              setSessionChecked(true);
-              return;
-            }
-            window.history.replaceState({}, "", `${url.pathname}${url.hash}`);
+            setSessionChecked(true);
+            return;
+          }
+          window.history.replaceState({}, "", `${url.pathname}${url.hash}`);
+          const { data: d1 } = await client.auth.getSession();
+          session = d1.session;
+        } else {
+          client = createImplicitRecoveryClient();
+          await client.auth.getSession();
+          const { data: d2 } = await client.auth.getSession();
+          session = d2.session;
+          if (!session) {
+            session = await waitForSession(client);
           }
         }
 
-        let session = (await supabase.auth.getSession()).data.session;
-        if (!session) {
-          session = await waitForSession(supabase);
-        }
         if (cancelled) return;
+
         if (session) {
+          supabaseRef.current = client;
           setAllowReset(true);
         } else {
           setInitError(
-            "Kimlik doğrulama oturumu bulunamadı. E-postadaki «şifre sıfırlama» bağlantısına tıkladıysanız süre dolmuş olabilir; yeni bir bağlantı isteyin."
+            "Kimlik doğrulama oturumu bulunamadı. E-postadaki bağlantıya tıkladıysanız süre dolmuş olabilir veya bağlantı eksik gelmiş olabilir; yeni bir «şifremi unuttum» isteği gönderin."
           );
         }
       } catch {
@@ -82,7 +98,7 @@ export default function ResetPassword() {
     return () => {
       cancelled = true;
     };
-  }, [supabase]);
+  }, []);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,18 +113,30 @@ export default function ResetPassword() {
     setLoading(true);
     setError(null);
 
+    const supabase = supabaseRef.current;
+    if (!supabase) {
+      setLoading(false);
+      setError(
+        "Oturum hazır değil. Bu sayfaya e-postadaki bağlantı ile gelmelisiniz."
+      );
+      return;
+    }
+
     const {
       data: { session },
     } = await supabase.auth.getSession();
     if (!session) {
       setLoading(false);
       setError(
-        "Oturum yok. Bu sayfaya e-postadaki sıfırlama bağlantısı ile gelmelisiniz."
+        "Oturum yok. Bağlantıyı e-postadan tekrar açın veya yeni sıfırlama isteyin."
       );
       return;
     }
 
     const { error: upErr } = await supabase.auth.updateUser({ password });
+    if (!upErr) {
+      await supabase.auth.signOut();
+    }
     setLoading(false);
     if (upErr) {
       setError(

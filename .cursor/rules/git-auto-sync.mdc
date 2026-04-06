@@ -5,7 +5,9 @@ alwaysApply: true
 
 # GitHub otomatik senkron
 
-Bu repoda (`b2b-portal`) kod veya içerik değişikliği yapan bir görevi bitirdiğinde, kullanıcı ayrıca söylemese bile:
+**Varsayılan:** Kullanıcı «GitHub’a gönder» demese bile bu repoda yapılan iş bitince commit + push yapılır.
+
+Bu repoda (`b2b-portal`) kod veya içerik değişikliği yapan bir görevi bitirdiğinde:
 
 1. `git status` ile durumu kontrol et.
 2. Anlamlı değişiklik varsa: ilgili dosyaları stage et (tercihen yaptığın değişiklikler; gereksiz yere tüm repo yerine mantıklı `git add`). `public/sw.js` gibi build çıktıları projede takip ediliyorsa ve görevle ilgiliyse dahil et.

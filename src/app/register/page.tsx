@@ -26,18 +26,21 @@ export default function Register() {
     setIsLoading(true);
     setError(null);
 
+    const meta: Record<string, string> = {
+      role,
+      business_name: businessName,
+      full_name: businessName,
+      phone_number: phone,
+    };
+    const trimmedTax = taxId.trim();
+    if (trimmedTax) meta.tax_id = trimmedTax;
+
     const { error: authError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          role: role,
-          business_name: businessName,
-          full_name: businessName,
-          phone_number: phone,
-          tax_id: taxId,
-        }
-      }
+        data: meta,
+      },
     });
 
     if (authError) {
@@ -128,9 +131,24 @@ export default function Register() {
           </div>
           
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Vergi no</label>
-              <input required type="text" value={taxId} onChange={(e) => setTaxId(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" placeholder="VKN" />
+            <div className="sm:col-span-1">
+              <label className="mb-1.5 block text-xs font-medium text-anthracite-600">
+                Vergi no{" "}
+                <span className="font-normal text-anthracite-400">(isteğe bağlı)</span>
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                value={taxId}
+                onChange={(e) => setTaxId(e.target.value)}
+                className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15"
+                placeholder="VKN — boş bırakılabilir"
+              />
+              <p className="mt-1.5 text-[11px] leading-snug text-anthracite-500">
+                Fatura ve resmi kayıt için kullanılır; şimdilik boş bırakıp onay veya ilk sipariş öncesi
+                yönetimle paylaşabilirsiniz.
+              </p>
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Telefon</label>

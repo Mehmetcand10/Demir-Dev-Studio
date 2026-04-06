@@ -23,8 +23,14 @@ export default function ForgotPassword() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
-    if (error) setError("E-posta gönderilemedi. Adresin kayıtlı olduğundan emin olun.");
-    else setSuccess(true);
+    if (error) {
+      const detail = error.message?.trim();
+      setError(
+        detail
+          ? `İşlem başarısız: ${detail}`
+          : "E-posta gönderilemedi. Adresin kayıtlı olduğundan veya Supabase yönlendirme URL ayarlarınızın doğru olduğundan emin olun."
+      );
+    } else setSuccess(true);
     
     setLoading(false);
   };
@@ -50,7 +56,10 @@ export default function ForgotPassword() {
         ) : (
           <>
             <p className="mb-6 text-sm text-anthracite-600">
-              Kayıtlı e-postanızı girin; şifre yenileme bağlantısı gönderelim.
+              Kayıtlı e-postanızı girin; size sıfırlama bağlantısı gönderelim. Bağlantı çalışmazsa
+              Supabase → Authentication → URL Configuration içinde bu site ve{" "}
+              <code className="rounded bg-anthracite-100 px-1 text-[11px]">/reset-password</code>{" "}
+              izinli olmalıdır.
             </p>
             
             {error && <div className="mb-4 rounded-xl border border-red-100 bg-red-50/90 p-3 text-sm text-red-700">{error}</div>}

@@ -77,8 +77,18 @@ export default function Login() {
               className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/15"
               placeholder="••••••••"
             />
-            <div className="mt-2 flex justify-end">
-              <Link href="/forgot-password" className="text-xs font-medium text-anthracite-500 transition hover:text-anthracite-800">Şifremi unuttum</Link>
+            <div className="mt-2 flex flex-col items-end gap-1">
+              <Link href="/forgot-password" className="text-xs font-medium text-anthracite-500 transition hover:text-anthracite-800">
+                Şifremi unuttum
+              </Link>
+              <span className="max-w-[18rem] text-right text-[11px] leading-snug text-anthracite-400">
+                Şifreyi biliyorsanız ve değiştirmek istiyorsanız önce giriş yapın; sonra üst menüden{" "}
+                <strong className="font-medium text-anthracite-600">Şifre</strong> (veya{" "}
+                <Link href="/hesap/sifre" className="font-medium text-emerald-700 hover:underline">
+                  /hesap/sifre
+                </Link>
+                ).
+              </span>
             </div>
           </div>
 
