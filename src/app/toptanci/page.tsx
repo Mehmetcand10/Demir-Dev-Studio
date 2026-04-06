@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { 
   Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck, 
   Loader2, LayoutDashboard, ShoppingBag, Wallet, PieChart as ChartIcon, 
-  ArrowRight, CheckCircle2, QrCode, FileText, MoveRight, Layers, History as HistoryIcon, Pencil
+  ArrowRight, CheckCircle2, QrCode, FileText, MoveRight, Layers, History as HistoryIcon, Pencil,
+  ShieldAlert
 } from 'lucide-react';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { createClient } from '@/utils/supabase/client';
@@ -44,6 +45,8 @@ export default function ToptanciDashboard() {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [profileIban, setProfileIban] = useState('');
   const [ibanSaving, setIbanSaving] = useState(false);
+  const [minOrderFloor, setMinOrderFloor] = useState('');
+  const [minOrderFloorSaving, setMinOrderFloorSaving] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -66,8 +69,13 @@ export default function ToptanciDashboard() {
       if (user) {
         setUser(user);
         fetchData(user.id);
-        const { data: prof } = await supabase.from('profiles').select('iban').eq('id', user.id).single();
+        const { data: prof } = await supabase.from('profiles').select('iban, min_order_floor_units').eq('id', user.id).single();
         if (prof?.iban) setProfileIban(prof.iban);
+        if (prof?.min_order_floor_units != null && Number(prof.min_order_floor_units) > 0) {
+          setMinOrderFloor(String(prof.min_order_floor_units));
+        } else {
+          setMinOrderFloor('');
+        }
       }
     }
     init();
@@ -80,6 +88,28 @@ export default function ToptanciDashboard() {
     setIbanSaving(false);
     if (error) alert('IBAN kaydedilemedi: ' + error.message);
     else alert('IBAN kaydedildi. Admin hakediş ekranında görüntülenebilir.');
+  };
+
+  const saveMinOrderFloor = async () => {
+    if (!user) return;
+    const raw = minOrderFloor.trim();
+    let val: number | null = null;
+    if (raw !== '') {
+      const n = parseInt(raw, 10);
+      if (!Number.isFinite(n) || n < 1) {
+        alert('Geçerli bir pozitif tam sayı girin veya alanı boş bırakın.');
+        return;
+      }
+      val = n;
+    }
+    setMinOrderFloorSaving(true);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ min_order_floor_units: val })
+      .eq('id', user.id);
+    setMinOrderFloorSaving(false);
+    if (error) alert('Kaydedilemedi: ' + error.message);
+    else alert(val == null ? 'Mağaza tabanı kaldırıldı (yalnızca ürün MOQ geçerli).' : `Tek sipariş minimum ${val} adet olarak kaydedildi.`);
   };
 
   const clearForm = () => {
@@ -174,6 +204,50 @@ export default function ToptanciDashboard() {
                             <p className="mt-1 text-sm text-anthracite-500">Katalogda görünen ürünleriniz.</p>
                         </div>
                         <button type="button" onClick={() => setActiveTab('studio')} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-xs font-medium text-white shadow-sm transition hover:bg-emerald-700">Yeni ürün ekle</button>
+                    </div>
+
+                    <div className="mb-8 rounded-2xl border border-amber-200/90 bg-gradient-to-br from-amber-50/90 to-white p-5 shadow-sm sm:p-6">
+                      <div className="mb-3 flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+                          <ShieldAlert className="h-5 w-5" strokeWidth={2} />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h3 className="text-sm font-semibold text-anthracite-900 sm:text-base">
+                            Mağaza satış politikası
+                          </h3>
+                          <p className="mt-1 text-xs leading-relaxed text-anthracite-600 sm:text-sm">
+                            Örneğin «500 adetin altına satmıyorum» diyorsanız buraya{" "}
+                            <strong className="font-medium text-anthracite-800">tek siparişte</strong> kabul
+                            edeceğiniz minimum <strong className="font-medium text-anthracite-800">toplam adet</strong>{" "}
+                            yazın. Butik bu adedin altında sipariş veremez (ürün MOQ&apos;suna ek olarak).
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                        <div className="flex-1">
+                          <label htmlFor="min-order-floor" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wide text-anthracite-500">
+                            Minimum toplam adet (tek sipariş)
+                          </label>
+                          <input
+                            id="min-order-floor"
+                            type="number"
+                            min={1}
+                            inputMode="numeric"
+                            placeholder="Örn. 500 — boş bırakırsanız sınır yok"
+                            value={minOrderFloor}
+                            onChange={(e) => setMinOrderFloor(e.target.value)}
+                            className="w-full rounded-xl border border-anthracite-200/90 bg-white px-4 py-3 text-sm outline-none ring-emerald-500/0 transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          disabled={minOrderFloorSaving}
+                          onClick={saveMinOrderFloor}
+                          className="shrink-0 rounded-xl bg-anthracite-900 px-6 py-3 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-anthracite-800 disabled:opacity-50"
+                        >
+                          {minOrderFloorSaving ? 'Kaydediliyor…' : 'Kaydet'}
+                        </button>
+                      </div>
                     </div>
 
                     {user && (

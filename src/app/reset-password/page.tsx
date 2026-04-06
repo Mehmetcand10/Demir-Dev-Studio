@@ -1,51 +1,187 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { LockKeyhole } from 'lucide-react';
-import Link from 'next/link';
-import { AuthCard } from '@/components/layout/AuthCard';
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { LockKeyhole, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { AuthCard } from "@/components/layout/AuthCard";
+
+async function waitForSession(
+  supabase: ReturnType<typeof createClient>,
+  maxMs = 6000
+) {
+  const step = 180;
+  for (let t = 0; t < maxMs; t += step) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session) return session;
+    await new Promise((r) => setTimeout(r, step));
+  }
+  return null;
+}
 
 export default function ResetPassword() {
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const [sessionChecked, setSessionChecked] = useState(false);
+  const [allowReset, setAllowReset] = useState(false);
+  const [initError, setInitError] = useState<string | null>(null);
+
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange(async (event) => {
-      if (event == "PASSWORD_RECOVERY") {
-        // recovery session active
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          if (url.searchParams.has("code")) {
+            const { error: exErr } = await supabase.auth.exchangeCodeForSession(
+              window.location.href
+            );
+            if (cancelled) return;
+            if (exErr) {
+              setInitError(
+                "Bağlantı geçersiz veya süresi dolmuş. Giriş sayfasından «Şifremi unuttum» ile yeni e-posta isteyin."
+              );
+              setSessionChecked(true);
+              return;
+            }
+            window.history.replaceState({}, "", `${url.pathname}${url.hash}`);
+          }
+        }
+
+        let session = (await supabase.auth.getSession()).data.session;
+        if (!session) {
+          session = await waitForSession(supabase);
+        }
+        if (cancelled) return;
+        if (session) {
+          setAllowReset(true);
+        } else {
+          setInitError(
+            "Kimlik doğrulama oturumu bulunamadı. E-postadaki «şifre sıfırlama» bağlantısına tıkladıysanız süre dolmuş olabilir; yeni bir bağlantı isteyin."
+          );
+        }
+      } catch {
+        if (!cancelled) {
+          setInitError(
+            "Oturum başlatılamadı. Sayfayı yenileyin veya yeni sıfırlama e-postası isteyin."
+          );
+        }
+      } finally {
+        if (!cancelled) setSessionChecked(true);
       }
-    });
-  }, [supabase.auth]);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(password.length < 6) return setError("Şifre en az 6 karakter olmalıdır.");
+    if (password.length < 6) {
+      setError("Şifre en az 6 karakter olmalıdır.");
+      return;
+    }
+    if (password !== confirm) {
+      setError("Şifreler eşleşmiyor.");
+      return;
+    }
     setLoading(true);
     setError(null);
-    
-    const { error } = await supabase.auth.updateUser({ password: password });
 
-    if (error) setError("Şifre güncellenemedi: " + error.message);
-    else setSuccess(true);
-    
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      setLoading(false);
+      setError(
+        "Oturum yok. Bu sayfaya e-postadaki sıfırlama bağlantısı ile gelmelisiniz."
+      );
+      return;
+    }
+
+    const { error: upErr } = await supabase.auth.updateUser({ password });
     setLoading(false);
+    if (upErr) {
+      setError(
+        "Şifre güncellenemedi: " +
+          (upErr.message || "Bilinmeyen hata. Tekrar deneyin.")
+      );
+    } else {
+      setSuccess(true);
+    }
   };
+
+  if (!sessionChecked) {
+    return (
+      <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
+        <AuthCard className="max-w-md text-center">
+          <Loader2 className="mx-auto h-10 w-10 animate-spin text-emerald-600" />
+          <p className="mt-4 text-sm font-medium text-anthracite-600">
+            Bağlantı doğrulanıyor…
+          </p>
+        </AuthCard>
+      </div>
+    );
+  }
+
+  if (initError && !allowReset) {
+    return (
+      <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
+        <AuthCard className="max-w-md text-center">
+          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-amber-100 bg-amber-50 text-amber-800">
+            <LockKeyhole className="h-6 w-6" strokeWidth={2} />
+          </div>
+          <h1 className="mb-2 text-xl font-semibold text-anthracite-900">
+            Şifre sıfırlama
+          </h1>
+          <p className="mb-6 text-sm text-anthracite-600">{initError}</p>
+          <div className="flex flex-col gap-2">
+            <Link
+              href="/forgot-password"
+              className="inline-block w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800"
+            >
+              Yeni bağlantı iste
+            </Link>
+            <Link
+              href="/login"
+              className="inline-block w-full rounded-xl border border-anthracite-200 py-3 text-sm font-medium text-anthracite-700 transition hover:bg-anthracite-50"
+            >
+              Girişe dön
+            </Link>
+          </div>
+        </AuthCard>
+      </div>
+    );
+  }
 
   if (success) {
     return (
       <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
         <AuthCard className="max-w-md text-center">
-           <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-             <LockKeyhole className="h-7 w-7" strokeWidth={2} />
-           </div>
-           <h2 className="mb-2 text-xl font-semibold text-anthracite-900">Şifre güncellendi</h2>
-           <p className="mb-6 text-sm text-anthracite-600">Yeni şifrenizle giriş yapabilirsiniz.</p>
-           <Link href="/login" className="inline-block w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800">Giriş yap</Link>
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+            <LockKeyhole className="h-7 w-7" strokeWidth={2} />
+          </div>
+          <h2 className="mb-2 text-xl font-semibold text-anthracite-900">
+            Şifre güncellendi
+          </h2>
+          <p className="mb-6 text-sm text-anthracite-600">
+            Yeni şifrenizle giriş yapabilirsiniz.
+          </p>
+          <Link
+            href="/login"
+            className="inline-block w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800"
+          >
+            Giriş yap
+          </Link>
         </AuthCard>
       </div>
     );
@@ -55,29 +191,57 @@ export default function ResetPassword() {
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
       <AuthCard className="max-w-md text-center">
         <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-sky-100 bg-sky-50 text-sky-700">
-           <LockKeyhole className="h-6 w-6" strokeWidth={2} />
+          <LockKeyhole className="h-6 w-6" strokeWidth={2} />
         </div>
-        
-        <h1 className="mb-2 text-xl font-semibold text-anthracite-900">Yeni şifre</h1>
-        <p className="mb-6 text-sm text-anthracite-600">Hesabınız için yeni bir şifre belirleyin.</p>
-        
-        {error && <div className="mb-4 rounded-xl border border-red-100 bg-red-50/90 p-3 text-sm text-red-700">{error}</div>}
+
+        <h1 className="mb-2 text-xl font-semibold text-anthracite-900">
+          Yeni şifre
+        </h1>
+        <p className="mb-6 text-sm text-anthracite-600">
+          Hesabınız için yeni bir şifre belirleyin.
+        </p>
+
+        {error && (
+          <div className="mb-4 rounded-xl border border-red-100 bg-red-50/90 p-3 text-left text-sm text-red-700">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleUpdate} className="flex flex-col gap-3 text-left">
-          <input 
-            required 
-            type="password" 
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-500/20" 
-            placeholder="••••••" 
-          />
-          <button 
-            type="submit" 
+          <div>
+            <label className="mb-1 block text-xs font-medium text-anthracite-600">
+              Yeni şifre
+            </label>
+            <input
+              required
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-500/20"
+              placeholder="En az 6 karakter"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-anthracite-600">
+              Yeni şifre (tekrar)
+            </label>
+            <input
+              required
+              type="password"
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-500/20"
+              placeholder="Tekrar girin"
+            />
+          </div>
+          <button
+            type="submit"
             disabled={loading}
             className="w-full rounded-xl bg-sky-600 py-3 text-sm font-medium text-white transition hover:bg-sky-700 disabled:opacity-50"
           >
-            {loading ? "Kaydediliyor…" : "Kaydet"}
+            {loading ? "Kaydediliyor…" : "Şifreyi kaydet"}
           </button>
         </form>
       </AuthCard>

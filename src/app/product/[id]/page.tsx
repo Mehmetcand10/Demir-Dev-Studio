@@ -1,23 +1,21 @@
 "use client";
 
 import { useEffect, useState, useCallback, useMemo } from "react";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, MessageCircle, Package, Search, Lock } from "lucide-react";
+import { ArrowLeft, MessageCircle, Package, Lock, ShieldAlert } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
 import { ORDER_STATUS } from '@/utils/orderStatus';
 import { notify } from '@/utils/notifications';
 import { getOrderableStocks, usesFallbackStocks } from '@/utils/productStocks';
 import { getWhatsAppOrderDigits } from '@/utils/whatsapp';
+import ProductImageGallery from '@/components/product/ProductImageGallery';
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<any>(null);
   const [isApproved, setIsApproved] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [isZoomed, setIsZoomed] = useState(false);
-  const [activeImageIndex, setActiveImageIndex] = useState(0); 
   const [seriCount, setSeriCount] = useState(1);
   const supabase = createClient();
 
@@ -29,6 +27,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const [isOrdering, setIsOrdering] = useState(false);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [selectedSize, setSelectedSize] = useState<string>('');
+  const [wholesalerMinFloor, setWholesalerMinFloor] = useState<number | null>(null);
 
   const orderableStocks = useMemo(() => (product ? getOrderableStocks(product) : {}), [product]);
   const stockIsFallback = useMemo(() => (product ? usesFallbackStocks(product) : false), [product]);
@@ -43,11 +42,24 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   }, [orderableStocks]);
 
   const fetchData = useCallback(async () => {
-    // 1. Ürünü çek
     const { data: p } = await supabase.from('products').select('*').eq('id', params.id).single();
-    if (p) setProduct(p);
+    if (p) {
+      setProduct(p);
+      setWholesalerMinFloor(null);
+      if (p.wholesaler_id) {
+        const { data: pubRows, error: rpcErr } = await supabase.rpc(
+          'get_wholesaler_public_profile',
+          { p_wholesaler_id: p.wholesaler_id }
+        );
+        if (!rpcErr && Array.isArray(pubRows) && pubRows[0]) {
+          const n = pubRows[0].min_order_floor_units;
+          if (typeof n === 'number' && n > 0) setWholesalerMinFloor(n);
+        }
+      }
+    } else {
+      setWholesalerMinFloor(null);
+    }
 
-    // 2. O anki kullacıyı oturumdan çek
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
@@ -69,11 +81,25 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const totalItems = seriCount * product.min_order_quantity;
   const unitPrice = Number(product.base_wholesale_price) + Number(product.margin_price || 0);
   const totalPrice = totalItems * unitPrice;
+  const floorBlocked =
+    wholesalerMinFloor != null &&
+    wholesalerMinFloor > 0 &&
+    totalItems < wholesalerMinFloor;
 
   // FAZ 4: DROP-SHIPPING SİPARİŞ OLUŞTURMA İŞLEMİ (Veritabanı + WhatsApp)
   const handleCreateOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if(!currentUserProfile) return alert("Kullanıcı profiliniz okunamadı, lütfen tekrar giriş yapın.");
+    if (
+      wholesalerMinFloor != null &&
+      wholesalerMinFloor > 0 &&
+      totalItems < wholesalerMinFloor
+    ) {
+      alert(
+        `Bu toptancı tek siparişte en az ${wholesalerMinFloor} adet kabul ediyor. Şu anki sipariş adedi: ${totalItems} adet. Paket sayısını artırın.`
+      );
+      return;
+    }
     setIsOrdering(true);
 
     try {
@@ -145,46 +171,11 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       </div>
 
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-        {/* Sol: ÇOKLU FOTOĞRAF GALERİSİ & TEXTURE ZOOM */}
-        <div className="flex flex-col gap-4">
-          
-          <div 
-            className="group relative aspect-[3/4] w-full cursor-zoom-in overflow-hidden rounded-2xl border border-anthracite-200/70 bg-anthracite-50 dark:bg-anthracite-900"
-            onClick={() => setIsZoomed(!isZoomed)}
-          >
-            <Image 
-              src={product.images && product.images.length > 0 ? product.images[activeImageIndex] : 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&q=90'}
-              alt={product.name}
-              fill
-              priority
-              className={`object-cover transition-transform duration-700 ${isZoomed ? "scale-150 origin-center" : "scale-100 group-hover:scale-105"}`}
-            />
-            <div className="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-medium text-anthracite-700 shadow-sm backdrop-blur-sm dark:bg-black/80 dark:text-white">
-              <Search className="h-3 w-3" strokeWidth={2} /> Yakınlaştır
-            </div>
-            {product.images?.length > 1 && (
-              <div className="absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
-                 {activeImageIndex + 1} / {product.images.length}
-              </div>
-            )}
-          </div>
-
-          {/* DİNAMİK VİTRİN SLIDER'I (THUMBNAILS) */}
-          {product.images && product.images.length > 1 && (
-            <div className="flex gap-4 overflow-x-auto pb-2 snap-x hide-scrollbar mt-2">
-              {product.images.map((img: string, idx: number) => (
-                <button 
-                  key={idx} 
-                  onClick={() => { setActiveImageIndex(idx); setIsZoomed(false); }}
-                  className={`relative h-32 w-24 shrink-0 snap-start overflow-hidden rounded-lg border-2 transition-all ${activeImageIndex === idx ? 'border-anthracite-800 shadow-sm dark:border-white' : 'border-transparent opacity-55 hover:opacity-100'}`}
-                >
-                  <Image src={img} alt={`Küçük Ölçek ${idx}`} fill className="object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
-
-        </div>
+        {/* Sol: çoklu fotoğraf + sığdırma / sürekli yakınlaştırma */}
+        <ProductImageGallery
+          images={Array.isArray(product.images) ? product.images : []}
+          productName={product.name}
+        />
 
         {/* Sağ: Bilgiler ve Sipariş İşlemleri */}
         <div className="flex flex-col">
@@ -208,6 +199,17 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <span className="font-medium">MOQ: {product.min_order_quantity} adet</span>
                 </div>
               </div>
+
+              {wholesalerMinFloor != null && wholesalerMinFloor > 0 && (
+                <div className="mb-6 flex items-start gap-2.5 rounded-2xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
+                  <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-400" strokeWidth={2} />
+                  <span>
+                    Bu toptancı{" "}
+                    <strong className="font-semibold">tek siparişte en az {wholesalerMinFloor} adet</strong>{" "}
+                    kabul ediyor (mağaza politikası). Toplam adet bunun altında olamaz.
+                  </span>
+                </div>
+              )}
 
               <div className="space-y-6 mb-10">
                 <div>
@@ -297,20 +299,28 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <span className="text-lg font-semibold tabular-nums">{totalPrice.toLocaleString("tr-TR")} ₺</span>
                 </div>
 
+                {floorBlocked && (
+                    <p className="mb-2 text-center text-xs font-medium text-red-700 dark:text-red-400">
+                      Mağaza minimumu: {wholesalerMinFloor} adet — paket sayısını artırın.
+                    </p>
+                  )}
+
                 <button 
                   type="button"
-                  disabled={!selectedSize}
+                  disabled={!selectedSize || floorBlocked}
                   onClick={() => setShowAddressModal(true)}
                   className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition ${
-                    !selectedSize 
+                    !selectedSize || floorBlocked
                       ? 'cursor-not-allowed border border-anthracite-200 bg-anthracite-100 text-anthracite-400' 
                       : 'bg-[#25D366] text-white shadow-sm hover:bg-[#20BE5C]'
                   }`}
                 >
-                  {selectedSize ? (
-                    <><MessageCircle className="h-5 w-5" strokeWidth={2} /> Sipariş — adres gir</>
-                  ) : (
+                  {!selectedSize ? (
                     "Beden seçin"
+                  ) : floorBlocked ? (
+                    "Minimum adete ulaşın"
+                  ) : (
+                    <><MessageCircle className="h-5 w-5" strokeWidth={2} /> Sipariş — adres gir</>
                   )}
                 </button>
               </div>

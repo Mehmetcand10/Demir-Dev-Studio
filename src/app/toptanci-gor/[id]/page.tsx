@@ -3,7 +3,7 @@
 import { useParams } from "next/navigation";
 import WholesalerStorefront from "@/components/wholesaler/WholesalerStorefront";
 
-export default function WholesalerProfile() {
+export default function ToptanciGorDetay() {
   const { id } = useParams();
   const wid = typeof id === "string" ? id : Array.isArray(id) ? id[0] : "";
   if (!wid) {
@@ -13,5 +13,11 @@ export default function WholesalerProfile() {
       </div>
     );
   }
-  return <WholesalerStorefront wholesalerId={wid} />;
+  return (
+    <WholesalerStorefront
+      wholesalerId={wid}
+      backHref="/toptanci-gor"
+      backLabel="Toptancılar"
+    />
+  );
 }

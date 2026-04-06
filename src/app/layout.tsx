@@ -64,6 +64,9 @@ export default async function RootLayout({
               <Link href="/katalog" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Katalog
               </Link>
+              <Link href="/toptanci-gor" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+                Toptancılar
+              </Link>
               <Link href="/yardim" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Yardım
               </Link>
@@ -97,6 +100,12 @@ export default async function RootLayout({
                     </Link>
                   )}
                   
+                  <Link
+                    href="/hesap/sifre"
+                    className="rounded-lg border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50"
+                  >
+                    Şifre
+                  </Link>
                   <form action="/auth/signout" method="post">
                     <button type="submit" className="rounded-lg border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50">
                       Çıkış
