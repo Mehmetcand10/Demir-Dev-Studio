@@ -37,7 +37,7 @@ export default function ToptanciGorListe() {
         counts.set(w, (counts.get(w) || 0) + 1);
       }
 
-      const ids = [...counts.keys()];
+      const ids = Array.from(counts.keys());
       if (ids.length === 0) {
         setRows([]);
         setLoading(false);
