@@ -10,6 +10,7 @@ import {
   Users,
   Sparkles,
 } from "lucide-react";
+import AnimatedWelcome from "@/components/home/AnimatedWelcome";
 
 export default function Home() {
   return (
@@ -31,20 +32,22 @@ export default function Home() {
 
         <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:gap-12 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:gap-14 lg:py-24 lg:pl-8 lg:pr-6 xl:pl-10">
           <div className="text-center lg:text-left">
+            <AnimatedWelcome />
             <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-anthracite-200/90 bg-white/90 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-anthracite-700 shadow-sm backdrop-blur-sm sm:text-xs">
               <Gem className="h-3.5 w-3.5 text-emerald-600" strokeWidth={2} />
-              Yeni nesil B2B tekstil
+              Demir Dev Studio · B2B Tekstil
             </span>
 
             <h1 className="mb-5 text-[2rem] font-bold leading-[1.12] tracking-tight text-neutral-900 sm:text-5xl sm:leading-[1.08] lg:text-[3.25rem] xl:text-6xl">
-              Modanın tedarik
+              Butik ve üreticiyi
               <br className="hidden sm:block" />
-              <span className="text-emerald-800"> tek vitrinde.</span>
+              <span className="text-emerald-800"> güvenli ağda buluşturuyoruz.</span>
             </h1>
 
             <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-neutral-800 sm:text-lg lg:mx-0">
-              Onaylı butikler ve üreticileri aracısız buluşturur; net fiyat, MOQ ve sipariş takibi tek
-              platformda. İlk günden profesyonel bir B2B deneyimi.
+              Demir Dev Studio, onaylı toptancı ve butiklerin sipariş sürecini tek panelde birleştirir:
+              net fiyat, beden bazlı adet, MOQ kontrolü, ödeme teyidi ve kargo takibi. İlk bakışta
+              anlaşılır, her adımda profesyonel B2B akış.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
