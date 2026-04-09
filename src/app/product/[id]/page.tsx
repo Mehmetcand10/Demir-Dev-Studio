@@ -16,7 +16,6 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const [isApproved, setIsApproved] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const [seriCount, setSeriCount] = useState(1);
   const supabase = createClient();
 
   // FAZ 4: Sipariş Pop-up Stateleri
@@ -26,20 +25,17 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const [adres, setAdres] = useState('');
   const [isOrdering, setIsOrdering] = useState(false);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
-  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [sizeQuantities, setSizeQuantities] = useState<Record<string, number>>({});
   const [wholesalerMinFloor, setWholesalerMinFloor] = useState<number | null>(null);
 
   const orderableStocks = useMemo(() => (product ? getOrderableStocks(product) : {}), [product]);
   const stockIsFallback = useMemo(() => (product ? usesFallbackStocks(product) : false), [product]);
 
   useEffect(() => {
-    setSelectedSize('');
-  }, [params.id]);
-
-  useEffect(() => {
-    const keys = Object.keys(orderableStocks);
-    if (keys.length === 1) setSelectedSize(keys[0]);
-  }, [orderableStocks]);
+    const next: Record<string, number> = {};
+    for (const key of Object.keys(orderableStocks)) next[key] = 0;
+    setSizeQuantities(next);
+  }, [params.id, orderableStocks]);
 
   const fetchData = useCallback(async () => {
     const { data: p } = await supabase.from('products').select('*').eq('id', params.id).single();
@@ -78,18 +74,32 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   if (loading) return <div className="py-24 text-center text-sm font-medium text-anthracite-400">Yükleniyor…</div>;
   if (!product) return <div className="py-24 text-center text-sm font-medium text-red-600">Ürün bulunamadı.</div>;
 
-  const totalItems = seriCount * product.min_order_quantity;
+  const totalItems = Object.values(sizeQuantities).reduce((acc, n) => acc + Number(n || 0), 0);
   const unitPrice = Number(product.base_wholesale_price) + Number(product.margin_price || 0);
   const totalPrice = totalItems * unitPrice;
+  const moqBlocked = totalItems > 0 && totalItems < Number(product.min_order_quantity || 0);
   const floorBlocked =
     wholesalerMinFloor != null &&
     wholesalerMinFloor > 0 &&
+    totalItems > 0 &&
     totalItems < wholesalerMinFloor;
+  const selectedLineItems = Object.entries(sizeQuantities)
+    .filter(([, qty]) => Number(qty) > 0)
+    .map(([size, qty]) => `${size}:${qty}`);
+  const selectedSizesSummary = selectedLineItems.join(", ");
 
   // FAZ 4: DROP-SHIPPING SİPARİŞ OLUŞTURMA İŞLEMİ (Veritabanı + WhatsApp)
   const handleCreateOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if(!currentUserProfile) return alert("Kullanıcı profiliniz okunamadı, lütfen tekrar giriş yapın.");
+    if (totalItems <= 0 || selectedLineItems.length === 0) {
+      alert("En az bir bedende adet girin.");
+      return;
+    }
+    if (moqBlocked) {
+      alert(`Bu ürün için minimum sipariş ${product.min_order_quantity} adet. Toplamı artırın.`);
+      return;
+    }
     if (
       wholesalerMinFloor != null &&
       wholesalerMinFloor > 0 &&
@@ -120,7 +130,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
            buyer_phone: currentUserProfile.phone_number,
            buyer_name: currentUserProfile.business_name || currentUserProfile.full_name,
            product_name: product.name,
-           selected_size: selectedSize,
+           selected_size: selectedSizesSummary,
            status: ORDER_STATUS.WAITING_PAYMENT
       });
 
@@ -142,7 +152,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       }
 
       // 2. WhatsApp Profesyonel Şablonu Oluştur ve Bota Yönlendir
-      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name} (Beden: ${selectedSize})\n🔢 Miktar: ${totalItems} Adet (MOQ Şartı Sağlandı)\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\n⚠️ Yönetim Notu: Sipariş sisteme kaydoldu, ödeme teyidi sonrası hazırlık sürecine alınabilir.\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
+      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name}\n📏 Beden dağılımı: ${selectedSizesSummary}\n🔢 Toplam Miktar: ${totalItems} Adet\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\n⚠️ Yönetim Notu: Sipariş sisteme kaydoldu, ödeme teyidi sonrası hazırlık sürecine alınabilir.\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
       
       // Demir Dev Studio (Merkez) Resmi WhatsApp Numarası
       const whatsappNumber = getWhatsAppOrderDigits();
@@ -221,29 +231,72 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                       Bu üründe ayrı stok satırı yok; tek seçenek gösteriliyor (eski kayıt veya standart seri). Yeni ürünlerde toptancı panelinden en az bir bedende stok girin.
                     </p>
                   )}
-                  <div className="flex flex-wrap gap-3 mt-4">
-                    {Object.entries(orderableStocks).map(([size, qty]) => (
-                      <button
-                        key={size}
-                        type="button"
-                        disabled={Number(qty) <= 0}
-                        onClick={() => setSelectedSize(size)}
-                        className={`flex min-w-[68px] flex-col items-center gap-0.5 rounded-xl border-2 px-4 py-2.5 text-sm font-medium transition-all ${
-                          Number(qty) <= 0
-                            ? 'bg-anthracite-50 border-anthracite-200 text-anthracite-300 cursor-not-allowed grayscale'
-                            : selectedSize === size
-                              ? 'bg-anthracite-900 border-anthracite-900 text-white shadow-lg scale-105'
-                              : 'bg-white border-anthracite-200 text-anthracite-600 hover:border-anthracite-900'
-                        }`}
-                      >
-                        <span className="text-center break-words max-w-[100px]">{size}</span>
-                        <span
-                          className={`text-[9px] uppercase ${Number(qty) <= 0 ? 'text-red-400' : selectedSize === size ? 'text-white/60' : 'text-anthracite-400'}`}
+                  <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {Object.entries(orderableStocks).map(([size, qty]) => {
+                      const stock = Number(qty) || 0;
+                      const current = Number(sizeQuantities[size] || 0);
+                      const soldOut = stock <= 0;
+                      return (
+                        <div
+                          key={size}
+                          className={`rounded-xl border p-3 transition ${
+                            soldOut
+                              ? 'border-anthracite-200 bg-anthracite-50/70 text-anthracite-400'
+                              : 'border-anthracite-200 bg-white'
+                          }`}
                         >
-                          {Number(qty) <= 0 ? 'Tükendi' : stockIsFallback ? 'Seri' : `${qty} Stok`}
-                        </span>
-                      </button>
-                    ))}
+                          <div className="mb-2 flex items-center justify-between">
+                            <span className="text-sm font-semibold text-anthracite-900">{size}</span>
+                            <span className={`text-[10px] font-semibold uppercase ${soldOut ? 'text-red-400' : 'text-anthracite-500'}`}>
+                              {soldOut ? 'Tükendi' : stockIsFallback ? 'Seri' : `${stock} Stok`}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              disabled={soldOut || current <= 0}
+                              onClick={() =>
+                                setSizeQuantities((prev) => ({
+                                  ...prev,
+                                  [size]: Math.max(0, Number(prev[size] || 0) - 1),
+                                }))
+                              }
+                              className="flex h-8 w-8 items-center justify-center rounded-md border border-anthracite-200 text-lg text-anthracite-700 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              −
+                            </button>
+                            <input
+                              type="number"
+                              min={0}
+                              max={Math.max(0, stock)}
+                              value={current}
+                              disabled={soldOut}
+                              onChange={(e) => {
+                                const next = Math.max(
+                                  0,
+                                  Math.min(stock, Number.parseInt(e.target.value || "0", 10) || 0)
+                                );
+                                setSizeQuantities((prev) => ({ ...prev, [size]: next }));
+                              }}
+                              className="w-full rounded-md border border-anthracite-200 px-2 py-1.5 text-center text-sm font-medium text-anthracite-900 outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-anthracite-50"
+                            />
+                            <button
+                              type="button"
+                              disabled={soldOut || current >= stock}
+                              onClick={() =>
+                                setSizeQuantities((prev) => ({
+                                  ...prev,
+                                  [size]: Math.min(stock, Number(prev[size] || 0) + 1),
+                                }))
+                              }
+                              className="flex h-8 w-8 items-center justify-center rounded-md border border-anthracite-200 text-lg text-anthracite-700 disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="text-anthracite-600 dark:text-anthracite-300 text-sm leading-relaxed bg-white border border-anthracite-200 p-5 rounded-2xl shadow-sm mt-6 overflow-hidden">
@@ -263,35 +316,9 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
               </div>
 
               <div className="mt-auto flex flex-col gap-6 border-t border-anthracite-100 pt-8 dark:border-anthracite-800">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex flex-col">
-                    <span className="font-bold text-anthracite-900 dark:text-white">Sipariş miktarı</span>
-                    <span className="text-[10px] font-medium text-anthracite-500 dark:text-anthracite-400">
-                      Paket sayısı (her paket {product.min_order_quantity} adet)
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-0.5 rounded-xl border border-anthracite-200 bg-white p-1 shadow-sm ring-1 ring-anthracite-100/80">
-                    <button
-                      type="button"
-                      aria-label="Paket azalt"
-                      onClick={() => setSeriCount(Math.max(1, seriCount - 1))}
-                      className="flex h-10 w-10 items-center justify-center rounded-lg bg-anthracite-100 text-xl font-semibold leading-none text-anthracite-900 transition hover:bg-anthracite-200"
-                    >
-                      −
-                    </button>
-                    <div className="min-w-[3rem] px-1 text-center">
-                      <span className="block text-xl font-bold tabular-nums text-anthracite-900">{seriCount}</span>
-                      <span className="block text-[10px] font-semibold uppercase tracking-wide text-anthracite-500">paket</span>
-                    </div>
-                    <button
-                      type="button"
-                      aria-label="Paket artır"
-                      onClick={() => setSeriCount(seriCount + 1)}
-                      className="flex h-10 w-10 items-center justify-center rounded-lg bg-anthracite-100 text-xl font-semibold leading-none text-anthracite-900 transition hover:bg-anthracite-200"
-                    >
-                      +
-                    </button>
-                  </div>
+                <div className="rounded-xl border border-anthracite-200 bg-anthracite-50/50 p-4 text-sm text-anthracite-700">
+                  Sipariş için birden fazla bedenden adet girebilirsiniz. Ürün minimumu{" "}
+                  <strong>{product.min_order_quantity} adet</strong> olarak uygulanır.
                 </div>
 
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-100/90 bg-emerald-50/60 p-4 text-emerald-950 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-100">
@@ -299,24 +326,38 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <span className="text-lg font-semibold tabular-nums">{totalPrice.toLocaleString("tr-TR")} ₺</span>
                 </div>
 
+                {moqBlocked && (
+                  <p className="mb-2 text-center text-xs font-medium text-red-700 dark:text-red-400">
+                    Ürün minimumu: {product.min_order_quantity} adet — toplam adedi artırın.
+                  </p>
+                )}
+
                 {floorBlocked && (
                     <p className="mb-2 text-center text-xs font-medium text-red-700 dark:text-red-400">
-                      Mağaza minimumu: {wholesalerMinFloor} adet — paket sayısını artırın.
+                      Mağaza minimumu: {wholesalerMinFloor} adet — toplam adedi artırın.
                     </p>
                   )}
 
+                {selectedLineItems.length > 0 && (
+                  <p className="text-center text-[11px] text-anthracite-500">
+                    Beden dağılımı: {selectedSizesSummary}
+                  </p>
+                )}
+
                 <button 
                   type="button"
-                  disabled={!selectedSize || floorBlocked}
+                  disabled={selectedLineItems.length === 0 || floorBlocked || moqBlocked}
                   onClick={() => setShowAddressModal(true)}
                   className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition ${
-                    !selectedSize || floorBlocked
+                    selectedLineItems.length === 0 || floorBlocked || moqBlocked
                       ? 'cursor-not-allowed border border-anthracite-200 bg-anthracite-100 text-anthracite-400' 
                       : 'bg-[#25D366] text-white shadow-sm hover:bg-[#20BE5C]'
                   }`}
                 >
-                  {!selectedSize ? (
-                    "Beden seçin"
+                  {selectedLineItems.length === 0 ? (
+                    "Beden-adet girin"
+                  ) : moqBlocked ? (
+                    "MOQ adedine ulaşın"
                   ) : floorBlocked ? (
                     "Minimum adete ulaşın"
                   ) : (

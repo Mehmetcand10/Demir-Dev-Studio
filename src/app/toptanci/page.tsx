@@ -508,7 +508,7 @@ export default function ToptanciDashboard() {
                                                 <p className="text-xs font-medium text-anthracite-900">{ord.product_name}</p>
                                             </div>
                                             <div className="rounded-lg bg-white/90 px-3 py-2 ring-1 ring-anthracite-100/80">
-                                                <p className="mb-0.5 text-[10px] font-medium text-anthracite-400">Beden / adet</p>
+                                                <p className="mb-0.5 text-[10px] font-medium text-anthracite-400">Beden dağılımı / toplam</p>
                                                 <p className="text-xs font-medium text-anthracite-900">{ord.selected_size} · {ord.quantity}</p>
                                             </div>
                                             <div className="rounded-lg bg-emerald-50/90 px-3 py-2 ring-1 ring-emerald-100/80">

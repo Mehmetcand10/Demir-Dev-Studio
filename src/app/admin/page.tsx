@@ -156,7 +156,23 @@ export default function AdminDashboard() {
       const { data: product } = await supabase.from('products').select('stocks').eq('id', order.product_id).single();
       if (product && product.stocks) {
         const newStocks = { ...product.stocks };
-        newStocks[order.selected_size] = Math.max(0, (Number(newStocks[order.selected_size]) || 0) - order.quantity);
+        const parsedLines = String(order.selected_size)
+          .split(',')
+          .map((part: string) => part.trim())
+          .filter(Boolean)
+          .map((part: string) => {
+            const [size, qty] = part.split(':').map((x) => x.trim());
+            return { size, qty: Number(qty) };
+          })
+          .filter((row: { size: string; qty: number }) => row.size && Number.isFinite(row.qty) && row.qty > 0);
+        if (parsedLines.length > 0) {
+          for (const row of parsedLines) {
+            newStocks[row.size] = Math.max(0, (Number(newStocks[row.size]) || 0) - row.qty);
+          }
+        } else {
+          // Geriye dönük: eski tek beden sipariş formatı
+          newStocks[order.selected_size] = Math.max(0, (Number(newStocks[order.selected_size]) || 0) - order.quantity);
+        }
         await supabase.from('products').update({ stocks: newStocks }).eq('id', order.product_id);
       }
     }
@@ -497,7 +513,7 @@ export default function AdminDashboard() {
                                         <p className="line-clamp-1 text-xs font-medium text-anthracite-900">{order.product_name}</p>
                                     </div>
                                     <div className="rounded-xl bg-white/80 p-3 text-center ring-1 ring-anthracite-100/80">
-                                        <p className="mb-0.5 text-[10px] font-medium text-anthracite-400">Beden / adet</p>
+                                        <p className="mb-0.5 text-[10px] font-medium text-anthracite-400">Beden dağılımı / toplam</p>
                                         <p className="text-xs font-medium text-anthracite-900">{order.selected_size} · {order.quantity}</p>
                                     </div>
                                     <div className="rounded-xl bg-emerald-50/80 p-3 text-center ring-1 ring-emerald-100/80">

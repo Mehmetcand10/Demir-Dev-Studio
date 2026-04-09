@@ -205,7 +205,7 @@ export default function Siparislerim() {
                       <div className="flex flex-col gap-3 border-b border-anthracite-100/80 pb-4 sm:flex-row sm:items-start sm:justify-between">
                          <div className="min-w-0">
                             <h3 className="text-lg font-semibold leading-snug text-anthracite-900 sm:text-xl">{order.product_name}</h3>
-                            <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-anthracite-500">{order.quantity} adet · {order.selected_size} · {date}</p>
+                            <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-anthracite-500">Toplam {order.quantity} adet · {order.selected_size} · {date}</p>
                          </div>
                          <div className="text-left sm:text-right">
                              <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-700/90">Tutar</p>
