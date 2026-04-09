@@ -21,15 +21,22 @@ type Props = {
 
 export default function ProductImageGallery({ images, productName }: Props) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [fitMode, setFitMode] = useState<"contain" | "cover">("contain");
   const [zoom, setZoom] = useState(1);
+  const [imageAspectRatio, setImageAspectRatio] = useState(3 / 4);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const pinchStateRef = useRef<{ startDistance: number; startZoom: number } | null>(
+    null
+  );
 
   const list = images?.length ? images : [];
   const src = list[activeImageIndex] ?? FALLBACK;
 
   useEffect(() => {
     setZoom(1);
+  }, [activeImageIndex]);
+
+  useEffect(() => {
+    setImageAspectRatio(3 / 4);
   }, [activeImageIndex]);
 
   useEffect(() => {
@@ -44,38 +51,20 @@ export default function ProductImageGallery({ images, productName }: Props) {
     return () => el.removeEventListener("wheel", handler);
   }, []);
 
+  const touchDistance = (
+    touches: { length: number; [index: number]: { clientX: number; clientY: number } }
+  ) => {
+    if (touches.length < 2) return 0;
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.hypot(dx, dy);
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:text-sm">
-        <span className="font-medium text-anthracite-500 dark:text-anthracite-400">
-          Görünüm
-        </span>
-        <div className="inline-flex rounded-lg border border-anthracite-200 bg-white p-0.5 dark:border-anthracite-700 dark:bg-anthracite-900/50">
-          <button
-            type="button"
-            onClick={() => setFitMode("contain")}
-            className={`rounded-md px-2.5 py-1 font-medium transition ${
-              fitMode === "contain"
-                ? "bg-anthracite-900 text-white dark:bg-white dark:text-anthracite-900"
-                : "text-anthracite-600 hover:bg-anthracite-50 dark:text-anthracite-300 dark:hover:bg-anthracite-800"
-            }`}
-          >
-            Tam sığdır
-          </button>
-          <button
-            type="button"
-            onClick={() => setFitMode("cover")}
-            className={`rounded-md px-2.5 py-1 font-medium transition ${
-              fitMode === "cover"
-                ? "bg-anthracite-900 text-white dark:bg-white dark:text-anthracite-900"
-                : "text-anthracite-600 hover:bg-anthracite-50 dark:text-anthracite-300 dark:hover:bg-anthracite-800"
-            }`}
-          >
-            Alanı doldur
-          </button>
-        </div>
-        <span className="hidden sm:inline text-anthracite-300 dark:text-anthracite-600">
-          |
+        <span className="rounded-lg bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+          Görsel otomatik tam sığdırılır
         </span>
         <span className="font-medium text-anthracite-500 dark:text-anthracite-400">
           Yakınlaştırma
@@ -130,13 +119,35 @@ export default function ProductImageGallery({ images, productName }: Props) {
       <div
         ref={scrollRef}
         className="relative w-full overflow-auto rounded-2xl border border-anthracite-200/70 bg-zinc-100 dark:bg-anthracite-900/90"
-        style={{ height: "min(75vh, 720px)", touchAction: "pan-x pan-y" }}
+        style={{ height: "min(72vh, 680px)", touchAction: "pan-x pan-y" }}
+        onTouchStart={(e) => {
+          if (e.touches.length < 2) return;
+          pinchStateRef.current = {
+            startDistance: touchDistance(e.touches),
+            startZoom: zoom,
+          };
+        }}
+        onTouchMove={(e) => {
+          if (e.touches.length < 2 || !pinchStateRef.current) return;
+          e.preventDefault();
+          const nextDistance = touchDistance(e.touches);
+          const scale = nextDistance / Math.max(1, pinchStateRef.current.startDistance);
+          const nextZoom = clamp(
+            Number((pinchStateRef.current.startZoom * scale).toFixed(2)),
+            MIN_ZOOM,
+            MAX_ZOOM
+          );
+          setZoom(nextZoom);
+        }}
+        onTouchEnd={(e) => {
+          if (e.touches.length < 2) pinchStateRef.current = null;
+        }}
       >
         <div
           className="relative mx-auto"
           style={{
             width: `${zoom * 100}%`,
-            aspectRatio: "3/4",
+            aspectRatio: String(imageAspectRatio),
           }}
         >
           <Image
@@ -145,14 +156,17 @@ export default function ProductImageGallery({ images, productName }: Props) {
             fill
             priority
             sizes="(max-width: 768px) 100vw, 50vw"
-            className={
-              fitMode === "contain" ? "object-contain" : "object-cover"
-            }
+            onLoadingComplete={(img) => {
+              if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+                setImageAspectRatio(img.naturalWidth / img.naturalHeight);
+              }
+            }}
+            className="object-contain"
           />
         </div>
         <div className="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-anthracite-700 shadow-sm backdrop-blur-sm dark:bg-black/80 dark:text-white">
           <ZoomIn className="h-3 w-3" strokeWidth={2} />
-          Kaydır · tekerlek
+          Kaydır · tekerlek · iki parmak
         </div>
         {list.length > 1 && (
           <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/55 px-2.5 py-1 text-[10px] font-medium text-white backdrop-blur-sm">
