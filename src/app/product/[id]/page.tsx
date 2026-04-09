@@ -294,6 +294,16 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                               +
                             </button>
                           </div>
+                          {!soldOut && (
+                            <p className="mt-2 text-[10px] font-medium text-anthracite-500">
+                              Maksimum {stock} adet seçebilirsiniz.
+                            </p>
+                          )}
+                          {!soldOut && current >= stock && (
+                            <p className="mt-1 text-[10px] font-semibold text-red-600">
+                              Bu bedende stok sınırına ulaştınız.
+                            </p>
+                          )}
                         </div>
                       );
                     })}
