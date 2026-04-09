@@ -44,21 +44,42 @@ export default function ToptanciGorListe() {
         return;
       }
 
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, business_name, full_name, role, is_approved")
-        .in("id", ids)
-        .eq("role", "toptanci")
-        .eq("is_approved", true);
+      // RLS nedeniyle butik kullanıcılar profiles tablosunu topluca okuyamayabilir.
+      // Bu yüzden toptancı vitrin bilgisini public RPC ile tek tek çekiyoruz.
+      const entries = await Promise.all(
+        ids.map(async (id) => {
+          const { data: pubRows, error } = await supabase.rpc(
+            "get_wholesaler_public_profile",
+            { p_wholesaler_id: id }
+          );
+          const p = Array.isArray(pubRows) ? pubRows[0] : null;
+          if (p && p.is_approved) {
+            return {
+              id,
+              business_name: p.business_name ?? null,
+              full_name: p.full_name ?? null,
+              productCount: counts.get(id) || 0,
+            } as Row;
+          }
+          // SQL fonksiyonu henüz çalıştırılmadıysa liste tamamen kaybolmasın.
+          if (error) {
+            return {
+              id,
+              business_name: null,
+              full_name: `Mağaza ${id.slice(0, 6)}`,
+              productCount: counts.get(id) || 0,
+            } as Row;
+          }
+          return {
+            id,
+            business_name: null,
+            full_name: null,
+            productCount: counts.get(id) || 0,
+          } as Row;
+        })
+      );
 
-      const list: Row[] = (profs || [])
-        .map((p) => ({
-          id: p.id,
-          business_name: p.business_name,
-          full_name: p.full_name,
-          productCount: counts.get(p.id) || 0,
-        }))
-        .filter((r) => r.productCount > 0);
+      const list: Row[] = entries.filter((r): r is Row => Boolean(r) && r.productCount > 0);
 
       list.sort(
         (a, b) =>

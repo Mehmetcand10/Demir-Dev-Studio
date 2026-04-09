@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, ShoppingBag, MapPin, Star, ArrowLeft, ShieldAlert } from "lucide-react";
+import { Package, ShoppingBag, MapPin, Star, ArrowLeft, ShieldAlert, Lock } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 const PLACEHOLDER =
@@ -25,6 +25,7 @@ export default function WholesalerStorefront({
   const [products, setProducts] = useState<any[]>([]);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [canSeePrices, setCanSeePrices] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -47,6 +48,18 @@ export default function WholesalerStorefront({
       }
       setProfile(prof);
 
+      const { data: auth } = await supabase.auth.getUser();
+      if (auth?.user) {
+        const { data: myProfile } = await supabase
+          .from("profiles")
+          .select("is_approved")
+          .eq("id", auth.user.id)
+          .single();
+        setCanSeePrices(Boolean(myProfile?.is_approved));
+      } else {
+        setCanSeePrices(false);
+      }
+
       const { data: prods } = await supabase
         .from("products")
         .select("*")
@@ -54,6 +67,16 @@ export default function WholesalerStorefront({
         .order("created_at", { ascending: false });
 
       if (prods) setProducts(prods);
+      if (!prof && prods && prods.length > 0) {
+        setProfile({
+          role: "toptanci",
+          is_approved: true,
+          business_name: "Mağaza",
+          full_name: "",
+          min_order_floor_units: null,
+          avatar_url: null,
+        });
+      }
       setLoading(false);
     }
     fetchData();
@@ -98,8 +121,18 @@ export default function WholesalerStorefront({
             <Package className="h-64 w-64" strokeWidth={1} />
           </div>
 
-          <div className="relative z-10 flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-3xl font-semibold text-white shadow-sm sm:h-28 sm:w-28 sm:text-4xl">
-            {profile.business_name?.[0] || profile.full_name?.[0] || "?"}
+          <div className="relative z-10 flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-3xl font-semibold text-white shadow-sm sm:h-28 sm:w-28 sm:text-4xl">
+            {profile.avatar_url ? (
+              <Image
+                src={profile.avatar_url}
+                alt={profile.business_name || profile.full_name || "Profil"}
+                fill
+                sizes="112px"
+                className="object-cover"
+              />
+            ) : (
+              <span>{profile.business_name?.[0] || profile.full_name?.[0] || "?"}</span>
+            )}
           </div>
 
           <div className="relative z-10 flex-1 text-center md:text-left">
@@ -196,22 +229,40 @@ export default function WholesalerStorefront({
 
                     <div className="flex items-end justify-between gap-1 border-t border-anthracite-100/80 pt-2">
                       <div className="flex min-w-0 flex-col">
-                        <span className="text-[8px] font-bold uppercase text-anthracite-400">
-                          B2B
-                        </span>
-                        <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-base">
-                          {(
-                            displayedPrice * parseInt(p.min_order_quantity, 10)
-                          ).toLocaleString("tr-TR")}{" "}
-                          ₺
-                        </span>
+                        {canSeePrices ? (
+                          <>
+                            <span className="text-[8px] font-bold uppercase text-anthracite-400">
+                              B2B
+                            </span>
+                            <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-base">
+                              {(
+                                displayedPrice * parseInt(p.min_order_quantity, 10)
+                              ).toLocaleString("tr-TR")}{" "}
+                              ₺
+                            </span>
+                          </>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-anthracite-400">
+                            <Lock className="h-3.5 w-3.5" />
+                            Onaylı üyeye açık
+                          </span>
+                        )}
                       </div>
-                      <Link
-                        href={`/product/${p.id}`}
-                        className="shrink-0 rounded-lg bg-anthracite-900 p-2 text-white shadow-sm sm:rounded-xl"
-                      >
-                        <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      </Link>
+                      {canSeePrices ? (
+                        <Link
+                          href={`/product/${p.id}`}
+                          className="shrink-0 rounded-lg bg-anthracite-900 p-2 text-white shadow-sm sm:rounded-xl"
+                        >
+                          <ShoppingBag className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </Link>
+                      ) : (
+                        <Link
+                          href="/login"
+                          className="shrink-0 rounded-lg border border-anthracite-200 bg-white px-2.5 py-2 text-[10px] font-medium text-anthracite-700 shadow-sm sm:rounded-xl"
+                        >
+                          Giriş
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>

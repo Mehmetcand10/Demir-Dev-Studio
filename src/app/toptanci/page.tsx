@@ -45,6 +45,8 @@ export default function ToptanciDashboard() {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [profileIban, setProfileIban] = useState('');
   const [ibanSaving, setIbanSaving] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [minOrderFloor, setMinOrderFloor] = useState('');
   const [minOrderFloorSaving, setMinOrderFloorSaving] = useState(false);
 
@@ -69,8 +71,9 @@ export default function ToptanciDashboard() {
       if (user) {
         setUser(user);
         fetchData(user.id);
-        const { data: prof } = await supabase.from('profiles').select('iban, min_order_floor_units').eq('id', user.id).single();
+        const { data: prof } = await supabase.from('profiles').select('iban, min_order_floor_units, avatar_url').eq('id', user.id).single();
         if (prof?.iban) setProfileIban(prof.iban);
+        if (prof?.avatar_url) setAvatarUrl(prof.avatar_url);
         if (prof?.min_order_floor_units != null && Number(prof.min_order_floor_units) > 0) {
           setMinOrderFloor(String(prof.min_order_floor_units));
         } else {
@@ -88,6 +91,33 @@ export default function ToptanciDashboard() {
     setIbanSaving(false);
     if (error) alert('IBAN kaydedilemedi: ' + error.message);
     else alert('IBAN kaydedildi. Admin hakediş ekranında görüntülenebilir.');
+  };
+
+  const uploadAvatar = async (file: File) => {
+    if (!user) return;
+    setAvatarUploading(true);
+    try {
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: uploadErr } = await supabase
+        .storage
+        .from('product-images')
+        .upload(path, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data: pub } = supabase.storage.from('product-images').getPublicUrl(path);
+      const nextUrl = pub.publicUrl;
+      const { error: dbErr } = await supabase
+        .from('profiles')
+        .update({ avatar_url: nextUrl })
+        .eq('id', user.id);
+      if (dbErr) throw dbErr;
+      setAvatarUrl(nextUrl);
+      alert('Profil görseli güncellendi.');
+    } catch (err: any) {
+      alert('Profil görseli yüklenemedi: ' + (err?.message || 'Bilinmeyen hata'));
+    } finally {
+      setAvatarUploading(false);
+    }
   };
 
   const saveMinOrderFloor = async () => {
@@ -207,6 +237,40 @@ export default function ToptanciDashboard() {
                     </div>
 
                     <div className="mb-8 rounded-2xl border border-amber-200/90 bg-gradient-to-br from-amber-50/90 to-white p-5 shadow-sm sm:p-6">
+                      <div className="mb-5 rounded-xl border border-emerald-200/80 bg-emerald-50/60 p-4">
+                        <h3 className="mb-2 text-sm font-semibold text-anthracite-900">
+                          Profil görseli (mağaza vitrini)
+                        </h3>
+                        <p className="mb-3 text-xs text-anthracite-600">
+                          Butikler “Toptancıyı gör” sayfasında bu görseli görür.
+                        </p>
+                        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+                          <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-anthracite-200 bg-white">
+                            {avatarUrl ? (
+                              <Image src={avatarUrl} alt="Profil" fill sizes="64px" className="object-cover" />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-[10px] font-medium text-anthracite-400">
+                                Görsel yok
+                              </div>
+                            )}
+                          </div>
+                          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-anthracite-200 bg-white px-4 py-2 text-xs font-medium text-anthracite-700 hover:bg-anthracite-50">
+                            {avatarUploading ? 'Yükleniyor…' : 'Görsel seç'}
+                            <input
+                              type="file"
+                              accept="image/*"
+                              disabled={avatarUploading}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) void uploadAvatar(file);
+                                e.currentTarget.value = '';
+                              }}
+                              className="hidden"
+                            />
+                          </label>
+                        </div>
+                      </div>
+
                       <div className="mb-3 flex items-start gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
                           <ShieldAlert className="h-5 w-5" strokeWidth={2} />
