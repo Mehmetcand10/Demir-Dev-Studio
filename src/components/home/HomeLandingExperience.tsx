@@ -11,43 +11,45 @@ type Props = {
   approvedWholesalers: string | null;
 };
 
-const INTRO_LINES = [
-  "Hoş geldiniz",
-  "Demir Dev Studio",
-  "Onaylı B2B tekstil ağı",
-];
+const SPLASH_MESSAGE = "Hoş geldiniz. Demir Dev Studio ile güvenli ve düzenli B2B ticarete başlıyorsunuz.";
+const SPLASH_SEEN_KEY = "demirdev_home_splash_seen_v1";
 
 export default function HomeLandingExperience({
   city,
   approvedBoutiques,
   approvedWholesalers,
 }: Props) {
-  const [showSplash, setShowSplash] = useState(true);
-  const [lineIndex, setLineIndex] = useState(0);
+  const [showSplash, setShowSplash] = useState(false);
   const [chars, setChars] = useState(0);
-
-  const activeLine = useMemo(() => INTRO_LINES[lineIndex], [lineIndex]);
+  const activeLine = useMemo(() => SPLASH_MESSAGE, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const seen = window.sessionStorage.getItem(SPLASH_SEEN_KEY) === "1";
+    if (seen) {
+      setShowSplash(false);
+      return;
+    }
+    setShowSplash(true);
+    window.sessionStorage.setItem(SPLASH_SEEN_KEY, "1");
+  }, []);
+
+  useEffect(() => {
+    if (!showSplash) return;
     const typeTimer = setInterval(() => {
       setChars((prev) => (prev < activeLine.length ? prev + 1 : prev));
-    }, 45);
-
-    const lineTimer = setTimeout(() => {
-      setChars(0);
-      setLineIndex((prev) => (prev + 1) % INTRO_LINES.length);
-    }, 1000);
+    }, 65);
 
     return () => {
       clearInterval(typeTimer);
-      clearTimeout(lineTimer);
     };
-  }, [activeLine]);
+  }, [activeLine, showSplash]);
 
   useEffect(() => {
+    if (!showSplash) return;
     const splashTimer = setTimeout(() => setShowSplash(false), 3000);
     return () => clearTimeout(splashTimer);
-  }, []);
+  }, [showSplash]);
 
   return (
     <div className="w-full">
@@ -56,14 +58,14 @@ export default function HomeLandingExperience({
           showSplash ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
-        <div className="relative flex h-full items-center justify-center overflow-hidden bg-neutral-950">
-          <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-emerald-500/25 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-sky-500/20 blur-3xl" />
+        <div className="relative flex h-full items-center justify-center overflow-hidden bg-[#121513]">
+          <div className="pointer-events-none absolute -top-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-emerald-500/20 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-emerald-300/15 blur-3xl" />
           <div className="px-6 text-center">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-300">
               Demir Dev Studio
             </p>
-            <h1 className="text-3xl font-bold text-white sm:text-5xl">
+            <h1 className="mx-auto max-w-4xl text-2xl font-semibold leading-relaxed text-white sm:text-4xl">
               {activeLine.slice(0, chars)}
               <span className="ml-1 inline-block h-8 w-[3px] animate-pulse bg-emerald-400 align-middle sm:h-11" />
             </h1>
@@ -75,7 +77,7 @@ export default function HomeLandingExperience({
       </div>
 
       <main className="flex w-full flex-col">
-        <section className="relative isolate overflow-hidden border-b border-neutral-200 bg-[#f5f5f3]">
+        <section className="relative isolate overflow-hidden border-b border-neutral-200 bg-[#f7f7f6]">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(16,185,129,0.2),_transparent_45%),radial-gradient(circle_at_bottom_right,_rgba(15,23,42,0.12),_transparent_40%)]" />
           <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:py-24">
             <div className="text-center lg:text-left">
@@ -83,10 +85,10 @@ export default function HomeLandingExperience({
                 <Gem className="h-3.5 w-3.5 text-emerald-600" />
                 Türkiye B2B Tekstil Ağı
               </span>
-              <h2 className="text-4xl font-bold leading-tight tracking-tight text-neutral-950 sm:text-5xl lg:text-6xl">
+              <h2 className="text-4xl font-semibold leading-tight tracking-tight text-neutral-950 sm:text-5xl lg:text-6xl">
                 İlk izlenimde güven.
                 <br />
-                <span className="text-emerald-800">Her adımda netlik.</span>
+                <span className="text-neutral-700">Her adımda netlik.</span>
               </h2>
               <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-neutral-800 sm:text-lg lg:mx-0">
                 Demir Dev Studio, butiklerin onaylı toptancılardan doğru ürünleri hızlıca bulmasını; toptancıların da
@@ -96,7 +98,7 @@ export default function HomeLandingExperience({
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
                 <Link
                   href="/register"
-                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-neutral-950 px-8 py-3.5 text-sm font-bold text-white shadow-lg transition hover:bg-black"
+                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl bg-neutral-900 px-8 py-3.5 text-sm font-semibold text-white shadow-md transition hover:bg-neutral-800"
                 >
                   Hemen başvur
                   <ArrowRight className="h-4 w-4" />
@@ -110,19 +112,19 @@ export default function HomeLandingExperience({
               </div>
             </div>
             <div className="relative min-h-[300px] sm:min-h-[360px]">
-              <div className="absolute inset-0 overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-950 shadow-2xl">
+                <div className="absolute inset-0 overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-900 shadow-xl">
                 <Image
                   src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1400&auto=format&fit=crop"
                   alt=""
                   fill
-                  className="object-cover opacity-75"
+                  className="object-cover opacity-80"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/20" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/10" />
               </div>
               <div className="relative z-10 flex h-full items-end p-5 sm:p-7">
-                <div className="w-full rounded-2xl border border-zinc-500 bg-neutral-950/95 p-4">
+                <div className="w-full rounded-2xl border border-zinc-500 bg-neutral-900/95 p-4">
                   <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-400">Canlı sipariş akışı</p>
                   <p className="mt-2 text-base font-bold text-white sm:text-lg">
                     Onaylı işletmeler için kapalı devre fiyatlandırma ve güvenli süreç
@@ -158,21 +160,21 @@ export default function HomeLandingExperience({
           </div>
         </section>
 
-        <section className="border-y border-neutral-200 bg-neutral-950 px-4 py-14 text-white sm:px-6 sm:py-18">
+        <section className="border-y border-neutral-200 bg-neutral-100 px-4 py-14 sm:px-6 sm:py-18">
           <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2 lg:items-center">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-300">Kendimizi nasıl anlatıyoruz?</p>
-              <h3 className="mt-3 text-3xl font-bold leading-tight sm:text-4xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">Kendimizi nasıl anlatıyoruz?</p>
+              <h3 className="mt-3 text-3xl font-semibold leading-tight text-neutral-950 sm:text-4xl">
                 Demir Dev Studio, dijital bir pazar değil;
                 <br />
                 işletmeler arası ticaret altyapısıdır.
               </h3>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-200">
+              <p className="mt-5 max-w-xl text-base leading-relaxed text-neutral-700">
                 Hedefimiz, toptan tekstilde dağınık iletişim ve kontrolsüz sipariş yerine güvenli, takip edilebilir ve hızlı bir sistem sunmak.
                 Her ekranı bu yüzden açık, sade ve okunur tasarlıyoruz.
               </p>
             </div>
-            <div className="rounded-2xl border border-zinc-700 bg-zinc-900 p-6">
+            <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
               <ul className="space-y-4">
                 {[
                   "Onaylı üyelik modeli ile güvenli ağ",
@@ -180,7 +182,7 @@ export default function HomeLandingExperience({
                   "Ürün, ödeme ve kargo adımlarında tek merkez yönetim",
                   "Mobil ve masaüstünde yüksek okunurluk odaklı arayüz",
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-zinc-100">
+                  <li key={item} className="flex items-start gap-3 text-sm leading-relaxed text-neutral-700">
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
                     {item}
                   </li>
