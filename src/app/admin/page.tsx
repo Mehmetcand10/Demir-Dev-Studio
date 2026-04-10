@@ -6,7 +6,8 @@ import {
   TrendingUp, Package, Clock, ShieldCheck, 
   Archive, FolderArchive, Trash2, LayoutDashboard,
   FileText, History as HistoryIcon, Info, Printer, Megaphone, Send,
-  ArrowRight, BarChart3, Receipt, UserCheck, ShoppingBag, Loader2, ClipboardList, AlertTriangle
+  ArrowRight, BarChart3, Receipt, UserCheck, ShoppingBag, Loader2, ClipboardList, AlertTriangle,
+  Phone, Copy, UserSearch
 } from 'lucide-react';
 import { 
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
@@ -26,7 +27,7 @@ import { DashboardShell } from '@/components/dashboard/DashboardShell';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
 
-type TabType = 'overview' | 'orders' | 'payments' | 'approvals' | 'announcements' | 'reports' | 'archive';
+type TabType = 'overview' | 'orders' | 'payments' | 'approvals' | 'members' | 'announcements' | 'reports' | 'archive';
 
 export default function AdminDashboard() {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -47,8 +48,19 @@ export default function AdminDashboard() {
   const [annTarget, setAnnTarget] = useState('all');
   const [annType, setAnnType] = useState('info');
   const [isPublishing, setIsPublishing] = useState(false);
+  const [memberProfiles, setMemberProfiles] = useState<any[]>([]);
+  const [memberRoleFilter, setMemberRoleFilter] = useState<'all' | 'butik' | 'toptanci'>('all');
+  const [memberQuery, setMemberQuery] = useState('');
 
   const supabase = useMemo(() => createClient(), []);
+
+  const copyToClipboard = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      alert('Kopyalama başarısız; metni elle seçin.');
+    }
+  }, []);
 
   const fetchPendingUsers = useCallback(async () => {
     const { data } = await supabase
@@ -57,6 +69,15 @@ export default function AdminDashboard() {
       .eq('is_approved', false)
       .order('created_at', { ascending: false });
     if (data) setProfiles(data);
+  }, [supabase]);
+
+  const fetchMemberProfiles = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .in('role', ['butik', 'toptanci'])
+      .order('created_at', { ascending: false });
+    if (!error && data) setMemberProfiles(data);
   }, [supabase]);
 
   const fetchOrders = useCallback(async () => {
@@ -129,10 +150,17 @@ export default function AdminDashboard() {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', authUser.id).single();
     if (profile?.role === 'admin') {
       setIsAdmin(true);
-      await Promise.all([fetchPendingUsers(), fetchOrders(), fetchAnnouncements(), fetchDisputes(), fetchProducts()]);
+      await Promise.all([
+        fetchPendingUsers(),
+        fetchMemberProfiles(),
+        fetchOrders(),
+        fetchAnnouncements(),
+        fetchDisputes(),
+        fetchProducts(),
+      ]);
     }
     setLoading(false);
-  }, [supabase, fetchPendingUsers, fetchOrders, fetchAnnouncements, fetchDisputes, fetchProducts]);
+  }, [supabase, fetchPendingUsers, fetchMemberProfiles, fetchOrders, fetchAnnouncements, fetchDisputes, fetchProducts]);
 
   useEffect(() => {
     setMounted(true);
@@ -144,6 +172,7 @@ export default function AdminDashboard() {
     if (!error) {
       alert(`${role === 'toptanci' ? 'Toptancı yetkisi' : 'Müşteri fiyat görme izni'} başarıyla onaylandı!`);
       fetchPendingUsers();
+      fetchMemberProfiles();
     }
   };
 
@@ -243,6 +272,31 @@ export default function AdminDashboard() {
     () => disputes.filter((d) => isDisputeOpen(d.status)).length,
     [disputes]
   );
+
+  const filteredMemberProfiles = useMemo(() => {
+    let list = memberProfiles;
+    if (memberRoleFilter !== 'all') {
+      list = list.filter((p) => p.role === memberRoleFilter);
+    }
+    const q = memberQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter((p) => {
+        const haystack = [
+          p.business_name,
+          p.full_name,
+          p.phone_number,
+          p.tax_id,
+          p.iban,
+          p.id,
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        return haystack.includes(q);
+      });
+    }
+    return list;
+  }, [memberProfiles, memberRoleFilter, memberQuery]);
 
   const disputeProductName = useCallback(
     (orderId: string) => orders.find((o) => o.id === orderId)?.product_name || 'Sipariş',
@@ -391,6 +445,7 @@ export default function AdminDashboard() {
           { id: "orders", label: "Siparişler", icon: ShoppingBag },
           { id: "payments", label: "Hakediş", icon: Wallet },
           { id: "approvals", label: "Onaylar", icon: UserCheck },
+          { id: "members", label: "Üyeler", icon: UserSearch },
           { id: "announcements", label: "Duyuru", icon: Megaphone },
           { id: "reports", label: "Raporlar", icon: ClipboardList },
           { id: "archive", label: "Arşiv", icon: HistoryIcon },
@@ -724,13 +779,37 @@ export default function AdminDashboard() {
                                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${profile.role === 'toptanci' ? 'bg-emerald-500 text-white' : 'bg-blue-500 text-white'}`}>
                                     {profile.role === 'toptanci' ? <Store className="w-8 h-8"/> : <UserRound className="w-8 h-8"/>}
                                 </div>
-                                <div className="text-center sm:text-left">
-                                    <h3 className="font-black text-2xl mb-1">{profile.business_name || 'Gizli Üye'}</h3>
-                                    <div className="flex justify-center sm:justify-start gap-2">
+                                <div className="text-center sm:text-left w-full min-w-0">
+                                    <h3 className="font-black text-2xl mb-1">{profile.business_name || profile.full_name || 'İsimsiz başvuru'}</h3>
+                                    <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-3">
                                         <span className="text-[10px] font-black uppercase tracking-widest text-anthracite-400 bg-white px-2 py-0.5 rounded border border-anthracite-200">
                                             {profile.role === 'toptanci' ? 'Tedarikçi / Üretici' : 'Butik / Alıcı'}
                                         </span>
-                                        <span className="text-[10px] font-black text-anthracite-500">{profile.full_name}</span>
+                                        {profile.full_name && profile.full_name !== profile.business_name ? (
+                                          <span className="text-[10px] font-black text-anthracite-500">{profile.full_name}</span>
+                                        ) : null}
+                                    </div>
+                                    <div className="grid gap-2 text-left text-xs font-medium text-anthracite-600 sm:grid-cols-2">
+                                      {profile.phone_number ? (
+                                        <a href={`tel:${String(profile.phone_number).replace(/\s/g, '')}`} className="inline-flex items-center gap-2 rounded-lg border border-anthracite-200 bg-white px-3 py-2 text-anthracite-800 hover:bg-anthracite-50">
+                                          <Phone className="h-3.5 w-3.5 shrink-0 text-emerald-600" strokeWidth={2} />
+                                          {profile.phone_number}
+                                        </a>
+                                      ) : (
+                                        <span className="rounded-lg border border-dashed border-anthracite-200 px-3 py-2 text-anthracite-400">Telefon yok</span>
+                                      )}
+                                      {profile.tax_id ? (
+                                        <span className="rounded-lg border border-anthracite-200 bg-white px-3 py-2">Vergi no: {profile.tax_id}</span>
+                                      ) : null}
+                                      {profile.role === 'toptanci' && profile.iban ? (
+                                        <span className="sm:col-span-2 rounded-lg border border-emerald-100 bg-emerald-50/80 px-3 py-2 font-mono text-[11px] text-emerald-950">IBAN: {profile.iban}</span>
+                                      ) : null}
+                                      <div className="sm:col-span-2 flex flex-wrap items-center gap-2">
+                                        <span className="font-mono text-[10px] text-anthracite-400">ID: {profile.id}</span>
+                                        <button type="button" onClick={() => copyToClipboard(profile.id)} className="inline-flex items-center gap-1 rounded-md border border-anthracite-200 bg-white px-2 py-1 text-[10px] font-bold uppercase text-anthracite-600 hover:bg-anthracite-50">
+                                          <Copy className="h-3 w-3" strokeWidth={2} /> Kopyala
+                                        </button>
+                                      </div>
                                     </div>
                                 </div>
                             </div>
@@ -739,6 +818,146 @@ export default function AdminDashboard() {
                     ))}
                 </div>
             </div>
+        )}
+
+        {activeTab === 'members' && (
+          <div className="overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:p-8">
+            <div className="mb-6 flex flex-col gap-4 border-b border-anthracite-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-anthracite-900 sm:text-xl">
+                  <UserSearch className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+                  Üye rehberi
+                </h2>
+                <p className="mt-1 text-sm text-anthracite-500">
+                  Onaylı ve bekleyen tüm butik ile toptancı kayıtları; telefon, IBAN ve kullanıcı kimliği burada.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(['all', 'butik', 'toptanci'] as const).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setMemberRoleFilter(key)}
+                    className={`rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                      memberRoleFilter === key
+                        ? 'bg-anthracite-900 text-white'
+                        : 'border border-anthracite-200 bg-white text-anthracite-600 hover:bg-anthracite-50'
+                    }`}
+                  >
+                    {key === 'all' ? 'Tümü' : key === 'butik' ? 'Butik' : 'Toptancı'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="sr-only" htmlFor="admin-member-search">
+                Ara
+              </label>
+              <input
+                id="admin-member-search"
+                type="search"
+                value={memberQuery}
+                onChange={(e) => setMemberQuery(e.target.value)}
+                placeholder="İşletme adı, telefon, vergi no, IBAN veya kullanıcı ID ile ara…"
+                className="w-full rounded-xl border border-anthracite-200 bg-anthracite-50/50 px-4 py-3 text-sm text-anthracite-900 outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+              />
+            </div>
+
+            <p className="mb-4 text-xs font-medium text-anthracite-500">
+              {filteredMemberProfiles.length} kayıt gösteriliyor (toplam {memberProfiles.length}).
+            </p>
+
+            <div className="overflow-x-auto rounded-xl border border-anthracite-100">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-anthracite-100 bg-anthracite-50/80 text-[10px] font-bold uppercase tracking-wider text-anthracite-500">
+                    <th className="px-3 py-3 sm:px-4">Rol</th>
+                    <th className="px-3 py-3 sm:px-4">İşletme / ad</th>
+                    <th className="px-3 py-3 sm:px-4">Telefon</th>
+                    <th className="px-3 py-3 sm:px-4">Vergi no</th>
+                    <th className="px-3 py-3 sm:px-4">IBAN</th>
+                    <th className="px-3 py-3 sm:px-4">Onay</th>
+                    <th className="px-3 py-3 sm:px-4">Kayıt</th>
+                    <th className="px-3 py-3 sm:px-4">ID</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-anthracite-100">
+                  {filteredMemberProfiles.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="px-4 py-16 text-center text-sm font-medium text-anthracite-400">
+                        Kayıt bulunamadı.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredMemberProfiles.map((m) => (
+                      <tr key={m.id} className="bg-white hover:bg-anthracite-50/50">
+                        <td className="px-3 py-3 sm:px-4">
+                          <span
+                            className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
+                              m.role === 'toptanci' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
+                            }`}
+                          >
+                            {m.role === 'toptanci' ? 'Toptancı' : 'Butik'}
+                          </span>
+                        </td>
+                        <td className="max-w-[200px] px-3 py-3 font-semibold text-anthracite-900 sm:px-4">
+                          <span className="line-clamp-2">{m.business_name || m.full_name || '—'}</span>
+                        </td>
+                        <td className="px-3 py-3 sm:px-4">
+                          {m.phone_number ? (
+                            <a
+                              href={`tel:${String(m.phone_number).replace(/\s/g, '')}`}
+                              className="inline-flex items-center gap-1 font-medium text-emerald-700 hover:underline"
+                            >
+                              <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+                              {m.phone_number}
+                            </a>
+                          ) : (
+                            <span className="text-anthracite-400">—</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3 font-mono text-xs text-anthracite-700 sm:px-4">{m.tax_id || '—'}</td>
+                        <td className="max-w-[140px] px-3 py-3 font-mono text-[10px] text-anthracite-700 sm:px-4">
+                          {m.role === 'toptanci' && m.iban ? (
+                            <span className="line-clamp-2 break-all">{m.iban}</span>
+                          ) : (
+                            '—'
+                          )}
+                        </td>
+                        <td className="px-3 py-3 sm:px-4">
+                          {m.is_approved ? (
+                            <span className="text-xs font-semibold text-emerald-700">Onaylı</span>
+                          ) : (
+                            <span className="text-xs font-semibold text-amber-700">Bekliyor</span>
+                          )}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-3 text-xs text-anthracite-500 sm:px-4">
+                          {m.created_at ? new Date(m.created_at).toLocaleDateString('tr-TR') : '—'}
+                        </td>
+                        <td className="px-3 py-3 sm:px-4">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-mono text-[10px] text-anthracite-400">{m.id.slice(0, 8)}…</span>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(m.id)}
+                              className="inline-flex w-max items-center gap-1 rounded border border-anthracite-200 bg-white px-2 py-1 text-[10px] font-bold text-anthracite-600 hover:bg-anthracite-50"
+                            >
+                              <Copy className="h-3 w-3" strokeWidth={2} />
+                              Kopyala
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-4 text-[11px] leading-relaxed text-anthracite-500">
+              E-posta adresleri Supabase kimlik (Authentication) tarafında tutulur; gerekirse yönetim konsolundan kullanıcıya göre kontrol edin.
+            </p>
+          </div>
         )}
 
         {/* ANNOUNCEMENTS TAB */}
