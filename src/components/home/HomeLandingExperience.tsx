@@ -36,6 +36,7 @@ export default function HomeLandingExperience({
 
   useEffect(() => {
     if (!showSplash) return;
+    setChars(0);
     const typeTimer = setInterval(() => {
       setChars((prev) => (prev < activeLine.length ? prev + 1 : prev));
     }, 65);
@@ -47,9 +48,10 @@ export default function HomeLandingExperience({
 
   useEffect(() => {
     if (!showSplash) return;
-    const splashTimer = setTimeout(() => setShowSplash(false), 3000);
+    if (chars < activeLine.length) return;
+    const splashTimer = setTimeout(() => setShowSplash(false), 1400);
     return () => clearTimeout(splashTimer);
-  }, [showSplash]);
+  }, [showSplash, chars, activeLine.length]);
 
   return (
     <div className="w-full">
