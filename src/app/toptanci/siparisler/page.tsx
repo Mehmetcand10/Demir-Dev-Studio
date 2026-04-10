@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from 'react';
-import { Package, ArrowLeft, Loader2, FileText, Scale, Truck } from 'lucide-react';
+import { Package, ArrowLeft, Loader2, FileText, Scale, Truck, Receipt, StickyNote } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { ORDER_STATUS } from '@/utils/orderStatus';
@@ -165,8 +165,26 @@ export default function ToptanciSiparisler() {
                       </div>
                     )}
                     <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
-                      <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${order.status === ORDER_STATUS.SHIPPED ? 'border-blue-200 bg-blue-50 text-blue-800' : 'border-emerald-200 bg-emerald-600 text-white'}`}>
-                        {order.status === ORDER_STATUS.SHIPPED ? 'Kargoda' : 'Hazırlanacak'}
+                      <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${
+                        order.status === ORDER_STATUS.SHIPPED
+                          ? 'border-blue-200 bg-blue-50 text-blue-800'
+                          : order.status === ORDER_STATUS.WAITING_PAYMENT
+                            ? 'border-amber-200 bg-amber-50 text-amber-900'
+                            : order.status === ORDER_STATUS.CANCELLED
+                              ? 'border-red-200 bg-red-50 text-red-800'
+                              : order.status === ORDER_STATUS.DELIVERED
+                                ? 'border-indigo-200 bg-indigo-50 text-indigo-800'
+                                : 'border-emerald-200 bg-emerald-600 text-white'
+                      }`}>
+                        {order.status === ORDER_STATUS.SHIPPED
+                          ? 'Kargoda'
+                          : order.status === ORDER_STATUS.WAITING_PAYMENT
+                            ? 'Ödeme bekliyor'
+                            : order.status === ORDER_STATUS.CANCELLED
+                              ? 'İptal'
+                              : order.status === ORDER_STATUS.DELIVERED
+                                ? 'Teslim'
+                                : 'Hazırlanacak'}
                       </span>
                       <span className="rounded-lg border border-emerald-100/90 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-900">
                         {Number(order.quantity)} adet
@@ -181,6 +199,31 @@ export default function ToptanciSiparisler() {
                       <p className="mt-1 text-sm leading-relaxed text-anthracite-600">{order.shipping_address}</p>
                       <p className="mt-3 rounded-lg border border-emerald-100/90 bg-emerald-50/80 p-2.5 text-xs font-medium text-emerald-800">{order.buyer_phone}</p>
                     </div>
+
+                    {(order.buyer_note || order.payment_receipt_url) && (
+                      <div className="mb-4 space-y-2 rounded-xl border border-anthracite-200/80 bg-white p-3 text-left">
+                        {order.buyer_note ? (
+                          <div className="flex gap-2 text-sm text-anthracite-800">
+                            <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-anthracite-400" strokeWidth={2} />
+                            <div>
+                              <p className="text-[10px] font-semibold uppercase tracking-wide text-anthracite-500">Butik notu</p>
+                              <p className="mt-0.5 text-xs font-medium leading-relaxed">{order.buyer_note}</p>
+                            </div>
+                          </div>
+                        ) : null}
+                        {order.payment_receipt_url ? (
+                          <a
+                            href={order.payment_receipt_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 underline underline-offset-2 hover:text-emerald-950"
+                          >
+                            <Receipt className="h-3.5 w-3.5" strokeWidth={2} />
+                            Ödeme dekontu (butik yüklemesi)
+                          </a>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
 
                   {order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? (

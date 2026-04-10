@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Package, ShoppingBag, MapPin, Star, ArrowLeft, ShieldAlert, Lock } from "lucide-react";
+import { Package, ShoppingBag, MapPin, Star, ArrowLeft, ShieldAlert, Lock, Bell, BellRing, Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { supplierAliasFromId } from "@/utils/supplierAlias";
 
@@ -27,6 +27,13 @@ export default function WholesalerStorefront({
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [canSeePrices, setCanSeePrices] = useState(false);
+  const [viewer, setViewer] = useState<{
+    id: string;
+    role: string;
+    is_approved: boolean;
+  } | null>(null);
+  const [following, setFollowing] = useState(false);
+  const [followBusy, setFollowBusy] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -53,12 +60,33 @@ export default function WholesalerStorefront({
       if (auth?.user) {
         const { data: myProfile } = await supabase
           .from("profiles")
-          .select("is_approved")
+          .select("is_approved, role")
           .eq("id", auth.user.id)
           .single();
         setCanSeePrices(Boolean(myProfile?.is_approved));
+        setViewer({
+          id: auth.user.id,
+          role: myProfile?.role || "butik",
+          is_approved: Boolean(myProfile?.is_approved),
+        });
+        if (
+          myProfile?.role === "butik" &&
+          auth.user.id !== wholesalerId
+        ) {
+          const { data: row } = await supabase
+            .from("boutique_wholesaler_follows")
+            .select("wholesaler_id")
+            .eq("boutique_id", auth.user.id)
+            .eq("wholesaler_id", wholesalerId)
+            .maybeSingle();
+          setFollowing(Boolean(row));
+        } else {
+          setFollowing(false);
+        }
       } else {
         setCanSeePrices(false);
+        setViewer(null);
+        setFollowing(false);
       }
 
       const { data: prods } = await supabase
@@ -82,6 +110,44 @@ export default function WholesalerStorefront({
     }
     fetchData();
   }, [wholesalerId, supabase]);
+
+  const toggleFollow = async () => {
+    if (
+      !viewer ||
+      viewer.role !== "butik" ||
+      !viewer.is_approved ||
+      viewer.id === wholesalerId
+    )
+      return;
+    setFollowBusy(true);
+    try {
+      if (following) {
+        const { error } = await supabase
+          .from("boutique_wholesaler_follows")
+          .delete()
+          .eq("boutique_id", viewer.id)
+          .eq("wholesaler_id", wholesalerId);
+        if (error) throw error;
+        setFollowing(false);
+      } else {
+        const { error } = await supabase
+          .from("boutique_wholesaler_follows")
+          .insert({
+            boutique_id: viewer.id,
+            wholesaler_id: wholesalerId,
+          });
+        if (error) throw error;
+        setFollowing(true);
+      }
+    } catch (e: unknown) {
+      alert(
+        "Takip güncellenemedi: " +
+          (e instanceof Error ? e.message : String(e))
+      );
+    } finally {
+      setFollowBusy(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -107,8 +173,19 @@ export default function WholesalerStorefront({
     );
   }
 
-  const storefrontName = supplierAliasFromId(wholesalerId);
-  const storefrontInitial = storefrontName[0]?.toUpperCase() || "?";
+  const isOwnerPreview =
+    viewer?.role === "toptanci" && viewer.id === wholesalerId;
+  const publicAlias = supplierAliasFromId(wholesalerId);
+  const ownerLegalName =
+    profile.business_name?.trim() ||
+    profile.full_name?.trim() ||
+    publicAlias;
+  const displayName = isOwnerPreview ? ownerLegalName : publicAlias;
+  const displayInitial = (displayName[0] || "?").toUpperCase();
+  const headerAvatarUrl =
+    isOwnerPreview && profile.avatar_url?.trim()
+      ? profile.avatar_url.trim()
+      : null;
 
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
@@ -125,22 +202,69 @@ export default function WholesalerStorefront({
             <Package className="h-64 w-64" strokeWidth={1} />
           </div>
 
-          <div className="relative z-10 flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-3xl font-semibold text-white shadow-sm sm:h-28 sm:w-28 sm:text-4xl">
-            <span>{storefrontInitial}</span>
+          <div className="relative z-10 h-24 w-24 shrink-0 overflow-hidden rounded-2xl shadow-sm ring-1 ring-anthracite-100/80 sm:h-28 sm:w-28">
+            {headerAvatarUrl ? (
+              <Image
+                src={headerAvatarUrl}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 96px, 112px"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-emerald-600 to-emerald-700 text-3xl font-semibold text-white sm:text-4xl">
+                {displayInitial}
+              </div>
+            )}
           </div>
 
           <div className="relative z-10 flex-1 text-center md:text-left">
             <div className="mb-3 flex flex-wrap items-center justify-center gap-2 md:justify-start">
-              <span className="rounded-full border border-emerald-200/80 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-medium text-emerald-800">
-                Onaylı üretici
+              <span
+                className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${
+                  isOwnerPreview
+                    ? "border-blue-200 bg-blue-50 text-blue-900"
+                    : "border-emerald-200/80 bg-emerald-50 text-emerald-800"
+                }`}
+              >
+                {isOwnerPreview ? "Kendi vitrininiz" : "Onaylı üretici"}
               </span>
               <div className="flex items-center gap-1 rounded-full border border-amber-100 bg-amber-50 px-2.5 py-0.5 text-[10px] font-medium text-amber-800">
                 <Star className="h-3 w-3 fill-current" /> Satıcı
               </div>
+              {viewer &&
+                viewer.role === "butik" &&
+                viewer.is_approved &&
+                viewer.id !== wholesalerId && (
+                  <button
+                    type="button"
+                    disabled={followBusy}
+                    onClick={() => void toggleFollow()}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-semibold transition ${
+                      following
+                        ? "border-emerald-300 bg-emerald-600 text-white hover:bg-emerald-700"
+                        : "border-anthracite-200 bg-white text-anthracite-800 hover:bg-anthracite-50"
+                    } disabled:opacity-60`}
+                  >
+                    {followBusy ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : following ? (
+                      <BellRing className="h-3 w-3" strokeWidth={2} />
+                    ) : (
+                      <Bell className="h-3 w-3" strokeWidth={2} />
+                    )}
+                    {following ? "Takipte" : "Takip et"}
+                  </button>
+                )}
             </div>
             <h1 className="mb-2 break-words text-2xl font-semibold leading-tight tracking-tight text-anthracite-900 sm:text-3xl">
-              {storefrontName}
+              {displayName}
             </h1>
+            {isOwnerPreview ? (
+              <p className="mb-2 text-xs font-medium text-anthracite-500">
+                Butikler vitrinde sizi yalnızca kodlu tedarikçi adıyla görür; burada iş unvanınız size özeldir.
+              </p>
+            ) : null}
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-anthracite-600 md:justify-start">
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-4 w-4 text-emerald-600" strokeWidth={2} />{" "}
@@ -177,7 +301,9 @@ export default function WholesalerStorefront({
             Ürünler ({products.length})
           </h2>
           <p className="text-xs text-anthracite-500 sm:text-sm">
-            Sadece bu tedarikçinin vitrini
+            {isOwnerPreview
+              ? "Aşağıdaki ürünler katalogdaki vitrininizle aynıdır."
+              : "Sadece bu tedarikçinin vitrini"}
           </p>
         </div>
 

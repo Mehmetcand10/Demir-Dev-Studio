@@ -5,7 +5,7 @@ import {
   Package, PlusCircle, Image as ImageIcon, Trash2, Eye, Truck, 
   Loader2, LayoutDashboard, ShoppingBag, Wallet, PieChart as ChartIcon, 
   ArrowRight, CheckCircle2, QrCode, FileText, MoveRight, Layers, History as HistoryIcon, Pencil,
-  ShieldAlert
+  ShieldAlert, BellRing, Receipt, StickyNote
 } from 'lucide-react';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { createClient } from '@/utils/supabase/client';
@@ -15,7 +15,7 @@ import NotificationBell from '@/components/NotificationBell';
 import { DashboardShell } from '@/components/dashboard/DashboardShell';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardTabs } from '@/components/dashboard/DashboardTabs';
-import { ORDER_STATUS } from '@/utils/orderStatus';
+import { ORDER_STATUS, getOrderStatusLabel } from '@/utils/orderStatus';
 import { hasPositiveStockLine, isLowStockProduct } from '@/utils/productStocks';
 import BulkProductCsvPanel from '@/components/toptanci/BulkProductCsvPanel';
 
@@ -49,6 +49,7 @@ export default function ToptanciDashboard() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [minOrderFloor, setMinOrderFloor] = useState('');
   const [minOrderFloorSaving, setMinOrderFloorSaving] = useState(false);
+  const [followerCount, setFollowerCount] = useState<number | null>(null);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -61,6 +62,13 @@ export default function ToptanciDashboard() {
     // Siparişleri Çek
     const { data: ords } = await supabase.from('orders').select('*').eq('wholesaler_id', userId).order('created_at', { ascending: false });
     if (ords) setOrders(ords);
+
+    const { count: fc, error: fcErr } = await supabase
+      .from('boutique_wholesaler_follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('wholesaler_id', userId);
+    if (!fcErr) setFollowerCount(fc ?? 0);
+    else setFollowerCount(0);
 
     setLoading(false);
   }, [supabase]);
@@ -246,7 +254,18 @@ export default function ToptanciDashboard() {
           <div className="py-20 text-center text-sm font-medium text-anthracite-400">Yükleniyor…</div>
       ) : (
           <div className="transition-all duration-500">
-            
+            {followerCount !== null && (
+              <div className="mb-5 flex gap-3 rounded-xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50/90 to-white px-4 py-3 text-sm text-emerald-950 shadow-sm">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white">
+                  <BellRing className="h-4 w-4" strokeWidth={2} />
+                </div>
+                <p className="min-w-0 leading-relaxed">
+                  <span className="font-semibold">{followerCount} onaylı butik</span> vitrininizi takip ediyor.
+                  Yeni ürün eklediğinizde bildirim önce onlara gider; hiç takipçiniz yoksa tüm onaylı butiklere yayılır.
+                </p>
+              </div>
+            )}
+
             {/* INVENTORY TAB */}
             {activeTab === 'inventory' && (
                 <div className="rounded-2xl border border-anthracite-200/70 bg-white p-6 text-left shadow-sm sm:p-8">
@@ -255,7 +274,15 @@ export default function ToptanciDashboard() {
                             <h2 className="text-lg font-semibold text-anthracite-900 sm:text-xl">Vitrin ({products.length})</h2>
                             <p className="mt-1 text-sm text-anthracite-500">Katalogda görünen ürünleriniz.</p>
                         </div>
-                        <button type="button" onClick={() => setActiveTab('studio')} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-xs font-medium text-white shadow-sm transition hover:bg-emerald-700">Yeni ürün ekle</button>
+                        <div className="flex flex-wrap gap-2 sm:justify-end">
+                          <Link
+                            href={`/toptanci-gor/${user.id}`}
+                            className="inline-flex items-center justify-center rounded-lg border border-anthracite-200 bg-white px-5 py-2.5 text-xs font-medium text-anthracite-800 shadow-sm transition hover:bg-anthracite-50"
+                          >
+                            Vitrinimi gör
+                          </Link>
+                          <button type="button" onClick={() => setActiveTab('studio')} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-xs font-medium text-white shadow-sm transition hover:bg-emerald-700">Yeni ürün ekle</button>
+                        </div>
                     </div>
 
                     <div className="mb-8 rounded-2xl border border-amber-200/90 bg-gradient-to-br from-amber-50/90 to-white p-5 shadow-sm sm:p-6">
@@ -264,7 +291,7 @@ export default function ToptanciDashboard() {
                           Profil görseli (mağaza vitrini)
                         </h3>
                         <p className="mb-3 text-xs text-anthracite-600">
-                          Butikler “Toptancıyı gör” sayfasında bu görseli görür.
+                          Önizlemede ve vitrin kartınızda kullanılır; butikler mağaza adınızı kodlu tedarikçi etiketiyle görür.
                         </p>
                         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                           <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-anthracite-200 bg-white">
@@ -565,7 +592,7 @@ export default function ToptanciDashboard() {
                 <div className="rounded-2xl border border-anthracite-200/70 bg-white p-6 text-left shadow-sm sm:p-8">
                     <div className="mb-8 border-b border-anthracite-100/90 pb-6">
                         <h2 className="text-lg font-semibold text-anthracite-900 sm:text-xl">Siparişler ({orders.length})</h2>
-                        <p className="mt-1 text-sm text-anthracite-500">Ödemesi onaylanmış işlemler.</p>
+                        <p className="mt-1 text-sm text-anthracite-500">Gelen tüm siparişler; durum rozetinden aşamayı görün. Kargolama için Kargo sekmesini kullanın.</p>
                     </div>
 
                     <div className="space-y-5">
@@ -574,8 +601,18 @@ export default function ToptanciDashboard() {
                         ) : orders.map(ord => (
                             <div key={ord.id} className="group relative flex flex-col items-center gap-6 overflow-hidden rounded-xl border border-anthracite-200/60 bg-anthracite-50/30 p-5 transition hover:border-anthracite-300/80 hover:bg-white hover:shadow-sm md:flex-row md:gap-8">
                                 <div className="absolute right-5 top-5 flex gap-2 md:right-6 md:top-6">
-                                     <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${ord.status === ORDER_STATUS.SHIPPED ? 'border-blue-200 bg-blue-50 text-blue-700' : ord.status === ORDER_STATUS.DELIVERED ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>
-                                         {ord.status === ORDER_STATUS.SHIPPED ? 'Kargoda' : ord.status === ORDER_STATUS.DELIVERED ? 'Teslim' : 'Hazırlanıyor'}
+                                     <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${
+                                       ord.status === ORDER_STATUS.SHIPPED
+                                         ? 'border-blue-200 bg-blue-50 text-blue-700'
+                                         : ord.status === ORDER_STATUS.DELIVERED
+                                           ? 'border-indigo-200 bg-indigo-50 text-indigo-700'
+                                           : ord.status === ORDER_STATUS.WAITING_PAYMENT
+                                             ? 'border-amber-200 bg-amber-50 text-amber-900'
+                                             : ord.status === ORDER_STATUS.CANCELLED
+                                               ? 'border-red-200 bg-red-50 text-red-800'
+                                               : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                     }`}>
+                                         {getOrderStatusLabel(ord.status)}
                                      </span>
                                 </div>
                                 <div className="flex w-full flex-1 flex-col items-center gap-6 text-left sm:flex-row sm:gap-8">
@@ -602,6 +639,30 @@ export default function ToptanciDashboard() {
                                                 <p className="text-xs font-semibold tabular-nums text-emerald-800">{ord.wholesaler_earning.toLocaleString('tr-TR')} ₺</p>
                                             </div>
                                         </div>
+                                        {(ord.buyer_note || ord.payment_receipt_url) && (
+                                          <div className="mt-4 w-full rounded-xl border border-anthracite-200/80 bg-white/90 p-3 text-left">
+                                            {ord.buyer_note ? (
+                                              <div className="flex gap-2 text-sm text-anthracite-800">
+                                                <StickyNote className="mt-0.5 h-4 w-4 shrink-0 text-anthracite-400" strokeWidth={2} />
+                                                <div>
+                                                  <p className="text-[10px] font-semibold uppercase tracking-wide text-anthracite-500">Butik notu</p>
+                                                  <p className="mt-0.5 text-xs font-medium leading-relaxed">{ord.buyer_note}</p>
+                                                </div>
+                                              </div>
+                                            ) : null}
+                                            {ord.payment_receipt_url ? (
+                                              <a
+                                                href={ord.payment_receipt_url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className={`inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 underline underline-offset-2 hover:text-emerald-950 ${ord.buyer_note ? 'mt-2' : ''}`}
+                                              >
+                                                <Receipt className="h-3.5 w-3.5" strokeWidth={2} />
+                                                Ödeme dekontu
+                                              </a>
+                                            ) : null}
+                                          </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex w-full shrink-0 flex-col gap-2 sm:w-auto">

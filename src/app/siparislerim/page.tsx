@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { 
   PackageSearch, PackageCheck, Clock, Truck, FileText, 
   Search, ArrowRight, CheckCircle2, History as HistoryIcon, CreditCard,
-  Package, ShoppingBag, Loader2, Info, Printer
+  Package, ShoppingBag, Loader2, Info, Printer, Upload, RotateCcw
 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
@@ -29,8 +29,43 @@ export default function Siparislerim() {
   const [disputeReason, setDisputeReason] = useState('');
   const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
   const [disputesByOrder, setDisputesByOrder] = useState<Record<string, any>>({});
+  const [receiptBusyId, setReceiptBusyId] = useState<string | null>(null);
 
   const supabase = useMemo(() => createClient(), []);
+
+  const uploadReceipt = async (orderId: string, file: File) => {
+    if (!user) return;
+    setReceiptBusyId(orderId);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      if (!["jpg", "jpeg", "png", "webp", "pdf"].includes(ext)) {
+        alert("Yalnızca JPG, PNG, WEBP veya PDF yükleyin.");
+        return;
+      }
+      const path = `${user.id}/receipts/${orderId}_${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("product-images").upload(path, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("product-images").getPublicUrl(path);
+      const url = pub.publicUrl;
+      const { error } = await supabase
+        .from("orders")
+        .update({ payment_receipt_url: url })
+        .eq("id", orderId)
+        .eq("buyer_id", user.id);
+      if (error) throw error;
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, payment_receipt_url: url } : o))
+      );
+      alert("Dekont yüklendi.");
+    } catch (e: unknown) {
+      alert("Yükleme başarısız: " + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setReceiptBusyId(null);
+    }
+  };
 
   const cancelOrder = async (orderId: string) => {
     if (!confirm("Bu siparişi ödeme öncesinde iptal etmek istiyor musunuz?")) return;
@@ -206,6 +241,12 @@ export default function Siparislerim() {
                          <div className="min-w-0">
                             <h3 className="text-lg font-semibold leading-snug text-anthracite-900 sm:text-xl">{order.product_name}</h3>
                             <p className="mt-1 text-[11px] font-medium uppercase tracking-wide text-anthracite-500">Toplam {order.quantity} adet · {order.selected_size} · {date}</p>
+                            {order.buyer_note ? (
+                              <p className="mt-2 rounded-lg border border-anthracite-100 bg-anthracite-50/80 px-2.5 py-1.5 text-xs leading-relaxed text-anthracite-700">
+                                <span className="font-semibold text-anthracite-800">Notunuz: </span>
+                                {order.buyer_note}
+                              </p>
+                            ) : null}
                          </div>
                          <div className="text-left sm:text-right">
                              <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-700/90">Tutar</p>
@@ -254,9 +295,38 @@ export default function Siparislerim() {
                       {/* AKSİYONLAR VE BİLGİ BANTLARI */}
                       <div className="flex flex-col gap-4 border-t border-anthracite-100/80 pt-4 sm:flex-row sm:items-center sm:justify-between">
                          {order.status === ORDER_STATUS.WAITING_PAYMENT ? (
-                            <div className="flex w-full items-center gap-2 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2.5 text-xs font-medium text-amber-900 sm:w-auto">
-                               <Info className="h-4 w-4 shrink-0 text-amber-600" />
-                               Dekontu WhatsApp (merkez) hattına iletin.
+                            <div className="flex w-full flex-col gap-2 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2.5 text-xs text-amber-950 sm:max-w-md">
+                               <div className="flex items-start gap-2 font-medium">
+                                 <Info className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
+                                 <span>Dekontu panelden yükleyin veya WhatsApp (merkez) hattına iletin.</span>
+                               </div>
+                               <div className="ml-6 flex flex-wrap items-center gap-2">
+                                 {order.payment_receipt_url ? (
+                                   <a
+                                     href={order.payment_receipt_url}
+                                     target="_blank"
+                                     rel="noreferrer"
+                                     className="text-[11px] font-semibold text-emerald-800 underline underline-offset-2"
+                                   >
+                                     Dekontu aç
+                                   </a>
+                                 ) : null}
+                                 <label className="inline-flex w-max cursor-pointer items-center gap-2 rounded-lg border border-amber-300 bg-white px-3 py-2 text-[11px] font-semibold text-amber-900 hover:bg-amber-50">
+                                   <Upload className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+                                   {receiptBusyId === order.id ? "Yükleniyor…" : order.payment_receipt_url ? "Dekontu değiştir" : "Dekont yükle"}
+                                   <input
+                                     type="file"
+                                     accept="image/jpeg,image/png,image/webp,application/pdf"
+                                     className="hidden"
+                                     disabled={receiptBusyId === order.id}
+                                     onChange={(e) => {
+                                       const f = e.target.files?.[0];
+                                       if (f) void uploadReceipt(order.id, f);
+                                       e.currentTarget.value = "";
+                                     }}
+                                   />
+                                 </label>
+                               </div>
                             </div>
                          ) : order.status === ORDER_STATUS.SHIPPED && order.tracking_number ? (
                             <div className="w-full rounded-xl border border-blue-100 bg-blue-50/90 px-3 py-2.5 text-center text-blue-900 sm:w-auto sm:text-left">
@@ -275,6 +345,15 @@ export default function Siparislerim() {
                                 <button onClick={() => exportInvoicePDF(order)} className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-anthracite-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-anthracite-800 sm:flex-none">
                                    <FileText className="h-4 w-4" /> Fatura
                                 </button>
+                            )}
+                            {order.product_id && order.selected_size && order.status !== ORDER_STATUS.CANCELLED && (
+                                <Link
+                                  href={`/product/${order.product_id}?bedenler=${encodeURIComponent(String(order.selected_size))}`}
+                                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-medium text-emerald-900 transition hover:bg-emerald-100 sm:flex-none"
+                                >
+                                  <RotateCcw className="h-4 w-4 shrink-0" strokeWidth={2} />
+                                  Tekrar sipariş
+                                </Link>
                             )}
                             {order.status === ORDER_STATUS.WAITING_PAYMENT && (
                                 <button onClick={() => cancelOrder(order.id)} className="inline-flex flex-1 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-xs font-medium text-red-800 transition hover:bg-red-100 sm:flex-none">

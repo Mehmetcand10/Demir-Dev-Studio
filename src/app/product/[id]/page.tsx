@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, MessageCircle, Package, Lock, ShieldAlert } from "lucide-react";
+import { ArrowLeft, MessageCircle, Package, Lock, ShieldAlert, ListOrdered, StickyNote } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
 import { ORDER_STATUS } from '@/utils/orderStatus';
@@ -10,6 +10,7 @@ import { notify } from '@/utils/notifications';
 import { getOrderableStocks, usesFallbackStocks } from '@/utils/productStocks';
 import { getWhatsAppOrderDigits } from '@/utils/whatsapp';
 import ProductImageGallery from '@/components/product/ProductImageGallery';
+import { pushRecentProductId } from '@/utils/recentProducts';
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<any>(null);
@@ -27,15 +28,36 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [sizeQuantities, setSizeQuantities] = useState<Record<string, number>>({});
   const [wholesalerMinFloor, setWholesalerMinFloor] = useState<number | null>(null);
+  const [buyerNote, setBuyerNote] = useState("");
+  const [listBusy, setListBusy] = useState(false);
 
   const orderableStocks = useMemo(() => (product ? getOrderableStocks(product) : {}), [product]);
   const stockIsFallback = useMemo(() => (product ? usesFallbackStocks(product) : false), [product]);
 
   useEffect(() => {
-    const next: Record<string, number> = {};
-    for (const key of Object.keys(orderableStocks)) next[key] = 0;
-    setSizeQuantities(next);
-  }, [params.id, orderableStocks]);
+    const keys = Object.keys(orderableStocks);
+    if (keys.length === 0 || !product?.id) return;
+    const base: Record<string, number> = {};
+    for (const k of keys) base[k] = 0;
+    if (typeof window !== "undefined") {
+      const raw = new URLSearchParams(window.location.search).get("bedenler");
+      if (raw) {
+        try {
+          const decoded = decodeURIComponent(raw);
+          for (const part of decoded.split(",")) {
+            const [size, q] = part.split(":").map((x) => x.trim());
+            if (size && base[size] !== undefined) {
+              const max = Number(orderableStocks[size]) || 0;
+              base[size] = Math.min(Math.max(0, parseInt(q, 10) || 0), max);
+            }
+          }
+        } catch {
+          /* ignore bad query */
+        }
+      }
+    }
+    setSizeQuantities(base);
+  }, [product?.id, orderableStocks]);
 
   const fetchData = useCallback(async () => {
     const { data: p } = await supabase.from('products').select('*').eq('id', params.id).single();
@@ -62,6 +84,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       if (profile) {
          setIsApproved(profile.is_approved || false);
          setCurrentUserProfile(profile);
+         if (profile.role === 'butik' && p?.id) pushRecentProductId(p.id);
       }
     }
     setLoading(false);
@@ -87,6 +110,40 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
     .filter(([, qty]) => Number(qty) > 0)
     .map(([size, qty]) => `${size}:${qty}`);
   const selectedSizesSummary = selectedLineItems.join(", ");
+
+  const handleAddToShoppingList = async () => {
+    if (!currentUserProfile || currentUserProfile.role !== "butik") {
+      alert("Alışveriş listesi yalnızca butik hesapları içindir.");
+      return;
+    }
+    if (selectedLineItems.length === 0) {
+      alert("Önce en az bir bedende adet girin.");
+      return;
+    }
+    setListBusy(true);
+    try {
+      const { error } = await supabase.from("shopping_list_items").upsert(
+        {
+          user_id: currentUserProfile.id,
+          product_id: product.id,
+          size_quantities: sizeQuantities,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id,product_id" }
+      );
+      if (error) throw error;
+      alert("Sepete eklendi. Üst menüden «Sepet» ile devam edebilirsiniz.");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      alert(
+        "Liste kaydı başarısız: " +
+          msg +
+          "\n\nVeritabanında butik_features.sql (shopping_list_items) uygulandı mı kontrol edin."
+      );
+    } finally {
+      setListBusy(false);
+    }
+  };
 
   // FAZ 4: DROP-SHIPPING SİPARİŞ OLUŞTURMA İŞLEMİ (Veritabanı + WhatsApp)
   const handleCreateOrder = async (e: React.FormEvent) => {
@@ -118,6 +175,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       const wholeEarn = totalPrice - comm; // Toptancının Parası (Müşteri Toplam Fiyatı - Demir Dev Komisyonu)
 
       // 1. Sisteme Finansal İşlemi Kaydet (orders tablosu)
+      const noteTrim = buyerNote.trim();
       const { error } = await supabase.from('orders').insert({
            product_id: product.id,
            buyer_id: currentUserProfile.id,
@@ -131,7 +189,8 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
            buyer_name: currentUserProfile.business_name || currentUserProfile.full_name,
            product_name: product.name,
            selected_size: selectedSizesSummary,
-           status: ORDER_STATUS.WAITING_PAYMENT
+           status: ORDER_STATUS.WAITING_PAYMENT,
+           buyer_note: noteTrim || null,
       });
 
       if(error) throw error;
@@ -152,16 +211,17 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       }
 
       // 2. WhatsApp Profesyonel Şablonu Oluştur ve Bota Yönlendir
-      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name}\n📏 Beden dağılımı: ${selectedSizesSummary}\n🔢 Toplam Miktar: ${totalItems} Adet\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}\n\n⚠️ Yönetim Notu: Sipariş sisteme kaydoldu, ödeme teyidi sonrası hazırlık sürecine alınabilir.\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
+      const message = `💎 YENİ SİPARİŞ - DEMİR DEV STUDIO 💎\n👤 Müşteri: ${currentUserProfile.business_name || "İsimsiz Butik"}\n📦 Ürün: ${product.name}\n📏 Beden dağılımı: ${selectedSizesSummary}\n🔢 Toplam Miktar: ${totalItems} Adet\n💰 Toplam Tutar: ${totalPrice.toLocaleString("tr-TR")} TL\n📍 Teslimat: ${fullAddress}${noteTrim ? `\n📝 Butik notu: ${noteTrim}` : ""}\n\n⚠️ Yönetim Notu: Sipariş sisteme kaydoldu, ödeme teyidi sonrası hazırlık sürecine alınabilir.\n\nLütfen ödeme dekontunu bu mesajın altına ekleyiniz veya panelden yükleyiniz. Onay sonrası sevkiyat başlayacaktır.`;
       
       // Demir Dev Studio (Merkez) Resmi WhatsApp Numarası
       const whatsappNumber = getWhatsAppOrderDigits();
       window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
 
       setShowAddressModal(false);
+      setBuyerNote("");
       
       // Müşteriyi Müşteri Paneline (Kargom Nerede) yönlendir (Birazdan yapacağız)
-      alert("Sipariş Kaydı Oluşturuldu! WhatsApp üzerinden dekont atmayı unutmayın.");
+      alert("Sipariş kaydı oluşturuldu. İsterseniz Siparişlerim’den dekont yükleyebilir veya WhatsApp ile iletebilirsiniz.");
       // window.location.href = '/siparislerim';
 
     } catch(err:any) {
@@ -354,6 +414,26 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   </p>
                 )}
 
+                {currentUserProfile?.role === "butik" && (
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <button
+                      type="button"
+                      disabled={listBusy || selectedLineItems.length === 0}
+                      onClick={() => void handleAddToShoppingList()}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-anthracite-200 bg-white py-3 text-sm font-medium text-anthracite-800 transition hover:bg-anthracite-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <ListOrdered className="h-4 w-4 shrink-0" strokeWidth={2} />
+                      {listBusy ? "Kaydediliyor…" : "Listeme ekle"}
+                    </button>
+                    <Link
+                      href="/sepet"
+                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/80 py-3 text-center text-sm font-medium text-emerald-900 transition hover:bg-emerald-100"
+                    >
+                      Sepeti aç
+                    </Link>
+                  </div>
+                )}
+
                 <button 
                   type="button"
                   disabled={selectedLineItems.length === 0 || floorBlocked || moqBlocked}
@@ -409,6 +489,20 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                <div>
                   <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Açık adres</label>
                   <textarea required value={adres} onChange={e=>setAdres(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15" placeholder="Mahalle, sokak, no…"></textarea>
+               </div>
+               <div>
+                  <label className="mb-1.5 flex items-center gap-2 text-xs font-medium text-anthracite-600">
+                    <StickyNote className="h-3.5 w-3.5" strokeWidth={2} />
+                    Sipariş notu (isteğe bağlı)
+                  </label>
+                  <textarea
+                    value={buyerNote}
+                    onChange={(e) => setBuyerNote(e.target.value)}
+                    rows={2}
+                    maxLength={500}
+                    className="w-full resize-none rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15"
+                    placeholder="Paketleme, teslimat veya ürünle ilgili kısa not (tedarikçi / operasyon görür)"
+                  />
                </div>
                <div className="mt-2 flex gap-3">
                  <button type="button" onClick={()=>setShowAddressModal(false)} className="flex-1 rounded-xl border border-anthracite-200 py-2.5 text-sm font-medium text-anthracite-700 transition hover:bg-anthracite-50">Vazgeç</button>

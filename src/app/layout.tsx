@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from 'next/link';
 import { Package, Heart } from 'lucide-react';
 import { createClient } from '@/utils/supabase/server';
+import { CartNavLink } from '@/components/nav/CartNavLink';
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { SiteBackground } from "@/components/layout/SiteBackground";
 import SiteFooter from "@/components/layout/SiteFooter";
@@ -31,10 +32,19 @@ export default async function RootLayout({
   // Profil rolünü çekelim (Admin (Demir Dev), Toptancı veya Butik için Akıllı Menü Yönlendirmesi)
   let userRole = 'butik';
   
+  let cartInitialCount = 0;
+
   if (user) {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
     if (profile) {
       userRole = profile.role;
+    }
+    if (profile?.role === 'butik') {
+      const { count } = await supabase
+        .from('shopping_list_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      cartInitialCount = count ?? 0;
     }
   }
 
@@ -76,6 +86,7 @@ export default async function RootLayout({
                   <Link href="/favorites" className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50">
                     <Heart className="h-4 w-4 fill-current" strokeWidth={2} /> Favoriler
                   </Link>
+                  <CartNavLink userId={user.id} initialCount={cartInitialCount} />
                   <Link href="/siparislerim" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                     Siparişlerim
                   </Link>

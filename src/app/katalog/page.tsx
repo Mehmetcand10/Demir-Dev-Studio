@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Lock, ShoppingBag, Search, Heart, Eye, X } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
 import NotificationBell from "@/components/NotificationBell";
+import { getRecentProductIds } from "@/utils/recentProducts";
 
 export default function Katalog() {
   const supabase = createClient();
@@ -24,6 +25,10 @@ export default function Katalog() {
   const [showQuickView, setShowQuickView] = useState<any>(null);
   const [notifyNewProducts, setNotifyNewProducts] = useState(true);
   const [notifyPrefSaving, setNotifyPrefSaving] = useState(false);
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [fabricFilter, setFabricFilter] = useState("");
+  const [recentStrip, setRecentStrip] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -51,6 +56,18 @@ export default function Katalog() {
             ? prods.filter((p) => p.wholesaler_id !== authUser.id)
             : prods;
         setProducts(displayProds);
+        if (roleForFilter === "butik") {
+          const ids = getRecentProductIds().filter((id) =>
+            displayProds.some((p) => p.id === id)
+          );
+          setRecentStrip(
+            ids
+              .map((id) => displayProds.find((p) => p.id === id))
+              .filter(Boolean) as any[]
+          );
+        } else {
+          setRecentStrip([]);
+        }
       }
       setLoading(false);
     }
@@ -71,12 +88,24 @@ export default function Katalog() {
   };
 
   // FİLTRELEME VE SIRALAMA MANTIĞI (useMemo ile performanslı)
+  const unitPrice = (p: any) =>
+    Number(p.base_wholesale_price) + Number(p.margin_price || 0);
+
   const filteredProducts = useMemo(() => {
-    let result = products.filter(p => {
+    const minN = priceMin.trim() === "" ? null : Number(priceMin.replace(",", "."));
+    const maxN = priceMax.trim() === "" ? null : Number(priceMax.replace(",", "."));
+    const fabricQ = fabricFilter.trim().toLowerCase();
+
+    let result = products.filter((p) => {
       const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === "Tümü" || p.category === selectedCategory;
       const matchesGender = selectedGender === "Tümü" || p.gender === selectedGender;
-      return matchesSearch && matchesCategory && matchesGender;
+      const u = unitPrice(p);
+      const okMin = minN === null || !Number.isFinite(minN) || u >= minN;
+      const okMax = maxN === null || !Number.isFinite(maxN) || u <= maxN;
+      const fab = String(p.fabric_type || "").toLowerCase();
+      const okFabric = !fabricQ || fab.includes(fabricQ);
+      return matchesSearch && matchesCategory && matchesGender && okMin && okMax && okFabric;
     });
 
     // Sıralama
@@ -89,7 +118,7 @@ export default function Katalog() {
     }
 
     return result;
-  }, [products, searchTerm, selectedCategory, selectedGender, sortBy]);
+  }, [products, searchTerm, selectedCategory, selectedGender, sortBy, priceMin, priceMax, fabricFilter]);
 
   const categories = ["Tümü", "Tişört", "Sweatshirt", "İç Çamaşırı / Pijama", "Ayakkabı / Sneaker", "Triko", "Pantolon / Jean", "Mont / Kaban", "Elbise / Etek", "Aksesuar"];
 
@@ -173,6 +202,60 @@ export default function Katalog() {
             </div>
         </div>
 
+        <div className="grid gap-2 sm:grid-cols-3">
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder="Min. adet fiyatı (₺)"
+            value={priceMin}
+            onChange={(e) => setPriceMin(e.target.value)}
+            className="w-full rounded-xl border border-anthracite-200/80 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/20"
+          />
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder="Max. adet fiyatı (₺)"
+            value={priceMax}
+            onChange={(e) => setPriceMax(e.target.value)}
+            className="w-full rounded-xl border border-anthracite-200/80 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/20"
+          />
+          <input
+            type="text"
+            placeholder="Kumaş ara (örn. pamuk)"
+            value={fabricFilter}
+            onChange={(e) => setFabricFilter(e.target.value)}
+            className="w-full rounded-xl border border-anthracite-200/80 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/20"
+          />
+        </div>
+
+        {userRole === "butik" && recentStrip.length > 0 && (
+          <div className="rounded-xl border border-anthracite-200/80 bg-white/90 p-3 shadow-sm">
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-anthracite-500">
+              Son baktıklarım
+            </p>
+            <div className="-mx-1 flex gap-2 overflow-x-auto pb-1 scrollbar-hide px-1">
+              {recentStrip.map((rp) => (
+                <Link
+                  key={rp.id}
+                  href={`/product/${rp.id}`}
+                  className="group relative h-24 w-20 shrink-0 overflow-hidden rounded-lg border border-anthracite-100 bg-anthracite-50"
+                >
+                  <Image
+                    src={
+                      rp.images?.[0] ||
+                      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&q=80"
+                    }
+                    alt={rp.name}
+                    fill
+                    sizes="80px"
+                    className="object-cover transition group-hover:scale-105"
+                  />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
             {categories.map(cat => (
                 <button
@@ -193,7 +276,20 @@ export default function Katalog() {
         <div className="rounded-2xl border border-dashed border-anthracite-200/90 bg-white/60 py-20 text-center">
            <Search className="mx-auto mb-3 h-12 w-12 text-anthracite-300" strokeWidth={1.5} />
            <p className="mb-3 text-sm font-medium text-anthracite-600">Bu filtrelerle ürün yok.</p>
-           <button type="button" onClick={() => { setSearchTerm(""); setSelectedCategory("Tümü"); setSelectedGender("Tümü"); }} className="text-sm font-medium text-emerald-700 underline-offset-2 hover:underline">Filtreleri sıfırla</button>
+           <button
+             type="button"
+             onClick={() => {
+               setSearchTerm("");
+               setSelectedCategory("Tümü");
+               setSelectedGender("Tümü");
+               setPriceMin("");
+               setPriceMax("");
+               setFabricFilter("");
+             }}
+             className="text-sm font-medium text-emerald-700 underline-offset-2 hover:underline"
+           >
+             Filtreleri sıfırla
+           </button>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">

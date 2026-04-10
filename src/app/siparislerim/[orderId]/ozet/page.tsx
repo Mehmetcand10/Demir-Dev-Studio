@@ -120,6 +120,29 @@ export default function SiparisOzetPage() {
             <dt className="text-anthracite-500">Teslimat</dt>
             <dd className="max-w-[65%] text-right text-xs leading-relaxed text-anthracite-800">{order.shipping_address}</dd>
           </div>
+          {order.buyer_note ? (
+            <div className="flex flex-col gap-1 border-b border-anthracite-50 pb-2 sm:flex-row sm:justify-between sm:gap-4">
+              <dt className="shrink-0 text-anthracite-500">Sipariş notu</dt>
+              <dd className="text-right text-xs font-medium leading-relaxed text-anthracite-800 sm:max-w-[70%]">
+                {order.buyer_note}
+              </dd>
+            </div>
+          ) : null}
+          {order.payment_receipt_url ? (
+            <div className="flex flex-col gap-1 border-b border-anthracite-50 pb-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <dt className="text-anthracite-500">Ödeme dekontu</dt>
+              <dd className="text-right">
+                <a
+                  href={order.payment_receipt_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs font-semibold text-emerald-700 underline underline-offset-2 hover:text-emerald-900"
+                >
+                  Dosyayı aç
+                </a>
+              </dd>
+            </div>
+          ) : null}
           <div className="flex justify-between gap-4 pt-2">
             <dt className="text-anthracite-500">Toplam</dt>
             <dd className="text-right text-lg font-bold tabular-nums text-emerald-700">
@@ -130,7 +153,7 @@ export default function SiparisOzetPage() {
 
         {order.status === ORDER_STATUS.WAITING_PAYMENT && (
           <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-xs text-amber-950">
-            Ödeme henüz teyit edilmedi. Dekontu merkez WhatsApp hattına iletin; teyit sonrası hazırlık başlar.
+            Ödeme henüz teyit edilmedi. Dekontu Siparişlerim sayfasından yükleyebilir veya merkez WhatsApp hattına iletebilirsiniz; teyit sonrası hazırlık başlar.
           </p>
         )}
 
