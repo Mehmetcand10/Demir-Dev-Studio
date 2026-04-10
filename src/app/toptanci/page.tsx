@@ -174,13 +174,35 @@ export default function ToptanciDashboard() {
         return;
       }
 
-      const { error: dbError } = await supabase.from('products').insert([{
-        wholesaler_id: user.id, name, category, gender, stocks: stocksJson, fabric_type: fabricType, gsm: gsm || null, images: uploadedUrls,
-        base_wholesale_price: Number(wholesalePrice), margin_price: Number(wholesalePrice) * 0.15, stock_status: 'In Stock', min_order_quantity: Number(minOrder),
-        low_stock_threshold: 5,
-      }]);
+      const { data: insertedRows, error: dbError } = await supabase
+        .from('products')
+        .insert([
+          {
+            wholesaler_id: user.id,
+            name,
+            category,
+            gender,
+            stocks: stocksJson,
+            fabric_type: fabricType,
+            gsm: gsm || null,
+            images: uploadedUrls,
+            base_wholesale_price: Number(wholesalePrice),
+            margin_price: Number(wholesalePrice) * 0.15,
+            stock_status: 'In Stock',
+            min_order_quantity: Number(minOrder),
+            low_stock_threshold: 5,
+          },
+        ])
+        .select('id')
+        .single();
 
       if (dbError) throw dbError;
+      if (insertedRows?.id) {
+        const { error: rpcErr } = await supabase.rpc('notify_boutiques_new_catalog_product', {
+          p_product_id: insertedRows.id,
+        });
+        if (rpcErr) console.warn('Butik bildirimi (SQL fonksiyonu çalıştırıldı mı?):', rpcErr.message);
+      }
       alert("Ürün Vitrine Eklendi!");
       clearForm();
       setActiveTab('inventory');

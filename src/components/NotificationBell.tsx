@@ -5,6 +5,11 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { Bell, Check, Info, AlertTriangle, CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import {
+  browserNotificationsSupported,
+  requestBrowserNotificationPermission,
+  tryShowDesktopNotification,
+} from "@/utils/browserNotify";
 
 export default function NotificationBell({ userId }: { userId: string }) {
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -39,8 +44,12 @@ export default function NotificationBell({ userId }: { userId: string }) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
         (payload) => {
-          setNotifications(prev => [payload.new, ...(prev ? prev.slice(0, 9) : [])]);
-          setUnreadCount(prev => prev + 1);
+          const row = payload.new as { title?: string; message?: string };
+          setNotifications((prev) => [payload.new, ...(prev ? prev.slice(0, 9) : [])]);
+          setUnreadCount((prev) => prev + 1);
+          if (row?.title && row?.message) {
+            tryShowDesktopNotification(row.title, row.message);
+          }
         }
       )
       .subscribe();
@@ -153,9 +162,23 @@ export default function NotificationBell({ userId }: { userId: string }) {
           
           <div className="border-t border-anthracite-100/90 bg-anthracite-50/30 p-3 text-center">
             <p className="text-[10px] font-medium leading-relaxed text-anthracite-500">
-              Ödeme onaylandığında ve kargoya verildiğinde burada kısa bilgi görürsünüz. E-posta gönderilmez; paneli zaman zaman kontrol edin.
+              Sipariş ve vitrin bildirimleri burada listelenir. İsterseniz aşağıdan izin vererek telefon veya bilgisayarda kısa uyarı da gösterebilirsiniz (uygulama açık veya sekmede arka plandayken).
             </p>
-            <p className="mt-1.5 text-[10px] text-anthracite-400">Demir Dev Studio</p>
+            {browserNotificationsSupported() && Notification.permission !== "granted" && (
+              <button
+                type="button"
+                onClick={async () => {
+                  const p = await requestBrowserNotificationPermission();
+                  if (p !== "granted") {
+                    alert("Bildirim izni verilmedi. Tarayıcı veya telefon ayarlarından siteye bildirim izni açabilirsiniz.");
+                  }
+                }}
+                className="mt-2 w-full rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-[11px] font-semibold text-emerald-900 transition hover:bg-emerald-100"
+              >
+                Cihazda bildirim izni ver
+              </button>
+            )}
+            <p className="mt-2 text-[10px] text-anthracite-400">Demir Dev Studio</p>
           </div>
         </div>
       )}

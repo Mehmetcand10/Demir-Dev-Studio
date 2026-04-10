@@ -63,6 +63,7 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
 
       const errors: string[] = [];
       let ok = 0;
+      let lastInsertedId: string | null = null;
 
       for (let i = 0; i < dataRows.length; i++) {
         const cells = dataRows[i];
@@ -74,28 +75,40 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
           continue;
         }
         const r = parsed.row;
-        const { error } = await supabase.from("products").insert([
-          {
-            wholesaler_id: userId,
-            name: r.name,
-            category: r.category,
-            gender: r.gender,
-            fabric_type: r.fabric_type,
-            gsm: r.gsm,
-            stocks: r.stocks,
-            images: r.images,
-            base_wholesale_price: r.base_wholesale_price,
-            margin_price: r.base_wholesale_price * 0.15,
-            stock_status: "In Stock",
-            min_order_quantity: r.min_order_quantity,
-            low_stock_threshold: r.low_stock_threshold,
-          },
-        ]);
+        const { data: ins, error } = await supabase
+          .from("products")
+          .insert([
+            {
+              wholesaler_id: userId,
+              name: r.name,
+              category: r.category,
+              gender: r.gender,
+              fabric_type: r.fabric_type,
+              gsm: r.gsm,
+              stocks: r.stocks,
+              images: r.images,
+              base_wholesale_price: r.base_wholesale_price,
+              margin_price: r.base_wholesale_price * 0.15,
+              stock_status: "In Stock",
+              min_order_quantity: r.min_order_quantity,
+              low_stock_threshold: r.low_stock_threshold,
+            },
+          ])
+          .select("id")
+          .single();
         if (error) {
           errors.push(`Satır ${i + 2} (${r.name}): ${error.message}`);
         } else {
           ok += 1;
+          if (ins?.id) lastInsertedId = ins.id;
         }
+      }
+
+      if (ok > 0 && lastInsertedId) {
+        const { error: rpcErr } = await supabase.rpc("notify_boutiques_new_catalog_product", {
+          p_product_id: lastInsertedId,
+        });
+        if (rpcErr) console.warn("Toplu yükleme butik bildirimi:", rpcErr.message);
       }
 
       const lines = [

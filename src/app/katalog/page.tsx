@@ -22,6 +22,8 @@ export default function Katalog() {
   const [selectedGender, setSelectedGender] = useState("Tümü");
   const [sortBy, setSortBy] = useState("newest"); // newest, price-asc, price-desc
   const [showQuickView, setShowQuickView] = useState<any>(null);
+  const [notifyNewProducts, setNotifyNewProducts] = useState(true);
+  const [notifyPrefSaving, setNotifyPrefSaving] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -34,6 +36,9 @@ export default function Katalog() {
         roleForFilter = profile?.role || 'butik';
         setIsApproved(profile?.is_approved || false);
         setUserRole(roleForFilter);
+        if (profile?.role === 'butik') {
+          setNotifyNewProducts(profile.notify_new_products !== false);
+        }
 
         const { data: favs } = await supabase.from('favorites').select('product_id').eq('user_id', authUser.id);
         if (favs) setFavorites(favs.map((f) => f.product_id));
@@ -97,10 +102,45 @@ export default function Katalog() {
                 <h1 className="mb-1 text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">Katalog</h1>
                 <p className="text-sm text-anthracite-600">Onaylı ürün vitrini</p>
             </div>
-            <div className="hidden sm:block">
-                {user && <NotificationBell userId={user.id} />}
-            </div>
+            {user && <NotificationBell userId={user.id} />}
         </div>
+
+        {user && userRole === 'butik' && isApproved && (
+          <div className="flex flex-col gap-2 rounded-xl border border-anthracite-200/80 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-anthracite-700">
+              <span className="font-semibold text-anthracite-900">Yeni ürün bildirimleri</span>
+              <span className="mt-0.5 block text-xs text-anthracite-500">
+                Toptancı vitrine ürün eklediğinde panelde bildirim alırsınız. Zil menüsünden cihaz bildirimine de izin verebilirsiniz.
+              </span>
+            </div>
+            <button
+              type="button"
+              disabled={notifyPrefSaving}
+              onClick={async () => {
+                if (!user) return;
+                const next = !notifyNewProducts;
+                setNotifyPrefSaving(true);
+                const { error } = await supabase
+                  .from('profiles')
+                  .update({ notify_new_products: next })
+                  .eq('id', user.id);
+                setNotifyPrefSaving(false);
+                if (error) {
+                  alert('Ayar kaydedilemedi: ' + error.message);
+                  return;
+                }
+                setNotifyNewProducts(next);
+              }}
+              className={`shrink-0 rounded-lg px-4 py-2 text-xs font-semibold transition ${
+                notifyNewProducts
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  : 'border border-anthracite-200 bg-anthracite-50 text-anthracite-700 hover:bg-anthracite-100'
+              }`}
+            >
+              {notifyPrefSaving ? 'Kaydediliyor…' : notifyNewProducts ? 'Açık' : 'Kapalı'}
+            </button>
+          </div>
+        )}
 
         <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
             <div className="group relative flex-1">
