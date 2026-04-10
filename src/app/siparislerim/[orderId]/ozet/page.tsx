@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Loader2, Printer } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { ORDER_STATUS, getOrderStatusLabel } from "@/utils/orderStatus";
+import { supplierAliasFromId } from "@/utils/supplierAlias";
 
 export default function SiparisOzetPage() {
   const params = useParams();
@@ -49,6 +50,11 @@ export default function SiparisOzetPage() {
   }
 
   const created = new Date(order.created_at).toLocaleString("tr-TR");
+  const canRevealSupplier =
+    order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED;
+  const supplierLabel = canRevealSupplier
+    ? order.wholesaler?.business_name || "—"
+    : supplierAliasFromId(order.wholesaler_id);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 print:max-w-none print:py-4 sm:py-10">
@@ -84,8 +90,15 @@ export default function SiparisOzetPage() {
             <dd className="text-right font-semibold text-anthracite-900">{order.product_name}</dd>
           </div>
           <div className="flex justify-between gap-4 border-b border-anthracite-50 pb-2">
-            <dt className="text-anthracite-500">Toptancı</dt>
-            <dd className="text-right font-medium text-anthracite-800">{order.wholesaler?.business_name || "—"}</dd>
+            <dt className="text-anthracite-500">Tedarikçi</dt>
+            <dd className="max-w-[65%] text-right">
+              <span className="font-medium text-anthracite-800">{supplierLabel}</span>
+              {!canRevealSupplier && (
+                <span className="mt-1 block text-[10px] font-normal leading-snug text-anthracite-500">
+                  Ticari unvan, sipariş kargoya verildikten sonra görünür.
+                </span>
+              )}
+            </dd>
           </div>
           <div className="flex justify-between gap-4 border-b border-anthracite-50 pb-2">
             <dt className="text-anthracite-500">Beden / adet</dt>

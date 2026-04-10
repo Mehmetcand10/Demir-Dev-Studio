@@ -3,6 +3,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { ORDER_STATUS } from "./orderStatus";
+import { supplierAliasFromId } from "./supplierAlias";
 
 export const exportInvoicePDF = (order: any) => {
   const doc = new jsPDF() as any;
@@ -52,11 +53,22 @@ export const exportInvoicePDF = (order: any) => {
   doc.text(order.buyer_name || "Bilinmeyen Butik", 14, 62);
   doc.text("Turkiye / B2B Agi Uyesi", 14, 68);
 
+  const canRevealSupplierName =
+    order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED;
+  const supplierDisplayName =
+    canRevealSupplierName && order.wholesaler?.business_name
+      ? order.wholesaler.business_name
+      : supplierAliasFromId(order.wholesaler_id);
+
   doc.setFontSize(12);
   doc.text("Satici (Tedarikci):", 140, 55);
   doc.setFontSize(10);
-  doc.text(order.wholesaler?.business_name || "Demir Dev Studio", 140, 62);
-  doc.text("Onayli Toptanci", 140, 68);
+  doc.text(supplierDisplayName, 140, 62);
+  doc.text(
+    canRevealSupplierName ? "Onayli tedarikci" : "Kimlik kargo sonrasi acilir",
+    140,
+    68
+  );
 
   // URUN TABLOSU
   const tableColumn = ["Urun", "Adet", "Birim Fiyat", "Toplam"];

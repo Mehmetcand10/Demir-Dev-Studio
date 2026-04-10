@@ -202,7 +202,7 @@ export default function Katalog() {
                 <div className="p-2.5 sm:p-3 flex flex-col flex-grow text-left min-h-0">
                   <div className="mb-1 min-w-0">
                         <h3 className="font-bold text-xs sm:text-sm text-anthracite-900 line-clamp-2 leading-snug">{p.name}</h3>
-                        <Link href={`/toptanci-gor/${p.wholesaler_id}`} className="text-[8px] sm:text-[9px] font-semibold text-emerald-700 hover:text-emerald-900 uppercase tracking-wide truncate block">Toptancıyı gör</Link>
+                        <Link href={`/toptanci-gor/${p.wholesaler_id}`} className="text-[8px] sm:text-[9px] font-semibold text-emerald-700 hover:text-emerald-900 uppercase tracking-wide truncate block">Tedarikçi vitrini</Link>
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-1 my-1.5">

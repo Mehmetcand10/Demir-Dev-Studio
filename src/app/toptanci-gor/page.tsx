@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Package, Store, ChevronRight } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
+import { supplierAliasFromId } from "@/utils/supplierAlias";
 
 type Row = {
   id: string;
@@ -81,14 +82,7 @@ export default function ToptanciGorListe() {
 
       const list: Row[] = entries.filter((r): r is Row => Boolean(r) && r.productCount > 0);
 
-      list.sort(
-        (a, b) =>
-          b.productCount - a.productCount ||
-          (a.business_name || a.full_name || "").localeCompare(
-            b.business_name || b.full_name || "",
-            "tr"
-          )
-      );
+      list.sort((a, b) => b.productCount - a.productCount || a.id.localeCompare(b.id, "tr"));
 
       setRows(list);
       setLoading(false);
@@ -107,10 +101,10 @@ export default function ToptanciGorListe() {
             <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Katalog
           </Link>
           <h1 className="mb-1 text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">
-            Toptancıları gör
+            Tedarikçileri gör
           </h1>
           <p className="text-sm text-anthracite-600">
-            Bir toptancıyı seçin; sadece o mağazanın ürünlerini görürsünüz.
+            Bir tedarikçi vitrini seçin; sadece o mağazanın ürünlerini görürsünüz.
           </p>
         </div>
         {userId ? (
@@ -134,7 +128,7 @@ export default function ToptanciGorListe() {
       ) : (
         <ul className="flex flex-col gap-3">
           {rows.map((r) => {
-            const name = r.business_name?.trim() || r.full_name?.trim() || "Mağaza";
+            const name = supplierAliasFromId(r.id);
             const initial = name[0]?.toUpperCase() || "?";
             return (
               <li key={r.id}>
@@ -155,7 +149,7 @@ export default function ToptanciGorListe() {
                     </p>
                   </div>
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-anthracite-900 px-3 py-2 text-xs font-medium text-white transition group-hover:bg-emerald-700 sm:text-sm">
-                    Toptancıyı gör
+                    Vitrine gir
                     <ChevronRight className="h-4 w-4" strokeWidth={2} />
                   </span>
                 </Link>

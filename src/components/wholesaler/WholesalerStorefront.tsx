@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Package, ShoppingBag, MapPin, Star, ArrowLeft, ShieldAlert, Lock } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { supplierAliasFromId } from "@/utils/supplierAlias";
 
 const PLACEHOLDER =
   "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80";
@@ -106,6 +107,9 @@ export default function WholesalerStorefront({
     );
   }
 
+  const storefrontName = supplierAliasFromId(wholesalerId);
+  const storefrontInitial = storefrontName[0]?.toUpperCase() || "?";
+
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <div className="mb-10">
@@ -122,17 +126,7 @@ export default function WholesalerStorefront({
           </div>
 
           <div className="relative z-10 flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-3xl font-semibold text-white shadow-sm sm:h-28 sm:w-28 sm:text-4xl">
-            {profile.avatar_url ? (
-              <Image
-                src={profile.avatar_url}
-                alt={profile.business_name || profile.full_name || "Profil"}
-                fill
-                sizes="112px"
-                className="object-cover"
-              />
-            ) : (
-              <span>{profile.business_name?.[0] || profile.full_name?.[0] || "?"}</span>
-            )}
+            <span>{storefrontInitial}</span>
           </div>
 
           <div className="relative z-10 flex-1 text-center md:text-left">
@@ -145,12 +139,12 @@ export default function WholesalerStorefront({
               </div>
             </div>
             <h1 className="mb-2 break-words text-2xl font-semibold leading-tight tracking-tight text-anthracite-900 sm:text-3xl">
-              {profile.business_name || profile.full_name}
+              {storefrontName}
             </h1>
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-anthracite-600 md:justify-start">
               <div className="flex items-center gap-1.5">
                 <MapPin className="h-4 w-4 text-emerald-600" strokeWidth={2} />{" "}
-                Merter / İstanbul
+                Türkiye genelinde teslimat
               </div>
               <div className="flex items-center gap-1.5">
                 <Package className="h-4 w-4 text-emerald-600" strokeWidth={2} />{" "}
@@ -183,7 +177,7 @@ export default function WholesalerStorefront({
             Ürünler ({products.length})
           </h2>
           <p className="text-xs text-anthracite-500 sm:text-sm">
-            Sadece bu toptancının vitrini
+            Sadece bu tedarikçinin vitrini
           </p>
         </div>
 

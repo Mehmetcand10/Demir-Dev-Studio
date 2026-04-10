@@ -106,7 +106,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
       totalItems < wholesalerMinFloor
     ) {
       alert(
-        `Bu toptancı tek siparişte en az ${wholesalerMinFloor} adet kabul ediyor. Şu anki sipariş adedi: ${totalItems} adet. Paket sayısını artırın.`
+        `Bu mağaza tek siparişte en az ${wholesalerMinFloor} adet kabul ediyor. Şu anki sipariş adedi: ${totalItems} adet. Paket sayısını artırın.`
       );
       return;
     }
@@ -214,7 +214,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                 <div className="mb-6 flex items-start gap-2.5 rounded-2xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
                   <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-400" strokeWidth={2} />
                   <span>
-                    Bu toptancı{" "}
+                    Bu mağaza{" "}
                     <strong className="font-semibold">tek siparişte en az {wholesalerMinFloor} adet</strong>{" "}
                     kabul ediyor (mağaza politikası). Toplam adet bunun altında olamaz.
                   </span>
@@ -228,7 +228,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   {/* BEDEN SEÇİMİ VE STOK GÖRÜNÜMÜ */}
                   {stockIsFallback && (
                     <p className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-3">
-                      Bu üründe ayrı stok satırı yok; tek seçenek gösteriliyor (eski kayıt veya standart seri). Yeni ürünlerde toptancı panelinden en az bir bedende stok girin.
+                      Bu üründe ayrı stok satırı yok; tek seçenek gösteriliyor (eski kayıt veya standart seri). Yeni ürünlerde tedarikçi panelinden en az bir bedende stok girin.
                     </p>
                   )}
                   <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
