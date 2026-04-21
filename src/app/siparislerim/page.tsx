@@ -174,11 +174,11 @@ export default function Siparislerim() {
       <DashboardHeader icon={ShoppingBag} eyebrow="Butik" title="Siparişlerim" />
 
       <div className="mb-8 flex flex-wrap gap-3">
-        <div className="min-w-[140px] flex-1 rounded-xl border border-anthracite-200/80 bg-white px-4 py-3 shadow-sm">
+        <div className="min-w-[140px] flex-1 premium-card px-4 py-3">
           <p className="text-[10px] font-medium uppercase tracking-wider text-anthracite-500">Toplam alım</p>
           <p className="text-lg font-semibold tabular-nums text-anthracite-900">{totalSpent.toLocaleString("tr-TR")} ₺</p>
         </div>
-        <div className="min-w-[120px] flex-1 rounded-xl border border-emerald-200/50 bg-gradient-to-br from-emerald-600 to-emerald-700 px-4 py-3 text-white shadow-sm">
+        <div className="min-w-[120px] flex-1 rounded-3xl border border-emerald-200/20 bg-gradient-to-br from-emerald-600 to-emerald-700 px-4 py-3 text-white shadow-sm">
           <p className="text-[10px] font-medium uppercase tracking-wider text-white/75">Aktif kargo</p>
           <p className="text-lg font-semibold tabular-nums">{activeCount} paket</p>
         </div>
@@ -200,7 +200,7 @@ export default function Siparislerim() {
             <p className="text-xs font-medium">Yükleniyor…</p>
         </div>
       ) : filteredOrders.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-anthracite-200/80 bg-white py-20 text-center shadow-sm">
+        <div className="premium-card border-dashed border-anthracite-200/80 py-20 text-center">
             <PackageSearch className="mx-auto mb-3 h-12 w-12 text-anthracite-200" />
             <h3 className="mb-1 text-lg font-semibold text-anthracite-900">Kayıt yok</h3>
             <p className="mb-2 text-sm text-anthracite-500">Bu sekmede sipariş bulunmuyor.</p>
@@ -228,7 +228,7 @@ export default function Siparislerim() {
             ];
 
             return (
-              <div key={order.id} className="group relative overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white p-5 shadow-sm transition hover:shadow-md sm:p-6">
+              <div key={order.id} className="premium-card group relative overflow-hidden p-5 transition hover:shadow-md sm:p-6">
                 <div className="flex flex-col items-center gap-6 lg:flex-row lg:gap-8">
                    
                    {/* ÜRÜN GÖRSELO VE ÖZET */}
@@ -388,7 +388,7 @@ export default function Siparislerim() {
 
       {showDisputeModal && disputeOrder && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-xl">
+          <div className="premium-card relative w-full max-w-lg p-6 shadow-xl">
             <h3 className="mb-1 text-lg font-semibold text-anthracite-900">Uyuşmazlık talebi</h3>
             <p className="mb-4 text-sm text-anthracite-600">
               Sipariş: <span className="font-medium text-anthracite-900">{disputeOrder.product_name}</span>

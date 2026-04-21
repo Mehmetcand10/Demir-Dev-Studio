@@ -397,7 +397,7 @@ export default function AdminDashboard() {
         title="Kontrol paneli"
         right={
           user ? (
-            <div className="rounded-lg border border-anthracite-200/80 bg-white p-1 shadow-sm">
+            <div className="premium-card p-1">
               <NotificationBell userId={user.id} />
             </div>
           ) : null
@@ -405,19 +405,19 @@ export default function AdminDashboard() {
       />
 
       <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-        <div className="relative overflow-hidden rounded-xl border border-anthracite-800 bg-anthracite-900 p-4 text-white shadow-sm">
+        <div className="relative overflow-hidden rounded-3xl border border-anthracite-800 bg-anthracite-900 p-4 text-white shadow-sm">
           <TrendingUp className="absolute -right-1 -top-1 h-16 w-16 opacity-[0.07]" />
           <p className="text-[10px] font-medium uppercase tracking-wider text-white/55">Toplam ciro</p>
           <p className="mt-1 text-lg font-semibold tabular-nums sm:text-xl">{totalCiro.toLocaleString("tr-TR")} ₺</p>
         </div>
-        <div className="rounded-xl border border-emerald-200/60 bg-gradient-to-br from-emerald-600 to-emerald-700 p-4 text-white shadow-sm">
+        <div className="rounded-3xl border border-emerald-200/30 bg-gradient-to-br from-emerald-600 to-emerald-700 p-4 text-white shadow-sm">
           <p className="text-[10px] font-medium uppercase tracking-wider text-white/75">Platform kârı</p>
           <p className="mt-1 text-lg font-semibold tabular-nums sm:text-xl">{totalProfit.toLocaleString("tr-TR")} ₺</p>
         </div>
         <button
           type="button"
           onClick={() => setActiveTab("orders")}
-          className="rounded-xl border border-anthracite-200/80 bg-white p-4 text-left shadow-sm transition hover:border-amber-300/80 hover:shadow-md"
+          className="premium-card p-4 text-left transition hover:border-amber-300/80 hover:shadow-md"
         >
           <p className="text-[10px] font-medium uppercase tracking-wider text-anthracite-500">Bekleyen ödeme</p>
           <p className="mt-1 flex items-baseline gap-2">
@@ -428,7 +428,7 @@ export default function AdminDashboard() {
         <button
           type="button"
           onClick={() => setActiveTab("approvals")}
-          className="rounded-xl border border-anthracite-200/80 bg-white p-4 text-left shadow-sm transition hover:border-anthracite-300 hover:shadow-md"
+          className="premium-card p-4 text-left transition hover:border-anthracite-300 hover:shadow-md"
         >
           <p className="text-[10px] font-medium uppercase tracking-wider text-anthracite-500">Onay / risk</p>
           <p className="mt-1 text-lg font-semibold tabular-nums text-anthracite-900 sm:text-xl">{pendingApprovalsCount}</p>
@@ -463,7 +463,7 @@ export default function AdminDashboard() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div className="relative overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:p-8 lg:col-span-8">
+                <div className="premium-card relative overflow-hidden p-6 sm:p-8 lg:col-span-8">
                     <h3 className="mb-6 flex items-center gap-2 text-base font-semibold text-anthracite-900">
                         <TrendingUp className="h-5 w-5 text-emerald-600" strokeWidth={2} /> Ciro özeti
                     </h3>
@@ -489,7 +489,7 @@ export default function AdminDashboard() {
                     </div>
                 </div>
                 <div className="space-y-4 lg:col-span-4">
-                    <div className="rounded-2xl border border-anthracite-200/70 bg-white p-5 shadow-sm sm:p-6">
+                    <div className="premium-card p-5 sm:p-6">
                         <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-anthracite-900">
                             <Megaphone className="h-4 w-4 text-amber-600" strokeWidth={2} /> Son duyuru
                         </h3>
@@ -501,7 +501,7 @@ export default function AdminDashboard() {
                         ) : <p className="text-xs text-anthracite-400">Henüz duyuru yok.</p>}
                         <button onClick={() => setActiveTab('announcements')} type="button" className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-anthracite-900 py-2.5 text-xs font-medium text-white transition hover:bg-anthracite-800">Duyuruları aç</button>
                     </div>
-                    <div className="relative overflow-hidden rounded-2xl border border-emerald-600/30 bg-gradient-to-br from-emerald-600 to-emerald-700 p-5 text-white shadow-sm sm:p-6">
+                    <div className="relative overflow-hidden rounded-3xl border border-emerald-600/30 bg-gradient-to-br from-emerald-600 to-emerald-700 p-5 text-white shadow-sm sm:p-6">
                         <Store className="absolute -bottom-2 -right-2 h-24 w-24 opacity-[0.12]" />
                         <h3 className="text-sm font-semibold">Toptancı alacakları</h3>
                         <p className="mt-1 text-xs text-white/75">Havuz toplamı</p>
@@ -515,7 +515,7 @@ export default function AdminDashboard() {
 
         {/* ORDERS TAB (İŞLEMLER) */}
         {activeTab === 'orders' && (
-            <div className="overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:p-8">
+            <div className="premium-card overflow-hidden p-6 sm:p-8">
                 <div className="mb-8 flex flex-col gap-1 border-b border-anthracite-100/90 pb-6 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 className="text-lg font-semibold text-anthracite-900 sm:text-xl">Siparişler</h2>
@@ -650,7 +650,7 @@ export default function AdminDashboard() {
                                 ? 'bg-blue-100 text-blue-800'
                                 : 'bg-amber-100 text-amber-800';
                         return (
-                          <div key={d.id} className="p-5 rounded-2xl border border-anthracite-100 bg-anthracite-50 flex flex-col gap-4 text-left">
+                          <div key={d.id} className="premium-card flex flex-col gap-4 border-anthracite-100/80 bg-anthracite-50/90 p-5 text-left">
                             <div className="flex flex-wrap items-start justify-between gap-3">
                               <div className="min-w-0 flex-1">
                                 <p className="text-sm font-black text-anthracite-900">{disputeProductName(d.order_id)}</p>
@@ -724,7 +724,7 @@ export default function AdminDashboard() {
 
         {/* PAYMENTS TAB (HAKEDİŞLER) */}
         {activeTab === 'payments' && (
-            <div className="bg-white border border-anthracite-100 rounded-2xl p-10 shadow-xl overflow-hidden">
+            <div className="premium-card overflow-hidden p-10 shadow-xl">
                 <h2 className="text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
                    <Wallet className="w-8 h-8 text-emerald-500" /> Toptancı Hakediş Masası
                 </h2>
@@ -791,7 +791,7 @@ export default function AdminDashboard() {
 
         {/* APPROVALS TAB */}
         {activeTab === 'approvals' && (
-            <div className="bg-white border border-anthracite-100 rounded-2xl p-10 shadow-xl overflow-hidden">
+            <div className="premium-card overflow-hidden p-10 shadow-xl">
                 <h2 className="text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
                    <UserCheck className="w-8 h-8 text-blue-500" /> Üyelik ve Yetki Onayları
                 </h2>
@@ -847,7 +847,7 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === 'members' && (
-          <div className="overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:p-8">
+          <div className="premium-card overflow-hidden p-6 sm:p-8">
             <div className="mb-6 flex flex-col gap-4 border-b border-anthracite-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="flex items-center gap-2 text-lg font-semibold text-anthracite-900 sm:text-xl">
@@ -989,7 +989,7 @@ export default function AdminDashboard() {
         {/* ANNOUNCEMENTS TAB */}
         {activeTab === 'announcements' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-                <div className="lg:col-span-5 bg-white border border-anthracite-100 rounded-2xl p-10 shadow-xl h-max text-left">
+                <div className="premium-card h-max p-10 text-left lg:col-span-5 shadow-xl">
                     <h2 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3 pb-6 border-b border-anthracite-50">
                         <Send className="w-6 h-6 text-emerald-500" /> Yeni Duyuru Yayınla
                     </h2>
@@ -1029,7 +1029,7 @@ export default function AdminDashboard() {
                     </form>
                 </div>
 
-                <div className="lg:col-span-7 bg-white border border-anthracite-200 rounded-2xl p-10 shadow-sm overflow-hidden">
+                <div className="premium-card overflow-hidden p-10 lg:col-span-7">
                     <h2 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3 pb-6 border-b border-anthracite-50 text-left">
                         <HistoryIcon className="w-6 h-6 text-anthracite-400" /> Aktif Yayınlar
                     </h2>
@@ -1078,30 +1078,30 @@ export default function AdminDashboard() {
           return (
             <div className="space-y-8 text-left">
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-2xl border border-anthracite-200/80 bg-white p-5 shadow-sm">
+                <div className="premium-card p-5">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-anthracite-500">Bugün (sipariş)</p>
                   <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{todayOrders.length}</p>
                   <p className="mt-1 text-xs text-anthracite-500">{todaySum.toLocaleString('tr-TR')} ₺ ciro</p>
                 </div>
-                <div className="rounded-2xl border border-amber-200/80 bg-amber-50/50 p-5 shadow-sm">
+                <div className="rounded-3xl border border-amber-200/80 bg-amber-50/50 p-5 shadow-sm backdrop-blur">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800">Ödeme bekliyor</p>
                   <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{waitingList.length}</p>
                   <button type="button" onClick={() => setActiveTab('orders')} className="mt-2 text-xs font-semibold text-emerald-700 hover:underline">
                     Siparişler sekmesine git
                   </button>
                 </div>
-                <div className="rounded-2xl border border-red-200/80 bg-red-50/40 p-5 shadow-sm">
+                <div className="rounded-3xl border border-red-200/80 bg-red-50/40 p-5 shadow-sm backdrop-blur">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-red-800">Hazırlık 3+ gün</p>
                   <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{delayedPrep.length}</p>
                 </div>
-                <div className="rounded-2xl border border-blue-200/80 bg-blue-50/40 p-5 shadow-sm">
+                <div className="rounded-3xl border border-blue-200/80 bg-blue-50/40 p-5 shadow-sm backdrop-blur">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-blue-800">Kargoda takipsiz</p>
                   <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{shippedNoTrack.length}</p>
                 </div>
               </div>
 
               <div className="grid gap-8 lg:grid-cols-2">
-                <div className="rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm">
+                <div className="premium-card p-6">
                   <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-anthracite-900">
                     <Clock className="h-4 w-4 text-amber-600" strokeWidth={2} />
                     Bekleyen ödeme (özet)
@@ -1119,7 +1119,7 @@ export default function AdminDashboard() {
                     )}
                   </ul>
                 </div>
-                <div className="rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm">
+                <div className="premium-card p-6">
                   <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-anthracite-900">
                     <AlertTriangle className="h-4 w-4 text-red-600" strokeWidth={2} />
                     Geciken / risk (hazırlık)
@@ -1141,7 +1141,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/30 p-6 shadow-sm">
+              <div className="rounded-3xl border border-emerald-200/80 bg-emerald-50/30 p-6 shadow-sm backdrop-blur">
                 <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-anthracite-900">
                   <Package className="h-4 w-4 text-emerald-600" strokeWidth={2} />
                   Düşük stok (ürün)
@@ -1169,7 +1169,7 @@ export default function AdminDashboard() {
 
         {/* ARCHIVE TAB */}
         {activeTab === 'archive' && (
-            <div className="bg-white border border-anthracite-100 rounded-2xl p-10 shadow-xl overflow-hidden">
+            <div className="premium-card overflow-hidden p-10 shadow-xl">
                 <h2 className="text-2xl font-black text-anthracite-900 mb-10 flex items-center gap-3 pb-6 border-b border-anthracite-50">
                     <Archive className="w-8 h-8 text-anthracite-300" /> Platform Geçmişi
                 </h2>
