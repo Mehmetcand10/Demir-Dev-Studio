@@ -100,11 +100,11 @@ export default function ToptanciGorListe() {
           >
             <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Katalog
           </Link>
-          <h1 className="mb-1 text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">
+          <h1 className="premium-title mb-1">
             Tedarikçileri gör
           </h1>
-          <p className="text-sm text-anthracite-600">
-            Bir tedarikçi vitrini seçin; sadece o mağazanın ürünlerini görürsünüz.
+          <p className="premium-subtitle">
+            Butik satın alma için tek ekranda tedarikçi seçin, ürüne inip siparişi tamamlayın.
           </p>
         </div>
         {userId ? (
@@ -134,7 +134,7 @@ export default function ToptanciGorListe() {
               <li key={r.id}>
                 <Link
                   href={`/toptanci-gor/${r.id}`}
-                  className="group flex items-center gap-4 rounded-2xl border border-anthracite-200/80 bg-white p-4 shadow-sm transition hover:border-emerald-200/90 hover:shadow-md sm:p-5"
+                  className="group flex items-center gap-4 rounded-2xl border border-anthracite-200/80 bg-white/95 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200/90 hover:shadow-lg sm:p-5"
                 >
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-xl font-semibold text-white shadow-sm sm:h-16 sm:w-16 sm:text-2xl">
                     {initial}

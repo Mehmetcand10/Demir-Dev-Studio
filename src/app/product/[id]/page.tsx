@@ -248,7 +248,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         />
 
         {/* Sağ: Bilgiler ve Sipariş İşlemleri */}
-        <div className="flex flex-col">
+        <div className="premium-shell flex flex-col p-5 sm:p-7">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-emerald-100/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">{product.gender || "Unisex"}</span>
             <span className="rounded-full bg-anthracite-100/60 px-2.5 py-0.5 text-xs font-medium text-anthracite-700">{product.category}</span>
@@ -259,7 +259,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
           {/* SADECE ONAYLI BUTİKLER GÖREBİLİR (GATEKEEPING) */}
           {isApproved ? (
             <>
-              <div className="mb-6 rounded-2xl border border-sky-100/90 bg-sky-50/50 p-5 dark:bg-blue-950/20">
+              <div className="mb-6 rounded-2xl border border-sky-100/90 bg-gradient-to-br from-sky-50/80 to-white p-5 dark:bg-blue-950/20">
                 <div className="mb-2 flex items-end gap-3">
                   <span className="text-3xl font-semibold tabular-nums tracking-tight text-anthracite-900 dark:text-white">{unitPrice.toLocaleString("tr-TR")} ₺</span>
                   <span className="mb-0.5 text-sm text-anthracite-500">/ adet</span>

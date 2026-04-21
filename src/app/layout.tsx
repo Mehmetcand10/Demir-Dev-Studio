@@ -64,7 +64,7 @@ export default async function RootLayout({
             `,
           }}
         />
-        <nav className="sticky top-0 z-50 border-b border-anthracite-200/80 bg-white/90 backdrop-blur-md">
+        <nav className="sticky top-0 z-50 border-b border-anthracite-200/80 bg-white/80 backdrop-blur-xl">
           <div className="mx-auto flex min-h-14 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
             <Link href="/" className="flex min-w-0 items-center gap-2 text-base font-semibold tracking-tight text-anthracite-900 sm:text-lg">
               <Package className="h-5 w-5 shrink-0 text-emerald-600" strokeWidth={2} />

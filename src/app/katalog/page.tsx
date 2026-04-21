@@ -128,8 +128,8 @@ export default function Katalog() {
       <div className="mb-8 flex flex-col gap-5 sm:mb-10">
         <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-                <h1 className="mb-1 text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">Katalog</h1>
-                <p className="text-sm text-anthracite-600">Onaylı ürün vitrini</p>
+                <h1 className="premium-title mb-1">Katalog</h1>
+                <p className="premium-subtitle">Butiklerin siparişe dönen ürün vitrini</p>
             </div>
             {user && <NotificationBell userId={user.id} />}
         </div>
@@ -171,7 +171,7 @@ export default function Katalog() {
           </div>
         )}
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-stretch">
+        <div className="premium-shell flex flex-col gap-3 p-3 md:flex-row md:items-stretch">
             <div className="group relative flex-1">
                 <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-anthracite-400 group-focus-within:text-emerald-600" strokeWidth={2} />
                 <input 
@@ -229,7 +229,7 @@ export default function Katalog() {
         </div>
 
         {userRole === "butik" && recentStrip.length > 0 && (
-          <div className="rounded-xl border border-anthracite-200/80 bg-white/90 p-3 shadow-sm">
+          <div className="premium-shell p-3">
             <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-anthracite-500">
               Son baktıklarım
             </p>
@@ -298,7 +298,7 @@ export default function Katalog() {
             const isFav = favorites.includes(p.id);
 
             return (
-              <div key={p.id} className="group relative flex flex-col overflow-hidden rounded-xl border border-anthracite-200/70 bg-white shadow-sm transition hover:border-anthracite-300/80 hover:shadow-md sm:rounded-2xl">
+              <div key={p.id} className="group relative flex flex-col overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white/95 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200/80 hover:shadow-lg">
                 
                 {/* Ürün Görseli — daha kısa oran, vitrinde daha çok ürün görünsün */}
                 <div className="relative aspect-[4/5] sm:aspect-[5/6] overflow-hidden bg-anthracite-50">
