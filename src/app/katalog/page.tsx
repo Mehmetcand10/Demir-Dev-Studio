@@ -129,9 +129,26 @@ export default function Katalog() {
         <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
                 <h1 className="premium-title mb-1">Katalog</h1>
-                <p className="premium-subtitle">Butiklerin siparişe dönen ürün vitrini</p>
+                <p className="premium-subtitle">Premium B2B vitrin: tedarikçiden butiğe siparişe dönüşen ürün akışı</p>
             </div>
             {user && <NotificationBell userId={user.id} />}
+        </div>
+
+        <div className="premium-shell grid gap-4 p-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-anthracite-200/70 bg-anthracite-50/60 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-anthracite-500">Toplam ürün</p>
+            <p className="mt-2 text-2xl font-semibold text-anthracite-900">{products.length}</p>
+          </div>
+          <div className="rounded-2xl border border-anthracite-200/70 bg-anthracite-50/60 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-anthracite-500">Filtre sonrası</p>
+            <p className="mt-2 text-2xl font-semibold text-anthracite-900">{filteredProducts.length}</p>
+          </div>
+          <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/70 p-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Akış</p>
+            <p className="mt-2 text-sm font-medium leading-relaxed text-emerald-900">
+              Tedarikçi vitrini seçin, ürün detayında beden-adet girip siparişi tamamlayın.
+            </p>
+          </div>
         </div>
 
         {user && userRole === 'butik' && isApproved && (
@@ -292,13 +309,13 @@ export default function Katalog() {
            </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
           {filteredProducts.map((p) => {
             const displayedPrice = Number(p.base_wholesale_price) + Number(p.margin_price || 0);
             const isFav = favorites.includes(p.id);
 
             return (
-              <div key={p.id} className="group relative flex flex-col overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white/95 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200/80 hover:shadow-lg">
+              <div key={p.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-anthracite-200/70 bg-white/95 shadow-sm transition hover:-translate-y-1 hover:border-emerald-200/90 hover:shadow-xl">
                 
                 {/* Ürün Görseli — daha kısa oran, vitrinde daha çok ürün görünsün */}
                 <div className="relative aspect-[4/5] sm:aspect-[5/6] overflow-hidden bg-anthracite-50">
@@ -335,7 +352,7 @@ export default function Katalog() {
                   )}
                 </div>
 
-                <div className="p-2.5 sm:p-3 flex flex-col flex-grow text-left min-h-0">
+                <div className="p-3 sm:p-4 flex flex-col flex-grow text-left min-h-0">
                   <div className="mb-1 min-w-0">
                         <h3 className="font-bold text-xs sm:text-sm text-anthracite-900 line-clamp-2 leading-snug">{p.name}</h3>
                         <Link href={`/toptanci-gor/${p.wholesaler_id}`} className="text-[8px] sm:text-[9px] font-semibold text-emerald-700 hover:text-emerald-900 uppercase tracking-wide truncate block">Tedarikçi vitrini</Link>
