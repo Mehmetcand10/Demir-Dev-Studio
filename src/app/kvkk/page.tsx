@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function KvkkPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <div className="premium-page-wrap max-w-3xl">
       <Link
         href="/"
         className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-anthracite-600 transition hover:text-anthracite-900"
@@ -23,7 +23,7 @@ export default function KvkkPage() {
           <Shield className="h-5 w-5" strokeWidth={2} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-anthracite-900 sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">
             Kişisel verilerin korunması (KVKK)
           </h1>
           <p className="mt-2 text-sm text-anthracite-600">
@@ -33,7 +33,7 @@ export default function KvkkPage() {
       </div>
 
       <div className="space-y-6 text-sm leading-relaxed text-anthracite-700">
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-3 text-base font-semibold text-anthracite-900">Veri sorumlusu</h2>
           <p>
             Demir Dev Studio olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında üyelik, sipariş ve iletişim
@@ -42,7 +42,7 @@ export default function KvkkPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-3 text-base font-semibold text-anthracite-900">İşlenen veriler ve amaçlar</h2>
           <p className="mb-3">
             Örnek olarak: kimlik / iletişim bilgileri, vergi numarası, işletme unvanı, sipariş ve ödeme teyidi için gerekli
@@ -54,7 +54,7 @@ export default function KvkkPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-3 text-base font-semibold text-anthracite-900">Haklarınız</h2>
           <p>
             KVKK md. 11 kapsamında verilerinizin işlenip işlenmediğini öğrenme, düzeltme, silme, itiraz ve şikâyet hakkına

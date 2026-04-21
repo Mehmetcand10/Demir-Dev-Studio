@@ -35,6 +35,27 @@ body {
   .premium-chip {
     @apply rounded-full border border-anthracite-200 bg-white px-3 py-1 text-[11px] font-medium text-anthracite-700;
   }
+
+  /* Broad premium defaults across pages */
+  .premium-page-wrap {
+    @apply mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8;
+  }
+
+  .premium-card {
+    @apply rounded-3xl border border-anthracite-200/70 bg-white/90 shadow-sm backdrop-blur;
+  }
+}
+
+@layer utilities {
+  .btn-premium {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition;
+  }
+  .btn-premium-dark {
+    @apply btn-premium bg-anthracite-900 text-white shadow-sm hover:bg-anthracite-800;
+  }
+  .btn-premium-light {
+    @apply btn-premium border border-anthracite-200 bg-white text-anthracite-800 hover:bg-anthracite-50;
+  }
 }
 
 @layer utilities {

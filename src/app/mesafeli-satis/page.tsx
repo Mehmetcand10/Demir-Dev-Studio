@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function MesafeliSatisPage() {
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <div className="premium-page-wrap max-w-3xl">
       <Link
         href="/"
         className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-anthracite-600 transition hover:text-anthracite-900"
@@ -23,7 +23,7 @@ export default function MesafeliSatisPage() {
           <FileText className="h-5 w-5" strokeWidth={2} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-anthracite-900 sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">
             Mesafeli satış ve ticari şartlar
           </h1>
           <p className="mt-2 text-sm text-anthracite-600">
@@ -33,7 +33,7 @@ export default function MesafeliSatisPage() {
       </div>
 
       <div className="space-y-6 text-sm leading-relaxed text-anthracite-700">
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-3 text-base font-semibold text-anthracite-900">Sipariş ve sözleşme</h2>
           <p className="mb-3">
             Platform üzerinden oluşturulan sipariş kayıtları, taraflar arasındaki ticari ilişkinin parçasıdır. Fiyatlar,
@@ -48,7 +48,7 @@ export default function MesafeliSatisPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-3 text-base font-semibold text-anthracite-900">Teslimat ve cayma</h2>
           <p className="mb-3">
             Kargo ve takip numarası toptancı tarafından sisteme işlenir; teslimat süreleri ve kargo ücreti politikası için
@@ -60,7 +60,7 @@ export default function MesafeliSatisPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-3 text-base font-semibold text-anthracite-900">Uyuşmazlık</h2>
           <p>
             İade ve uyuşmazlık talepleri panel üzerinden iletilebilir; iletişim için{" "}

@@ -59,7 +59,7 @@ export default function YardimPage() {
   const contact = getSitePublicContact();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <div className="premium-page-wrap max-w-3xl">
       <Link
         href="/"
         className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-anthracite-600 transition hover:text-anthracite-900"
@@ -73,7 +73,7 @@ export default function YardimPage() {
           <CircleHelp className="h-5 w-5" strokeWidth={2} />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-anthracite-900 sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">
             Yardım ve süreçler
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-anthracite-600 sm:text-base">
@@ -83,7 +83,7 @@ export default function YardimPage() {
       </div>
 
       <div className="space-y-10 text-left">
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
             <UserCheck className="h-5 w-5 text-emerald-600" strokeWidth={2} />
             Genel akış (tek cümle)
@@ -95,7 +95,7 @@ export default function YardimPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
             <ShoppingBag className="h-5 w-5 text-emerald-600" strokeWidth={2} />
             Butik için adımlar
@@ -117,7 +117,7 @@ export default function YardimPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
+        <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
             <Package className="h-5 w-5 text-emerald-600" strokeWidth={2} />
             Toptancı için adımlar
