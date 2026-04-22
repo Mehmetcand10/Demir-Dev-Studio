@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Lock, ShoppingBag, Search, Heart, Eye, X } from "lucide-react";
+import { Lock, ShoppingBag, Search, Heart } from "lucide-react";
 import { createClient } from '@/utils/supabase/client';
 import NotificationBell from "@/components/NotificationBell";
 import { getRecentProductIds } from "@/utils/recentProducts";
@@ -22,7 +22,6 @@ export default function Katalog() {
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
   const [selectedGender, setSelectedGender] = useState("Tümü");
   const [sortBy, setSortBy] = useState("newest"); // newest, price-asc, price-desc
-  const [showQuickView, setShowQuickView] = useState<any>(null);
   const [notifyNewProducts, setNotifyNewProducts] = useState(true);
   const [notifyPrefSaving, setNotifyPrefSaving] = useState(false);
   const [priceMin, setPriceMin] = useState("");
@@ -315,38 +314,31 @@ export default function Katalog() {
            </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-3.5 lg:grid-cols-4 xl:grid-cols-5">
           {filteredProducts.map((p) => {
             const displayedPrice = Number(p.base_wholesale_price) + Number(p.margin_price || 0);
             const isFav = favorites.includes(p.id);
 
             return (
-              <div key={p.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-anthracite-200/70 bg-white/95 shadow-sm transition hover:-translate-y-1 hover:border-emerald-200/90 hover:shadow-xl">
+              <div key={p.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-anthracite-200/70 bg-white/95 shadow-sm transition hover:border-anthracite-300/80 hover:shadow-md">
                 
                 {/* Ürün Görseli — daha kısa oran, vitrinde daha çok ürün görünsün */}
-                <div className="relative aspect-[4/5] sm:aspect-[5/6] overflow-hidden bg-anthracite-50">
+                <div className="relative aspect-[4/5] overflow-hidden bg-anthracite-50 p-2.5">
                   <Image 
                     src={p.images && p.images.length > 0 ? p.images[0] : 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80'} 
                     alt={p.name} 
                     fill 
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-contain"
                   />
                   
-                  <div className="absolute top-2 right-2 flex flex-col gap-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="absolute right-2 top-2 flex">
                     <button 
                         type="button"
                         onClick={(e) => { e.preventDefault(); toggleFavorite(p.id); }}
                         className={`p-2 rounded-xl backdrop-blur-md shadow-md transition-all ${isFav ? 'bg-red-500 text-white' : 'bg-white/90 text-anthracite-900'}`}
                     >
                         <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isFav ? 'fill-current' : ''}`} />
-                    </button>
-                    <button 
-                        type="button"
-                        onClick={() => setShowQuickView(p)}
-                        className="p-2 bg-white/90 backdrop-blur-md text-anthracite-900 rounded-xl shadow-md"
-                    >
-                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </button>
                   </div>
 
@@ -358,21 +350,16 @@ export default function Katalog() {
                   )}
                 </div>
 
-                <div className="p-3 sm:p-4 flex flex-col flex-grow text-left min-h-0">
-                  <div className="mb-1 min-w-0">
+                <div className="flex min-h-0 flex-grow flex-col p-3 text-left sm:p-3.5">
+                  <div className="mb-1.5 min-w-0">
                         <h3 className="font-bold text-xs sm:text-sm text-anthracite-900 line-clamp-2 leading-snug">{p.name}</h3>
-                        <Link href={`/toptanci-gor/${p.wholesaler_id}`} className="text-[8px] sm:text-[9px] font-semibold text-emerald-700 hover:text-emerald-900 uppercase tracking-wide truncate block">Tedarikçi vitrini</Link>
-                  </div>
-                  
-                  <div className="flex flex-wrap items-center gap-1 my-1.5">
-                     <span className="text-[7px] sm:text-[8px] font-bold tracking-wide text-emerald-700 bg-emerald-50/90 px-1.5 py-0.5 rounded border border-emerald-100/80 uppercase">{p.gender}</span>
-                     <span className="text-[7px] sm:text-[8px] font-bold text-anthracite-500 bg-anthracite-50 px-1.5 py-0.5 rounded uppercase truncate max-w-[5rem] sm:max-w-none">{p.category}</span>
+                        <Link href={`/toptanci-gor/${p.wholesaler_id}`} className="mt-1 block truncate text-[9px] font-semibold uppercase tracking-wide text-emerald-700 hover:text-emerald-900 sm:text-[10px]">Tedarikci vitrini</Link>
                   </div>
                   
                   <div className="mb-2 flex items-center justify-between gap-2">
-                    <p className="text-[9px] sm:text-[10px] font-medium text-anthracite-400 line-clamp-1">MOQ {p.min_order_quantity}</p>
-                    <span className="rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-red-700">
-                      %15 daha uygun
+                    <p className="line-clamp-1 text-[10px] font-medium text-anthracite-400">MOQ {p.min_order_quantity}</p>
+                    <span className="rounded-full border border-anthracite-200 bg-anthracite-50 px-2 py-0.5 text-[9px] font-semibold text-anthracite-600">
+                      {p.gender}
                     </span>
                   </div>
                   
@@ -380,11 +367,11 @@ export default function Katalog() {
                     {isApproved ? (
                       <>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[8px] font-bold text-anthracite-400 uppercase tracking-wide">Toptan fiyat</span>
-                          <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-base">
+                          <span className="text-[9px] font-bold uppercase tracking-wide text-anthracite-400">Toptan fiyat</span>
+                          <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-[15px]">
                              {displayedPrice.toLocaleString("tr-TR")}<span className="text-[10px] font-medium"> ₺ / adet</span>
                           </span>
-                          <span className="text-[10px] text-anthracite-400 line-through">{Math.round(displayedPrice * 1.22).toLocaleString("tr-TR")} ₺ perakende</span>
+                          <span className="text-[10px] text-anthracite-400 line-through">{Math.round(displayedPrice * 1.22).toLocaleString("tr-TR")} ₺</span>
                         </div>
                         <Link href={`/product/${p.id}`} className="shrink-0 bg-anthracite-900 text-white w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                           <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -400,44 +387,6 @@ export default function Katalog() {
             )
           })}
         </div>
-      )}
-
-      {/* QUICK VIEW MODAL */}
-      {showQuickView && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-anthracite-900/35 p-4 backdrop-blur-sm sm:p-6">
-              <div className="relative flex max-h-[92vh] w-full max-w-4xl flex-col overflow-y-auto overflow-hidden rounded-2xl border border-anthracite-200/80 bg-white shadow-xl md:flex-row">
-                  <button type="button" onClick={() => setShowQuickView(null)} className="absolute right-4 top-4 z-10 rounded-full bg-anthracite-100 p-2 transition hover:bg-anthracite-200">
-                    <X className="h-5 w-5" strokeWidth={2} />
-                  </button>
-                  <div className="w-full md:w-1/2 aspect-[3/4] relative bg-anthracite-50">
-                    <Image src={showQuickView.images?.[0]} alt="quick" fill className="object-cover" />
-                  </div>
-                  <div className="flex w-full flex-col p-6 text-left sm:p-8 md:w-1/2 md:p-10">
-                     <span className="mb-3 w-max rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800 ring-1 ring-emerald-100/80">{showQuickView.category}</span>
-                     <h2 className="mb-2 break-words text-xl font-semibold leading-tight text-anthracite-900 sm:text-2xl">{showQuickView.name}</h2>
-                     <p className="mb-6 text-sm text-anthracite-600">{showQuickView.description}</p>
-                     
-                     <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-                        <div className="rounded-xl bg-anthracite-50/80 p-4 ring-1 ring-anthracite-100/80">
-                            <p className="mb-1 text-[10px] font-medium text-anthracite-500">Bedenler</p>
-                            <p className="text-sm font-medium text-anthracite-900">{showQuickView.sizes}</p>
-                        </div>
-                        <div className="rounded-xl bg-anthracite-50/80 p-4 ring-1 ring-anthracite-100/80">
-                            <p className="mb-1 text-[10px] font-medium text-anthracite-500">MOQ</p>
-                            <p className="text-sm font-medium text-anthracite-900">{showQuickView.min_order_quantity} adet</p>
-                        </div>
-                     </div>
-
-                     <div className="mt-auto flex flex-wrap items-end justify-between gap-4">
-                        <div className="flex flex-col">
-                            <span className="mb-0.5 text-[10px] font-medium text-anthracite-500">Adet fiyatı</span>
-                            <span className="text-2xl font-semibold tabular-nums text-anthracite-900">{(Number(showQuickView.base_wholesale_price) + Number(showQuickView.margin_price || 0)).toLocaleString("tr-TR")} ₺</span>
-                        </div>
-                        <Link href={`/product/${showQuickView.id}`} className="w-full rounded-xl bg-anthracite-900 px-6 py-3.5 text-center text-sm font-medium text-white shadow-sm transition hover:bg-anthracite-800 sm:w-auto">Ürüne git</Link>
-                     </div>
-                  </div>
-              </div>
-          </div>
       )}
 
     </div>
