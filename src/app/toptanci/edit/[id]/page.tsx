@@ -188,18 +188,18 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   return (
     <DashboardShell>
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:py-10">
+    <div className="premium-page-wrap max-w-4xl">
       
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-         <Link href="/toptanci" className="inline-flex items-center gap-2 rounded-lg border border-anthracite-200/80 bg-white px-4 py-2.5 text-sm font-medium text-anthracite-700 shadow-sm transition hover:bg-anthracite-50">
-            <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Panele dön
+         <Link href="/toptanci" className="btn-premium-light">
+            <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Panele don
          </Link>
          <h1 className="text-xl font-semibold text-anthracite-900 sm:text-2xl">
-            Ürünü düzenle
+            Urunu duzenle
          </h1>
       </div>
 
-      <form onSubmit={handleUpdate} className="grid gap-8 rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:gap-10 sm:p-8 md:grid-cols-2">
+      <form onSubmit={handleUpdate} className="premium-card grid gap-8 rounded-2xl p-6 sm:gap-10 sm:p-8 md:grid-cols-2">
          
          <div className="flex flex-col md:col-span-1">
             <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-anthracite-900"><ImageIcon className="h-4 w-4 text-emerald-600" strokeWidth={2}/> Görseller</h3>

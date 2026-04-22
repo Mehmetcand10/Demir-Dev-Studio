@@ -248,7 +248,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
         />
 
         {/* Sağ: Bilgiler ve Sipariş İşlemleri */}
-        <div className="premium-shell flex flex-col p-5 sm:p-7">
+        <div className="premium-shell flex flex-col p-5 sm:sticky sm:top-24 sm:p-7">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-emerald-100/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">{product.gender || "Unisex"}</span>
             <span className="rounded-full bg-anthracite-100/60 px-2.5 py-0.5 text-xs font-medium text-anthracite-700">{product.category}</span>
@@ -264,6 +264,9 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <span className="text-3xl font-semibold tabular-nums tracking-tight text-anthracite-900 dark:text-white">{unitPrice.toLocaleString("tr-TR")} ₺</span>
                   <span className="mb-0.5 text-sm text-anthracite-500">/ adet</span>
                 </div>
+                <p className="text-xs text-anthracite-500 line-through">
+                  Referans perakende: {Math.round(unitPrice * 1.22).toLocaleString("tr-TR")} ₺ / adet
+                </p>
                 <div className="flex items-center gap-2 text-sm text-sky-900/80 dark:text-blue-300">
                   <Package className="h-4 w-4 shrink-0" strokeWidth={2} />
                   <span className="font-medium">MOQ: {product.min_order_quantity} adet</span>
@@ -391,9 +394,22 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <strong>{product.min_order_quantity} adet</strong> olarak uygulanır.
                 </div>
 
-                <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-100/90 bg-emerald-50/60 p-4 text-emerald-950 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-100">
-                  <span className="text-sm font-medium">Toplam ({totalItems} adet)</span>
-                  <span className="text-lg font-semibold tabular-nums">{totalPrice.toLocaleString("tr-TR")} ₺</span>
+                <div className="rounded-xl border border-emerald-100/90 bg-emerald-50/60 p-4 text-emerald-950 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-100">
+                  <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Fiyat dagilimi</p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>Urun ara toplam ({totalItems} adet)</span>
+                      <span className="font-semibold tabular-nums">{(Number(product.base_wholesale_price) * totalItems).toLocaleString("tr-TR")} ₺</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2">
+                      <span>Platform komisyonu</span>
+                      <span className="font-semibold tabular-nums">{(Number(product.margin_price || 0) * totalItems).toLocaleString("tr-TR")} ₺</span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between gap-2 border-t border-emerald-200/80 pt-2">
+                      <span className="text-sm font-semibold">Toplam ({totalItems} adet)</span>
+                      <span className="text-lg font-semibold tabular-nums">{totalPrice.toLocaleString("tr-TR")} ₺</span>
+                    </div>
+                  </div>
                 </div>
 
                 {moqBlocked && (
@@ -451,7 +467,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   ) : floorBlocked ? (
                     "Minimum adete ulaşın"
                   ) : (
-                    <><MessageCircle className="h-5 w-5" strokeWidth={2} /> Sipariş — adres gir</>
+                    <><MessageCircle className="h-5 w-5" strokeWidth={2} /> Buy wholesale</>
                   )}
                 </button>
               </div>

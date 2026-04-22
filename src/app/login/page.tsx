@@ -43,9 +43,9 @@ export default function Login() {
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100/80">
             <Package className="h-5 w-5" strokeWidth={2} />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-anthracite-900">Giriş</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-anthracite-900">Ticari giris</h1>
           <p className="mt-2 text-sm text-anthracite-600 text-balance">
-            Kayıtlı e-posta ve şifrenizle vitrine erişin.
+            Butik veya toptanci hesabinizla toptan fiyat paneline erisin.
           </p>
         </div>
 
@@ -57,33 +57,33 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-anthracite-600">E-posta</label>
+            <label className="premium-label">E-posta</label>
             <input 
               required
               type="email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/15"
+              className="premium-input"
               placeholder="sizin@butik.com"
             />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Şifre</label>
+            <label className="premium-label">Sifre</label>
             <input 
               required
               type="password" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/15"
+              className="premium-input"
               placeholder="••••••••"
             />
             <div className="mt-2 flex flex-col items-end gap-1">
               <Link href="/forgot-password" className="text-xs font-medium text-anthracite-500 transition hover:text-anthracite-800">
-                Şifremi unuttum
+                Sifremi unuttum
               </Link>
               <span className="max-w-[18rem] text-right text-[11px] leading-snug text-anthracite-400">
-                Şifreyi biliyorsanız ve değiştirmek istiyorsanız önce giriş yapın; sonra üst menüden{" "}
-                <strong className="font-medium text-anthracite-600">Şifre</strong> (veya{" "}
+                Sifreyi biliyorsaniz ve degistirmek istiyorsaniz once giris yapin; sonra ust menuden{" "}
+                <strong className="font-medium text-anthracite-600">Sifre</strong> (veya{" "}
                 <Link href="/hesap/sifre" className="font-medium text-emerald-700 hover:underline">
                   /hesap/sifre
                 </Link>
@@ -95,16 +95,16 @@ export default function Login() {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="mt-2 w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800 disabled:opacity-50"
+            className="btn-premium-dark mt-2 w-full"
           >
-            {isLoading ? "Giriş yapılıyor…" : "Giriş yap"}
+            {isLoading ? "Giris yapiliyor..." : "Giris yap"}
           </button>
         </form>
 
         <div className="mt-8 border-t border-anthracite-100 pt-6 text-center">
           <p className="text-sm text-anthracite-600">
-            Hesabınız yok mu?{' '}
-            <Link href="/register" className="font-medium text-emerald-700 hover:underline">Başvuru</Link>
+            Hesabiniz yok mu?{' '}
+            <Link href="/register" className="font-medium text-emerald-700 hover:underline">Basvuru</Link>
           </p>
           <p className="mt-3 text-xs text-anthracite-500">
             <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">

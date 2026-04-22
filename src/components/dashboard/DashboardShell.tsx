@@ -8,10 +8,10 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 120% 80% at 50% -30%, rgba(16, 185, 129, 0.075), transparent 55%), radial-gradient(ellipse 60% 40% at 100% 0%, rgba(9, 9, 11, 0.035), transparent 50%)",
+            "radial-gradient(ellipse 120% 80% at 50% -30%, rgba(16, 185, 129, 0.09), transparent 55%), radial-gradient(ellipse 60% 40% at 100% 0%, rgba(30, 64, 175, 0.05), transparent 50%)",
         }}
       />
-      <div className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">{children}</div>
+      <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">{children}</div>
     </div>
   );
 }

@@ -58,15 +58,15 @@ export default function Register() {
         <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-emerald-600">
            <ShieldCheck className="h-8 w-8" strokeWidth={2} />
         </div>
-        <h1 className="mb-3 text-2xl font-semibold tracking-tight text-anthracite-900">E-postanızı doğrulayın</h1>
+        <h1 className="mb-3 text-2xl font-semibold tracking-tight text-anthracite-900">E-postanizi dogrulayin</h1>
         <p className="mb-6 max-w-md text-sm leading-relaxed text-anthracite-600">
-          <strong className="text-anthracite-800">{email}</strong> adresine bir bağlantı gönderdik. Hesabı etkinleştirmek için gelen kutunuzu kontrol edin.
+          <strong className="text-anthracite-800">{email}</strong> adresine bir baglanti gonderdik. Hesabi etkinlestirmek icin gelen kutunuzu kontrol edin.
         </p>
         <div className="mb-8 max-w-sm rounded-xl border border-amber-100 bg-amber-50/90 p-4 text-left text-xs text-amber-900">
-           Spam / gereksiz klasörüne de bakın.
+           Spam / gereksiz klasorune de bakin.
         </div>
         <Link href="/login" className="rounded-xl bg-anthracite-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800">
-           Girişe dön
+           Girise don
         </Link>
         <p className="mt-6 text-xs text-anthracite-500">
           <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">
@@ -84,9 +84,9 @@ export default function Register() {
           <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100/80">
             <Package className="h-5 w-5" strokeWidth={2} />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-anthracite-900">Üyelik başvurusu</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-anthracite-900">Ticari uyelik basvurusu</h1>
           <p className="mt-2 text-sm text-anthracite-600 text-balance">
-            Butik veya toptancı olarak başvurun; onay sonrası panele erişirsiniz.
+            Butik veya toptanci olarak basvurun; onay sonrasi toptan alim paneline erisin.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export default function Register() {
         <form onSubmit={handleRegister} className="flex flex-col gap-4">
           
           <div>
-            <label className="mb-2 block text-xs font-medium text-anthracite-600">Hesap tipi</label>
+            <label className="premium-label">Hesap tipi</label>
             <div className="grid grid-cols-2 gap-2">
               <button 
                 type="button"
@@ -113,28 +113,28 @@ export default function Register() {
                 onClick={() => setRole('toptanci')}
                 className={`rounded-xl border py-2.5 text-sm font-medium transition ${role === 'toptanci' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-anthracite-200 bg-white text-anthracite-600 hover:border-anthracite-300'}`}
               >
-                Toptancı
+                Toptanci
               </button>
             </div>
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-anthracite-600">{role === 'toptanci' ? 'Firma adı' : 'Butik adı'}</label>
+            <label className="premium-label">{role === 'toptanci' ? 'Firma adi' : 'Butik adi'}</label>
             <input 
               required
               type="text" 
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
-              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15"
+              className="premium-input"
               placeholder="Ticari unvan"
             />
           </div>
           
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="sm:col-span-1">
-              <label className="mb-1.5 block text-xs font-medium text-anthracite-600">
+              <label className="premium-label">
                 Vergi no{" "}
-                <span className="font-normal text-anthracite-400">(isteğe bağlı)</span>
+                <span className="font-normal normal-case tracking-normal text-anthracite-400">(istege bagli)</span>
               </label>
               <input
                 type="text"
@@ -142,29 +142,29 @@ export default function Register() {
                 autoComplete="off"
                 value={taxId}
                 onChange={(e) => setTaxId(e.target.value)}
-                className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15"
-                placeholder="VKN — boş bırakılabilir"
+                className="premium-input"
+                placeholder="VKN — bos birakilabilir"
               />
               <p className="mt-1.5 text-[11px] leading-snug text-anthracite-500">
-                Fatura ve resmi kayıt için kullanılır; şimdilik boş bırakıp onay veya ilk sipariş öncesi
-                yönetimle paylaşabilirsiniz.
+                Fatura ve resmi kayit icin kullanilir; simdilik bos birakip onay veya ilk siparis oncesi
+                yonetimle paylasabilirsiniz.
               </p>
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Telefon</label>
-              <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" placeholder="05xx…" />
+              <label className="premium-label">Telefon</label>
+              <input required type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="premium-input" placeholder="05xx..." />
             </div>
           </div>
 
           <hr className="border-anthracite-100" />
 
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-anthracite-600">E-posta</label>
-            <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" placeholder="ornek@firma.com" />
+            <label className="premium-label">E-posta</label>
+            <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="premium-input" placeholder="ornek@firma.com" />
           </div>
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Şifre</label>
-            <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" placeholder="En az 6 karakter" />
+            <label className="premium-label">Sifre</label>
+            <input required type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="premium-input" placeholder="En az 6 karakter" />
           </div>
 
           <button 
@@ -172,14 +172,14 @@ export default function Register() {
             disabled={isLoading}
             className={`mt-1 w-full rounded-xl py-3 text-sm font-medium text-white transition disabled:opacity-50 ${role === 'toptanci' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-anthracite-900 hover:bg-anthracite-800'}`}
           >
-            {isLoading ? "Gönderiliyor…" : "Başvuruyu gönder"}
+            {isLoading ? "Gonderiliyor..." : "Basvuruyu gonder"}
           </button>
         </form>
 
         <div className="mt-8 border-t border-anthracite-100 pt-6 text-center">
           <p className="text-sm text-anthracite-600">
-            Zaten üye misiniz?{' '}
-            <Link href="/login" className="font-medium text-emerald-700 hover:underline">Giriş</Link>
+            Zaten uye misiniz?{' '}
+            <Link href="/login" className="font-medium text-emerald-700 hover:underline">Giris</Link>
           </p>
           <p className="mt-3 text-xs text-anthracite-500">
             <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">

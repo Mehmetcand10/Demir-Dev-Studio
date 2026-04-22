@@ -88,13 +88,13 @@ export default function HesapSifreDegistir() {
       <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
         <AuthCard className="max-w-md text-center">
           <p className="mb-6 text-sm text-anthracite-600">
-            Şifre değiştirmek için giriş yapmalısınız.
+            Sifre degistirmek icin giris yapmalisiniz.
           </p>
           <Link
             href="/login"
             className="inline-block w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800"
           >
-            Giriş
+            Giris
           </Link>
         </AuthCard>
       </div>
@@ -109,10 +109,10 @@ export default function HesapSifreDegistir() {
             <KeyRound className="h-6 w-6" strokeWidth={2} />
           </div>
           <h1 className="mb-2 text-xl font-semibold text-anthracite-900">
-            Şifre güncellendi
+            Sifre guncellendi
           </h1>
           <p className="mb-6 text-sm text-anthracite-600">
-            Bir sonraki girişinizde yeni şifrenizi kullanın.
+            Bir sonraki girisinizde yeni sifrenizi kullanin.
           </p>
           <Link
             href="/katalog"
@@ -141,10 +141,10 @@ export default function HesapSifreDegistir() {
         </div>
 
         <h1 className="mb-1 text-center text-xl font-semibold text-anthracite-900">
-          Şifre değiştir
+            Sifre degistir
         </h1>
         <p className="mb-6 text-center text-sm text-anthracite-600">
-          Önce mevcut şifrenizi doğrulayın, ardından yeni şifrenizi girin.
+          Once mevcut sifrenizi dogrulayin, ardindan yeni sifrenizi girin.
         </p>
 
         {error && (
@@ -156,7 +156,7 @@ export default function HesapSifreDegistir() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
             <label className="mb-1 block text-xs font-medium text-anthracite-600">
-              Mevcut şifre
+              Mevcut sifre
             </label>
             <input
               required
@@ -164,12 +164,12 @@ export default function HesapSifreDegistir() {
               autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15"
+              className="premium-input"
             />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-anthracite-600">
-              Yeni şifre
+              Yeni sifre
             </label>
             <input
               required
@@ -177,13 +177,13 @@ export default function HesapSifreDegistir() {
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15"
+              className="premium-input"
               placeholder="En az 6 karakter"
             />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-anthracite-600">
-              Yeni şifre (tekrar)
+              Yeni sifre (tekrar)
             </label>
             <input
               required
@@ -191,7 +191,7 @@ export default function HesapSifreDegistir() {
               autoComplete="new-password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15"
+              className="premium-input"
             />
           </div>
           <button
@@ -199,15 +199,15 @@ export default function HesapSifreDegistir() {
             disabled={loading}
             className="mt-1 w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800 disabled:opacity-50"
           >
-            {loading ? "Kaydediliyor…" : "Yeni şifreyi kaydet"}
+            {loading ? "Kaydediliyor..." : "Yeni sifreyi kaydet"}
           </button>
         </form>
 
         <p className="mt-5 text-center text-xs text-anthracite-500">
           <Link href="/forgot-password" className="font-medium text-emerald-700 hover:underline">
-            Şifremi unuttum
+            Sifremi unuttum
           </Link>{" "}
-          (e-posta ile sıfırlama)
+          (e-posta ile sifirlama)
         </p>
       </AuthCard>
     </div>

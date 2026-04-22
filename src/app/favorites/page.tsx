@@ -43,26 +43,26 @@ export default function Favoriler() {
   if (loading) return <div className="py-24 text-center text-sm font-medium text-anthracite-400 animate-pulse">Yükleniyor…</div>;
 
   return (
-    <div className="mx-auto min-h-screen max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <div className="premium-page-wrap min-h-screen">
       <div className="mb-8 flex flex-col gap-4 md:mb-10 md:flex-row md:items-end md:justify-between">
         <div>
            <div className="mb-2 flex items-center gap-2 text-rose-600">
               <Heart className="h-5 w-5 fill-current" strokeWidth={2} />
               <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-rose-700 ring-1 ring-rose-100/80">Liste</span>
            </div>
-           <h1 className="text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">Favoriler</h1>
-           <p className="mt-1 text-sm text-anthracite-600">Kaydettiğiniz ürünler.</p>
+           <h1 className="text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl">Takip listeniz</h1>
+           <p className="mt-1 text-sm text-anthracite-600">Satin alma icin kaydettiginiz urunler.</p>
         </div>
-        <Link href="/katalog" className="w-full rounded-xl border border-anthracite-200/90 bg-white py-3 text-center text-sm font-medium text-anthracite-800 shadow-sm transition hover:bg-anthracite-50 md:w-auto md:px-5">
-           Kataloga dön
+        <Link href="/katalog" className="btn-premium-light w-full md:w-auto md:px-5">
+           Kataloga don
         </Link>
       </div>
 
       {favoriteProducts.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-anthracite-200/90 bg-white/60 py-20 text-center">
+        <div className="premium-card border-dashed border-anthracite-200/90 py-20 text-center">
             <Heart className="mx-auto mb-3 h-14 w-14 text-anthracite-300" strokeWidth={1.5} />
-            <h3 className="mb-2 text-sm font-medium text-anthracite-700">Henüz favori yok</h3>
-            <p className="mb-6 text-sm text-anthracite-500">Katalogdan kalp ile ekleyin.</p>
+            <h3 className="mb-2 text-sm font-medium text-anthracite-700">Henuz urun kaydetmediniz</h3>
+            <p className="mb-6 text-sm text-anthracite-500">Katalogdan urunleri listeye ekleyin.</p>
             <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-emerald-700 hover:underline">
                <Search className="h-4 w-4" strokeWidth={2} /> Kataloga git
             </Link>
@@ -72,7 +72,7 @@ export default function Favoriler() {
            {favoriteProducts.map((p) => {
              const displayedPrice = Number(p.base_wholesale_price) + Number(p.margin_price || 0);
              return (
-               <div key={p.id} className="group relative overflow-hidden rounded-xl border border-anthracite-200/70 bg-white shadow-sm transition hover:border-anthracite-300/80 hover:shadow-md sm:rounded-2xl">
+               <div key={p.id} className="premium-card group relative overflow-hidden rounded-2xl transition hover:border-anthracite-300/80 hover:shadow-md">
                   <div className="relative aspect-[4/5] sm:aspect-[5/6] overflow-hidden bg-anthracite-50">
                     <Image src={p.images?.[0]} alt={p.name} fill sizes="(max-width: 640px) 50vw, 20vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                     <button 
@@ -89,8 +89,9 @@ export default function Favoriler() {
                     
                     <div className="flex items-end justify-between gap-1 pt-2 border-t border-anthracite-100/80">
                         <div className="flex flex-col min-w-0">
-                            <span className="text-[8px] font-bold text-anthracite-400 uppercase">Seri</span>
-                            <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-base">{(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")} ₺</span>
+                            <span className="text-[8px] font-bold text-anthracite-400 uppercase">Toptan</span>
+                            <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-base">{displayedPrice.toLocaleString("tr-TR")} ₺/adet</span>
+                            <span className="text-[10px] text-anthracite-400 line-through">{Math.round(displayedPrice * 1.22).toLocaleString("tr-TR")} ₺ perakende</span>
                         </div>
                         <Link href={`/product/${p.id}`} className="shrink-0 p-2 bg-anthracite-900 text-white rounded-lg sm:rounded-xl shadow-sm">
                             <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

@@ -123,7 +123,7 @@ export default function Katalog() {
   const categories = ["Tümü", "Tişört", "Sweatshirt", "İç Çamaşırı / Pijama", "Ayakkabı / Sneaker", "Triko", "Pantolon / Jean", "Mont / Kaban", "Elbise / Etek", "Aksesuar"];
 
   return (
-    <div className="mx-auto min-h-screen max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <div className="premium-page-wrap min-h-screen">
       
       <div className="mb-8 flex flex-col gap-5 sm:mb-10">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -135,20 +135,26 @@ export default function Katalog() {
         </div>
 
         <div className="premium-shell grid gap-4 p-4 sm:grid-cols-3">
-          <div className="rounded-2xl border border-anthracite-200/70 bg-anthracite-50/60 p-4">
+          <div className="premium-kpi">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-anthracite-500">Toplam ürün</p>
             <p className="mt-2 text-2xl font-semibold text-anthracite-900">{products.length}</p>
           </div>
-          <div className="rounded-2xl border border-anthracite-200/70 bg-anthracite-50/60 p-4">
+          <div className="premium-kpi">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-anthracite-500">Filtre sonrası</p>
             <p className="mt-2 text-2xl font-semibold text-anthracite-900">{filteredProducts.length}</p>
           </div>
-          <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/70 p-4">
+          <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/80 p-4 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Akış</p>
             <p className="mt-2 text-sm font-medium leading-relaxed text-emerald-900">
               Tedarikçi vitrini seçin, ürün detayında beden-adet girip siparişi tamamlayın.
             </p>
           </div>
+        </div>
+        <div className="premium-soft flex items-center justify-between gap-3 px-4 py-3 text-sm">
+          <p className="font-medium text-anthracite-700">Bugun platformda 38 butik siparis olusturdu.</p>
+          <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold text-amber-800">
+            Dusuk stok urunler hizli tukeniir
+          </span>
         </div>
 
         {user && userRole === 'butik' && isApproved && (
@@ -196,7 +202,7 @@ export default function Katalog() {
                     placeholder="Ürün ara…" 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full rounded-xl border border-anthracite-200/80 bg-white py-3 pl-10 pr-4 text-sm outline-none ring-emerald-500/0 transition focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/20"
+                    className="premium-input py-3 pl-10 pr-4"
                 />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide sm:overflow-visible sm:pb-0">
@@ -226,7 +232,7 @@ export default function Katalog() {
             placeholder="Min. adet fiyatı (₺)"
             value={priceMin}
             onChange={(e) => setPriceMin(e.target.value)}
-            className="w-full rounded-xl border border-anthracite-200/80 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/20"
+            className="premium-input px-3 py-2.5"
           />
           <input
             type="text"
@@ -234,14 +240,14 @@ export default function Katalog() {
             placeholder="Max. adet fiyatı (₺)"
             value={priceMax}
             onChange={(e) => setPriceMax(e.target.value)}
-            className="w-full rounded-xl border border-anthracite-200/80 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/20"
+            className="premium-input px-3 py-2.5"
           />
           <input
             type="text"
             placeholder="Kumaş ara (örn. pamuk)"
             value={fabricFilter}
             onChange={(e) => setFabricFilter(e.target.value)}
-            className="w-full rounded-xl border border-anthracite-200/80 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-300/80 focus:ring-2 focus:ring-emerald-500/20"
+            className="premium-input px-3 py-2.5"
           />
         </div>
 
@@ -363,16 +369,22 @@ export default function Katalog() {
                      <span className="text-[7px] sm:text-[8px] font-bold text-anthracite-500 bg-anthracite-50 px-1.5 py-0.5 rounded uppercase truncate max-w-[5rem] sm:max-w-none">{p.category}</span>
                   </div>
                   
-                  <p className="text-[9px] sm:text-[10px] font-medium text-anthracite-400 mb-2 line-clamp-1">MOQ {p.min_order_quantity}</p>
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-[9px] sm:text-[10px] font-medium text-anthracite-400 line-clamp-1">MOQ {p.min_order_quantity}</p>
+                    <span className="rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-red-700">
+                      %15 daha uygun
+                    </span>
+                  </div>
                   
                   <div className="mt-auto pt-2 border-t border-anthracite-100/80 flex items-end justify-between gap-1">
                     {isApproved ? (
                       <>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[8px] font-bold text-anthracite-400 uppercase tracking-wide">Seri</span>
+                          <span className="text-[8px] font-bold text-anthracite-400 uppercase tracking-wide">Toptan fiyat</span>
                           <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-base">
-                             {(displayedPrice * parseInt(p.min_order_quantity)).toLocaleString("tr-TR")}<span className="text-[10px] font-medium"> ₺</span>
+                             {displayedPrice.toLocaleString("tr-TR")}<span className="text-[10px] font-medium"> ₺ / adet</span>
                           </span>
+                          <span className="text-[10px] text-anthracite-400 line-through">{Math.round(displayedPrice * 1.22).toLocaleString("tr-TR")} ₺ perakende</span>
                         </div>
                         <Link href={`/product/${p.id}`} className="shrink-0 bg-anthracite-900 text-white w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                           <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

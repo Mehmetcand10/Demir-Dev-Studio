@@ -91,7 +91,7 @@ export default function ToptanciGorListe() {
   }, [supabase]);
 
   return (
-    <div className="mx-auto min-h-screen max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <div className="premium-page-wrap min-h-screen">
       <div className="mb-8 flex flex-wrap items-start justify-between gap-3">
         <div>
           <Link
@@ -101,10 +101,10 @@ export default function ToptanciGorListe() {
             <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Katalog
           </Link>
           <h1 className="premium-title mb-1">
-            Tedarikçileri gör
+            Tedarikcileri kesfet
           </h1>
           <p className="premium-subtitle">
-            Butik satın alma için tek ekranda tedarikçi seçin, ürüne inip siparişi tamamlayın.
+            Butik satin alma icin tek ekranda tedarikci secin, urune inip siparisi tamamlayin.
           </p>
         </div>
         {userId ? (
@@ -119,10 +119,10 @@ export default function ToptanciGorListe() {
           Yükleniyor…
         </div>
       ) : rows.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-anthracite-200/90 bg-white/60 py-16 text-center">
+        <div className="premium-card border-dashed border-anthracite-200/90 py-16 text-center">
           <Store className="mx-auto mb-3 h-12 w-12 text-anthracite-300" />
           <p className="text-sm font-medium text-anthracite-600">
-            Henüz listelenecek onaylı toptancı yok.
+            Henuz listelenecek onayli toptanci yok.
           </p>
         </div>
       ) : (
@@ -134,7 +134,7 @@ export default function ToptanciGorListe() {
               <li key={r.id}>
                 <Link
                   href={`/toptanci-gor/${r.id}`}
-                  className="group flex items-center gap-4 rounded-2xl border border-anthracite-200/80 bg-white/95 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200/90 hover:shadow-lg sm:p-5"
+                  className="premium-card group flex items-center gap-4 rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-emerald-200/90 hover:shadow-lg sm:p-5"
                 >
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-xl font-semibold text-white shadow-sm sm:h-16 sm:w-16 sm:text-2xl">
                     {initial}
@@ -145,7 +145,7 @@ export default function ToptanciGorListe() {
                     </h2>
                     <p className="mt-0.5 flex items-center gap-1.5 text-xs text-anthracite-500 sm:text-sm">
                       <Package className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-                      {r.productCount} ürün
+                      {r.productCount} urun
                     </p>
                   </div>
                   <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-anthracite-900 px-3 py-2 text-xs font-medium text-white transition group-hover:bg-emerald-700 sm:text-sm">

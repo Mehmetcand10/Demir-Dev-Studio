@@ -46,18 +46,18 @@ export default function ForgotPassword() {
            <KeyRound className="h-6 w-6" strokeWidth={2} />
         </div>
         
-        <h1 className="mb-2 text-xl font-semibold text-anthracite-900">Şifre sıfırlama</h1>
+        <h1 className="mb-2 text-xl font-semibold text-anthracite-900">Sifre sifirlama</h1>
         
         {success ? (
           <div className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50/90 p-4 text-left text-sm text-emerald-900">
-             <p className="font-medium">Bağlantı gönderildi.</p>
+             <p className="font-medium">Baglanti gonderildi.</p>
              <p className="mt-2 text-emerald-800/90"><strong>{email}</strong> gelen kutusunu kontrol edin.</p>
           </div>
         ) : (
           <>
             <p className="mb-6 text-sm text-anthracite-600">
-              Kayıtlı e-postanızı girin; size sıfırlama bağlantısı gönderelim. Bağlantı açılmaz veya e-posta gelmezse spam
-              klasörüne bakın; sorun sürerse site yöneticinizden veya destekten yardım isteyin.
+              Kayitli e-postanizi girin; size sifirlama baglantisi gonderelim. Baglanti acilmaz veya e-posta gelmezse spam
+              klasorune bakin; sorun surerse destekten yardim isteyin.
             </p>
             
             {error && <div className="mb-4 rounded-xl border border-red-100 bg-red-50/90 p-3 text-sm text-red-700">{error}</div>}
@@ -68,15 +68,15 @@ export default function ForgotPassword() {
                 type="email" 
                 value={email} 
                 onChange={e => setEmail(e.target.value)} 
-                className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" 
+                className="premium-input" 
                 placeholder="ornek@firma.com" 
               />
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800 disabled:opacity-50"
+                className="btn-premium-dark w-full"
               >
-                {loading ? "Gönderiliyor…" : "Bağlantı gönder"}
+                {loading ? "Gonderiliyor..." : "Baglanti gonder"}
               </button>
             </form>
           </>

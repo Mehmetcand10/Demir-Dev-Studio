@@ -154,7 +154,7 @@ export default function ResetPassword() {
         <AuthCard className="max-w-md text-center">
           <Loader2 className="mx-auto h-10 w-10 animate-spin text-emerald-600" />
           <p className="mt-4 text-sm font-medium text-anthracite-600">
-            Bağlantı doğrulanıyor…
+            Baglanti dogrulaniyor...
           </p>
         </AuthCard>
       </div>
@@ -169,7 +169,7 @@ export default function ResetPassword() {
             <LockKeyhole className="h-6 w-6" strokeWidth={2} />
           </div>
           <h1 className="mb-2 text-xl font-semibold text-anthracite-900">
-            Şifre sıfırlama
+            Sifre sifirlama
           </h1>
           <p className="mb-6 text-sm text-anthracite-600">{initError}</p>
           <div className="flex flex-col gap-2">
@@ -177,13 +177,13 @@ export default function ResetPassword() {
               href="/forgot-password"
               className="inline-block w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800"
             >
-              Yeni bağlantı iste
+              Yeni baglanti iste
             </Link>
             <Link
               href="/login"
               className="inline-block w-full rounded-xl border border-anthracite-200 py-3 text-sm font-medium text-anthracite-700 transition hover:bg-anthracite-50"
             >
-              Girişe dön
+              Girise don
             </Link>
           </div>
         </AuthCard>
@@ -199,16 +199,16 @@ export default function ResetPassword() {
             <LockKeyhole className="h-7 w-7" strokeWidth={2} />
           </div>
           <h2 className="mb-2 text-xl font-semibold text-anthracite-900">
-            Şifre güncellendi
+            Sifre guncellendi
           </h2>
           <p className="mb-6 text-sm text-anthracite-600">
-            Yeni şifrenizle giriş yapabilirsiniz.
+            Yeni sifrenizle giris yapabilirsiniz.
           </p>
           <Link
             href="/login"
             className="inline-block w-full rounded-xl bg-anthracite-900 py-3 text-sm font-medium text-white transition hover:bg-anthracite-800"
           >
-            Giriş yap
+            Giris yap
           </Link>
         </AuthCard>
       </div>
@@ -223,10 +223,10 @@ export default function ResetPassword() {
         </div>
 
         <h1 className="mb-2 text-xl font-semibold text-anthracite-900">
-          Yeni şifre
+          Yeni sifre
         </h1>
         <p className="mb-6 text-sm text-anthracite-600">
-          Hesabınız için yeni bir şifre belirleyin.
+          Hesabiniz icin yeni bir sifre belirleyin.
         </p>
 
         {error && (
@@ -238,7 +238,7 @@ export default function ResetPassword() {
         <form onSubmit={handleUpdate} className="flex flex-col gap-3 text-left">
           <div>
             <label className="mb-1 block text-xs font-medium text-anthracite-600">
-              Yeni şifre
+              Yeni sifre
             </label>
             <input
               required
@@ -246,13 +246,13 @@ export default function ResetPassword() {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-500/20"
+              className="premium-input"
               placeholder="En az 6 karakter"
             />
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-anthracite-600">
-              Yeni şifre (tekrar)
+              Yeni sifre (tekrar)
             </label>
             <input
               required
@@ -260,16 +260,16 @@ export default function ResetPassword() {
               autoComplete="new-password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-500/20"
+              className="premium-input"
               placeholder="Tekrar girin"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-sky-600 py-3 text-sm font-medium text-white transition hover:bg-sky-700 disabled:opacity-50"
+            className="btn-premium-emerald w-full"
           >
-            {loading ? "Kaydediliyor…" : "Şifreyi kaydet"}
+            {loading ? "Kaydediliyor..." : "Sifreyi kaydet"}
           </button>
         </form>
       </AuthCard>

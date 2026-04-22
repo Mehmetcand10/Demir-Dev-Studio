@@ -98,13 +98,13 @@ export default function ToptanciSiparisler() {
         eyebrow="Toptancı"
         title="Kargo"
         right={
-          <Link href="/toptanci" className="inline-flex items-center gap-2 rounded-lg border border-anthracite-200/80 bg-white px-4 py-2.5 text-sm font-medium text-anthracite-800 shadow-sm transition hover:bg-anthracite-50">
-            <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Panele dön
+          <Link href="/toptanci" className="btn-premium-light">
+            <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Panele don
           </Link>
         }
       />
 
-      <div className="rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:p-8">
+      <div className="premium-card p-6 sm:p-8">
         <h2 className="mb-6 border-b border-anthracite-100/90 pb-4 text-base font-semibold text-anthracite-900">
            Bekleyen gönderiler
         </h2>
@@ -115,8 +115,8 @@ export default function ToptanciSiparisler() {
              <p className="text-sm font-medium text-anthracite-500">Yükleniyor…</p>
           </div>
         ) : orders.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-anthracite-200/90 bg-anthracite-50/40 px-4 py-14 text-center sm:px-8">
-             <h3 className="mb-3 text-base font-semibold text-anthracite-900">Henüz kargolanacak sipariş yok</h3>
+          <div className="premium-card border-dashed border-anthracite-200/90 bg-anthracite-50/40 px-4 py-14 text-center sm:px-8">
+             <h3 className="mb-3 text-base font-semibold text-anthracite-900">Henuz kargolanacak siparis yok</h3>
              <p className="mx-auto max-w-lg text-sm leading-relaxed text-anthracite-600">
                Butik siparişi oluşturduktan sonra yönetim ödemeyi teyit eder; onay sonrası işlemler burada listelenir.
                Ürünlerinizi{" "}

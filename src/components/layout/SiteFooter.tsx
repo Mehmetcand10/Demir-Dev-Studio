@@ -25,9 +25,9 @@ export default function SiteFooter() {
   const c = getSitePublicContact();
 
   return (
-    <footer className="mt-auto border-t border-anthracite-200/70 bg-white/60 backdrop-blur-sm">
+    <footer className="mt-auto border-t border-anthracite-200/70 bg-white/80 backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center gap-4 text-center sm:gap-5">
+        <div className="premium-soft flex flex-col items-center gap-4 px-4 py-5 text-center sm:gap-5 sm:px-5">
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-anthracite-600 sm:text-sm">
             <a
               href={c.whatsappHref}
@@ -36,7 +36,7 @@ export default function SiteFooter() {
               className="inline-flex items-center gap-1.5 font-medium text-emerald-800 transition hover:text-emerald-900 hover:underline"
             >
               <MessageCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-              Sipariş WhatsApp {c.whatsappDisplay}
+              Siparis WhatsApp {c.whatsappDisplay}
             </a>
             {c.supportEmailHref ? (
               <>
@@ -69,17 +69,17 @@ export default function SiteFooter() {
             <span className="text-anthracite-300" aria-hidden>
               ·
             </span>
-            <FooterLegalLink href={c.mesafeliHref}>Mesafeli satış</FooterLegalLink>
+            <FooterLegalLink href={c.mesafeliHref}>Mesafeli satis</FooterLegalLink>
             <span className="text-anthracite-300" aria-hidden>
               ·
             </span>
             <Link href="/yardim" className={legalClass}>
-              Yardım ve süreçler
+              Yardim ve surecler
             </Link>
           </div>
 
           <p className="text-xs text-anthracite-500 sm:text-sm">
-            Demir Dev Studio © {new Date().getFullYear()}
+            Demir Dev Studio © {new Date().getFullYear()} · Verified B2B Commerce Network
           </p>
         </div>
       </div>

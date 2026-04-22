@@ -64,30 +64,35 @@ export default async function RootLayout({
             `,
           }}
         />
-        <nav className="sticky top-0 z-50 border-b border-anthracite-200/80 bg-white/80 backdrop-blur-xl">
-          <div className="mx-auto flex min-h-14 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
-            <Link href="/" className="flex min-w-0 items-center gap-2 text-base font-semibold tracking-tight text-anthracite-900 sm:text-lg">
-              <Package className="h-5 w-5 shrink-0 text-emerald-600" strokeWidth={2} />
+        <nav className="sticky top-0 z-50 border-b border-anthracite-200/70 bg-white/88 backdrop-blur-xl">
+          <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
+            <Link href="/" className="flex min-w-0 items-center gap-2.5 text-base font-semibold tracking-tight text-anthracite-900 sm:text-lg">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+                <Package className="h-4.5 w-4.5 shrink-0" strokeWidth={2} />
+              </span>
               <span className="truncate">Demir Dev Studio</span>
+              <span className="hidden rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-800 md:inline">
+                B2B
+              </span>
             </Link>
             <div className="w-full overflow-x-auto md:w-auto">
-            <div className="flex min-w-max items-center gap-1 pb-1 sm:gap-2 md:min-w-0 md:pb-0">
-              <Link href="/katalog" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+            <div className="flex min-w-max items-center gap-1.5 rounded-2xl border border-anthracite-200/70 bg-white/80 p-1 pb-1 shadow-sm sm:gap-2 md:min-w-0 md:pb-1">
+              <Link href="/katalog" className="flex h-9 items-center rounded-xl px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Katalog
               </Link>
-              <Link href="/toptanci-gor" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+              <Link href="/toptanci-gor" className="flex h-9 items-center rounded-xl px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Toptancılar
               </Link>
-              <Link href="/yardim" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+              <Link href="/yardim" className="flex h-9 items-center rounded-xl px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Yardım
               </Link>
               {userRole === 'butik' && user ? (
                 <>
-                  <Link href="/favorites" className="flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50">
+                  <Link href="/favorites" className="flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium text-rose-600 transition hover:bg-rose-50">
                     <Heart className="h-4 w-4 fill-current" strokeWidth={2} /> Favoriler
                   </Link>
                   <CartNavLink userId={user.id} initialCount={cartInitialCount} />
-                  <Link href="/siparislerim" className="flex h-9 items-center rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+                  <Link href="/siparislerim" className="flex h-9 items-center rounded-xl px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                     Siparişlerim
                   </Link>
                 </>
@@ -98,7 +103,7 @@ export default async function RootLayout({
                   {userRole === 'admin' && (
                     <Link 
                       href="/admin" 
-                      className="rounded-lg border border-emerald-200/80 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100/80"
+                      className="rounded-xl border border-emerald-200/80 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100/80"
                     >
                       Yönetim
                     </Link>
@@ -106,7 +111,7 @@ export default async function RootLayout({
                   {userRole === 'toptanci' && (
                     <Link 
                       href="/toptanci" 
-                      className="rounded-lg border border-emerald-200/80 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100/80"
+                      className="rounded-xl border border-emerald-200/80 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100/80"
                     >
                       Toptancı paneli
                     </Link>
@@ -114,14 +119,14 @@ export default async function RootLayout({
                   
                   <Link
                     href="/hesap/sifre"
-                    className="rounded-lg border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50"
+                    className="rounded-xl border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50"
                   >
                     Şifre
                   </Link>
                   <SignOutButton />
                 </div>
               ) : (
-                <Link href="/login" className="ml-1 flex h-9 items-center rounded-lg bg-anthracite-900 px-4 text-sm font-medium text-white transition hover:bg-anthracite-800">Giriş</Link>
+                <Link href="/login" className="ml-1 flex h-9 items-center rounded-xl bg-anthracite-900 px-4 text-sm font-medium text-white transition hover:bg-anthracite-800">Giriş</Link>
               )}
             </div>
             </div>

@@ -32,7 +32,7 @@ export function CartNavLink({
   return (
     <Link
       href="/sepet"
-      className="relative flex h-9 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900"
+      className="relative flex h-9 items-center gap-1.5 rounded-xl px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900"
     >
       <ShoppingCart className="h-4 w-4 shrink-0" strokeWidth={2} />
       Sepet

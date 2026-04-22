@@ -84,7 +84,7 @@ export default function ListemPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+    <div className="premium-page-wrap max-w-3xl">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
         <div>
           <Link
@@ -94,17 +94,17 @@ export default function ListemPage() {
             <ArrowLeft className="h-4 w-4" strokeWidth={2} />
             Katalog
           </Link>
-          <h1 className="text-2xl font-semibold tracking-tight text-anthracite-900">Sepet</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-anthracite-900">Siparis listeniz</h1>
           <p className="mt-1 text-sm text-anthracite-600">
-            Ürünleri burada biriktirin; beden adetleri kayıtlı kalır. Siparişi tamamlamak için «Siparişe geç» ile ürün sayfasına gidin.
+            Urunleri burada biriktirin; beden adetleri kayitli kalir. Siparisi tamamlamak icin «Siparise gec» ile urun sayfasina gidin.
           </p>
         </div>
         {userId ? <NotificationBell userId={userId} /> : null}
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-anthracite-200 bg-white py-16 text-center">
-          <p className="text-sm font-medium text-anthracite-600">Sepetiniz boş.</p>
+        <div className="premium-card border-dashed border-anthracite-200 py-16 text-center">
+          <p className="text-sm font-medium text-anthracite-600">Listeniz bos.</p>
           <Link href="/katalog" className="mt-4 inline-block text-sm font-semibold text-emerald-700 hover:underline">
             Kataloga git
           </Link>
@@ -117,7 +117,7 @@ export default function ListemPage() {
               return (
                 <li
                   key={r.id}
-                  className="flex items-center justify-between rounded-2xl border border-anthracite-200 bg-white p-4"
+                className="premium-card flex items-center justify-between rounded-2xl p-4"
                 >
                   <span className="text-sm text-anthracite-500">Ürün kaldırılmış</span>
                   <button
@@ -139,14 +139,14 @@ export default function ListemPage() {
             return (
               <li
                 key={r.id}
-                className="flex gap-4 rounded-2xl border border-anthracite-200/80 bg-white p-4 shadow-sm"
+                className="premium-card flex gap-4 rounded-2xl p-4"
               >
                 <div className="relative h-24 w-20 shrink-0 overflow-hidden rounded-xl bg-anthracite-50">
                   <Image src={img} alt="" fill className="object-cover" sizes="80px" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h2 className="font-semibold text-anthracite-900 line-clamp-2">{p.name}</h2>
-                  <p className="mt-1 text-xs text-anthracite-500">
+                    <p className="mt-1 text-xs text-anthracite-500">
                     {total} adet · {(unit * total).toLocaleString("tr-TR")} ₺ tahmini
                   </p>
                   <p className="mt-1 line-clamp-2 text-[11px] text-anthracite-400">
@@ -155,10 +155,10 @@ export default function ListemPage() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Link
                       href={q ? `/product/${p.id}?bedenler=${encodeURIComponent(q)}` : `/product/${p.id}`}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-anthracite-900 px-3 py-2 text-xs font-medium text-white hover:bg-black"
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-anthracite-900 px-3 py-2 text-xs font-medium text-white hover:bg-black"
                     >
                       <ShoppingBag className="h-3.5 w-3.5" strokeWidth={2} />
-                      Siparişe geç
+                      Siparise gec
                     </Link>
                     <button
                       type="button"
@@ -166,7 +166,7 @@ export default function ListemPage() {
                       className="inline-flex items-center gap-1 rounded-lg border border-anthracite-200 px-3 py-2 text-xs font-medium text-anthracite-600 hover:bg-anthracite-50"
                     >
                       <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-                      Çıkar
+                      Cikar
                     </button>
                   </div>
                 </div>

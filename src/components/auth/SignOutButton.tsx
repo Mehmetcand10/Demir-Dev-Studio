@@ -21,9 +21,9 @@ export default function SignOutButton() {
       type="button"
       disabled={busy}
       onClick={handleSignOut}
-      className="rounded-lg border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50 disabled:opacity-60"
+      className="rounded-xl border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50 disabled:opacity-60"
     >
-      {busy ? "Çıkış…" : "Çıkış"}
+      {busy ? "Cikis..." : "Cikis"}
     </button>
   );
 }

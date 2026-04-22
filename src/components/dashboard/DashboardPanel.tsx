@@ -9,7 +9,7 @@ type Props = {
 export function DashboardPanel({ children, className = "" }: Props) {
   return (
     <div
-      className={`rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:p-8 ${className}`}
+      className={`premium-card rounded-3xl p-6 sm:p-8 ${className}`}
     >
       {children}
     </div>

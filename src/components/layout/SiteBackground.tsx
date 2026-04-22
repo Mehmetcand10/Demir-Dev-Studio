@@ -9,8 +9,12 @@ export function SiteBackground({ children }: { children: ReactNode }) {
         aria-hidden
         style={{
           background:
-            "radial-gradient(ellipse 120% 80% at 50% -25%, rgba(16, 185, 129, 0.045), transparent 55%), radial-gradient(ellipse 55% 35% at 100% 0%, rgba(9, 9, 11, 0.02), transparent 50%)",
+            "radial-gradient(ellipse 120% 80% at 50% -25%, rgba(16, 185, 129, 0.065), transparent 55%), radial-gradient(ellipse 55% 35% at 100% 0%, rgba(30, 64, 175, 0.04), transparent 50%)",
         }}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-16 border-b border-white/40 bg-gradient-to-b from-white/30 to-transparent"
+        aria-hidden
       />
       <div className="relative">{children}</div>
     </div>
