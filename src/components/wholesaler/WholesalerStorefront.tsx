@@ -188,7 +188,7 @@ export default function WholesalerStorefront({
       : null;
 
   return (
-    <div className="mx-auto min-h-screen max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <div className="premium-page-wrap min-h-screen">
       <div className="mb-10">
         <Link
           href={backHref}
@@ -197,7 +197,7 @@ export default function WholesalerStorefront({
           <ArrowLeft className="h-4 w-4" strokeWidth={2} /> {backLabel}
         </Link>
 
-        <div className="relative flex flex-col items-center gap-6 overflow-hidden rounded-2xl border border-anthracite-200/70 bg-white p-6 shadow-sm sm:flex-row sm:gap-8 sm:p-8">
+        <div className="premium-card relative flex flex-col items-center gap-6 overflow-hidden rounded-2xl p-6 sm:flex-row sm:gap-8 sm:p-8">
           <div className="absolute -right-16 -top-16 opacity-[0.04]">
             <Package className="h-64 w-64" strokeWidth={1} />
           </div>
@@ -308,7 +308,7 @@ export default function WholesalerStorefront({
         </div>
 
         {products.length === 0 ? (
-          <div className="py-16 text-center text-sm text-anthracite-500">
+          <div className="premium-card py-16 text-center text-sm text-anthracite-500">
             Bu mağazada henüz ürün yok.
           </div>
         ) : (
@@ -323,27 +323,27 @@ export default function WholesalerStorefront({
               return (
                 <div
                   key={p.id}
-                  className="group overflow-hidden rounded-xl border border-anthracite-200/70 bg-white shadow-sm transition hover:border-anthracite-300/80 hover:shadow-md sm:rounded-2xl"
+                  className="premium-card group overflow-hidden rounded-xl transition hover:border-anthracite-300/80 hover:shadow-md sm:rounded-2xl"
                 >
-                  <div className="relative aspect-[4/5] overflow-hidden bg-anthracite-50 sm:aspect-[5/6]">
+                  <div className="relative aspect-[4/5] overflow-hidden bg-anthracite-50 p-2.5">
                     <Image
                       src={img}
                       alt={p.name}
                       fill
                       sizes="(max-width: 640px) 50vw, 20vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-contain"
                     />
                   </div>
                   <div className="p-2.5 text-left sm:p-3">
                     <h3 className="mb-1 line-clamp-2 text-xs font-bold leading-snug text-anthracite-900 sm:text-sm">
                       {p.name}
                     </h3>
-                    <div className="mb-2 flex flex-wrap gap-1">
-                      <span className="rounded border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[7px] font-bold uppercase text-emerald-700 sm:text-[8px]">
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="rounded border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[8px] font-bold uppercase text-emerald-700">
                         {p.gender}
                       </span>
-                      <span className="max-w-[5rem] truncate rounded bg-anthracite-50 px-1.5 py-0.5 text-[7px] font-bold uppercase text-anthracite-500 sm:text-[8px]">
-                        {p.category}
+                      <span className="text-[10px] font-medium text-anthracite-400">
+                        MOQ {p.min_order_quantity}
                       </span>
                     </div>
 
@@ -351,14 +351,14 @@ export default function WholesalerStorefront({
                       <div className="flex min-w-0 flex-col">
                         {canSeePrices ? (
                           <>
-                            <span className="text-[8px] font-bold uppercase text-anthracite-400">
-                              B2B
+                            <span className="text-[9px] font-bold uppercase text-anthracite-400">
+                              Toptan
                             </span>
-                            <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-base">
-                              {(
-                                displayedPrice * parseInt(p.min_order_quantity, 10)
-                              ).toLocaleString("tr-TR")}{" "}
-                              ₺
+                            <span className="text-sm font-semibold tabular-nums text-anthracite-900 sm:text-[15px]">
+                              {displayedPrice.toLocaleString("tr-TR")} ₺/adet
+                            </span>
+                            <span className="text-[10px] text-anthracite-400 line-through">
+                              {Math.round(displayedPrice * 1.22).toLocaleString("tr-TR")} ₺
                             </span>
                           </>
                         ) : (
