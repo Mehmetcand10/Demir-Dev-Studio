@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #f3f5f9;
-  --foreground: #101828;
+  --background: #eef2ff;
+  --foreground: #0b1220;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -18,13 +18,14 @@ body {
   color: var(--foreground);
   background: var(--background);
   background-image:
-    radial-gradient(120% 70% at 50% -20%, rgba(16, 185, 129, 0.1), transparent 60%),
-    radial-gradient(70% 50% at 100% 0%, rgba(30, 64, 175, 0.08), transparent 60%);
+    radial-gradient(120% 80% at 50% -25%, rgba(16, 185, 129, 0.14), transparent 58%),
+    radial-gradient(85% 60% at 100% 0%, rgba(59, 130, 246, 0.14), transparent 62%),
+    linear-gradient(180deg, #f8fbff 0%, #eef2ff 52%, #f6f8fc 100%);
 }
 
 @layer components {
   .premium-shell {
-    @apply rounded-3xl border border-anthracite-200/70 bg-white/90 shadow-sm backdrop-blur;
+    @apply rounded-3xl border border-anthracite-200/70 bg-white/90 shadow-md backdrop-blur;
   }
   .premium-title {
     @apply text-2xl font-semibold tracking-tight text-anthracite-900 sm:text-3xl;
@@ -33,7 +34,7 @@ body {
     @apply text-sm text-anthracite-600;
   }
   .premium-chip {
-    @apply rounded-full border border-anthracite-200 bg-white px-3 py-1 text-[11px] font-medium text-anthracite-700;
+    @apply rounded-full border border-anthracite-200/80 bg-white/95 px-3 py-1 text-[11px] font-semibold text-anthracite-700 shadow-sm;
   }
 
   /* Broad premium defaults across pages */
@@ -42,19 +43,19 @@ body {
   }
 
   .premium-card {
-    @apply rounded-3xl border border-anthracite-200/70 bg-white/95 shadow-sm backdrop-blur;
+    @apply rounded-3xl border border-anthracite-200/75 bg-white/95 shadow-md backdrop-blur;
   }
 
   .premium-soft {
-    @apply rounded-2xl border border-anthracite-200/70 bg-white/75 backdrop-blur;
+    @apply rounded-2xl border border-anthracite-200/75 bg-white/80 backdrop-blur;
   }
 
   .premium-kpi {
-    @apply rounded-2xl border border-anthracite-200/80 bg-white/95 p-4 shadow-sm;
+    @apply rounded-2xl border border-anthracite-200/80 bg-white p-4 shadow-md;
   }
 
   .premium-input {
-    @apply w-full rounded-2xl border border-anthracite-200 bg-white px-4 py-3 text-sm text-anthracite-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-100;
+    @apply w-full rounded-2xl border border-anthracite-200 bg-white px-4 py-3 text-sm text-anthracite-900 outline-none transition focus:border-emerald-300 focus:ring-4 focus:ring-emerald-100/90;
   }
 
   .premium-label {
@@ -67,13 +68,13 @@ body {
     @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition;
   }
   .btn-premium-dark {
-    @apply btn-premium bg-anthracite-900 text-white shadow-sm hover:bg-anthracite-800;
+    @apply btn-premium bg-gradient-to-r from-anthracite-900 to-anthracite-800 text-white shadow-md hover:from-anthracite-800 hover:to-anthracite-700;
   }
   .btn-premium-light {
-    @apply btn-premium border border-anthracite-200 bg-white text-anthracite-800 hover:bg-anthracite-50;
+    @apply btn-premium border border-anthracite-200 bg-white/95 text-anthracite-800 hover:bg-anthracite-50;
   }
   .btn-premium-emerald {
-    @apply btn-premium bg-emerald-600 text-white shadow-sm hover:bg-emerald-500;
+    @apply btn-premium bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-md hover:from-emerald-500 hover:to-emerald-400;
   }
   .badge-trust {
     @apply inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-800;

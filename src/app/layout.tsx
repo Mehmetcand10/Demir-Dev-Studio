@@ -64,10 +64,10 @@ export default async function RootLayout({
             `,
           }}
         />
-        <nav className="sticky top-0 z-50 border-b border-anthracite-200/70 bg-white/88 backdrop-blur-xl">
-          <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6 lg:px-8">
+        <nav className="sticky top-0 z-50 border-b border-anthracite-900/10 bg-white/72 backdrop-blur-2xl">
+          <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6 lg:px-8">
             <Link href="/" className="flex min-w-0 items-center gap-2.5 text-base font-semibold tracking-tight text-anthracite-900 sm:text-lg">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-500 text-white shadow-md">
                 <Package className="h-4.5 w-4.5 shrink-0" strokeWidth={2} />
               </span>
               <span className="truncate">Demir Dev Studio</span>
@@ -76,14 +76,14 @@ export default async function RootLayout({
               </span>
             </Link>
             <div className="w-full overflow-x-auto md:w-auto">
-            <div className="flex min-w-max items-center gap-1.5 rounded-2xl border border-anthracite-200/70 bg-white/80 p-1 pb-1 shadow-sm sm:gap-2 md:min-w-0 md:pb-1">
-              <Link href="/katalog" className="flex h-9 items-center rounded-xl px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+            <div className="flex min-w-max items-center gap-1.5 rounded-2xl border border-anthracite-200/80 bg-white/90 p-1 pb-1 shadow-md sm:gap-2 md:min-w-0 md:pb-1">
+              <Link href="/katalog" className="flex h-9 items-center rounded-xl px-3 text-sm font-semibold text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Katalog
               </Link>
-              <Link href="/toptanci-gor" className="flex h-9 items-center rounded-xl px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+              <Link href="/toptanci-gor" className="flex h-9 items-center rounded-xl px-3 text-sm font-semibold text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Toptancılar
               </Link>
-              <Link href="/yardim" className="flex h-9 items-center rounded-xl px-3 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
+              <Link href="/yardim" className="flex h-9 items-center rounded-xl px-3 text-sm font-semibold text-anthracite-600 transition hover:bg-anthracite-100/80 hover:text-anthracite-900">
                 Yardım
               </Link>
               {userRole === 'butik' && user ? (
@@ -126,7 +126,7 @@ export default async function RootLayout({
                   <SignOutButton />
                 </div>
               ) : (
-                <Link href="/login" className="ml-1 flex h-9 items-center rounded-xl bg-anthracite-900 px-4 text-sm font-medium text-white transition hover:bg-anthracite-800">Giriş</Link>
+                <Link href="/login" className="ml-1 flex h-9 items-center rounded-xl bg-gradient-to-r from-anthracite-900 to-anthracite-800 px-4 text-sm font-semibold text-white transition hover:from-anthracite-800 hover:to-anthracite-700">Giriş</Link>
               )}
             </div>
             </div>

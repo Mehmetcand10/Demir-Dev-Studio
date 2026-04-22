@@ -25,9 +25,9 @@ export default function SiteFooter() {
   const c = getSitePublicContact();
 
   return (
-    <footer className="mt-auto border-t border-anthracite-200/70 bg-white/80 backdrop-blur-sm">
+    <footer className="mt-auto border-t border-anthracite-200/70 bg-white/88 backdrop-blur-md">
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="premium-soft flex flex-col items-center gap-4 px-4 py-5 text-center sm:gap-5 sm:px-5">
+        <div className="premium-soft flex flex-col items-center gap-4 px-4 py-5 text-center shadow-sm sm:gap-5 sm:px-5">
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-anthracite-600 sm:text-sm">
             <a
               href={c.whatsappHref}
@@ -78,7 +78,7 @@ export default function SiteFooter() {
             </Link>
           </div>
 
-          <p className="text-xs text-anthracite-500 sm:text-sm">
+          <p className="text-xs font-medium text-anthracite-500 sm:text-sm">
             Demir Dev Studio © {new Date().getFullYear()} · Verified B2B Commerce Network
           </p>
         </div>
