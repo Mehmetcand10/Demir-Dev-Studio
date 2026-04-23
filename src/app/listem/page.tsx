@@ -77,7 +77,7 @@ export default function ListemPage() {
   if (loading) {
     return (
       <div className="flex min-h-[40vh] flex-col items-center justify-center gap-2 text-anthracite-500">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-sky-600" />
         <p className="text-sm font-medium">Yükleniyor…</p>
       </div>
     );
@@ -105,7 +105,7 @@ export default function ListemPage() {
       {rows.length === 0 ? (
         <div className="premium-card border-dashed border-anthracite-200 py-16 text-center">
           <p className="text-sm font-medium text-anthracite-600">Listeniz bos.</p>
-          <Link href="/katalog" className="mt-4 inline-block text-sm font-semibold text-emerald-700 hover:underline">
+          <Link href="/katalog" className="mt-4 inline-block text-sm font-semibold text-sky-700 hover:underline">
             Kataloga git
           </Link>
         </div>

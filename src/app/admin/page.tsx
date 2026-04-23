@@ -410,7 +410,7 @@ export default function AdminDashboard() {
           <p className="text-[10px] font-medium uppercase tracking-wider text-white/55">Toplam ciro</p>
           <p className="mt-1 text-lg font-semibold tabular-nums sm:text-xl">{totalCiro.toLocaleString("tr-TR")} ₺</p>
         </div>
-        <div className="rounded-3xl border border-emerald-200/30 bg-gradient-to-br from-emerald-600 to-emerald-700 p-4 text-white shadow-sm">
+        <div className="rounded-3xl border border-sky-200/30 bg-gradient-to-br from-sky-600 to-sky-700 p-4 text-white shadow-sm">
           <p className="text-[10px] font-medium uppercase tracking-wider text-white/75">Platform kârı</p>
           <p className="mt-1 text-lg font-semibold tabular-nums sm:text-xl">{totalProfit.toLocaleString("tr-TR")} ₺</p>
         </div>
@@ -454,7 +454,7 @@ export default function AdminDashboard() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 text-anthracite-400">
-            <Loader2 className="mb-3 h-9 w-9 animate-spin text-emerald-600/70" />
+            <Loader2 className="mb-3 h-9 w-9 animate-spin text-sky-600/70" />
             <p className="text-xs font-medium">Yükleniyor…</p>
         </div>
       ) : (
@@ -465,7 +465,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="premium-card relative overflow-hidden p-6 sm:p-8 lg:col-span-8">
                     <h3 className="mb-6 flex items-center gap-2 text-base font-semibold text-anthracite-900">
-                        <TrendingUp className="h-5 w-5 text-emerald-600" strokeWidth={2} /> Ciro özeti
+                        <TrendingUp className="h-5 w-5 text-sky-600" strokeWidth={2} /> Ciro özeti
                     </h3>
                     <div className="h-[300px] sm:h-[340px]">
                         {mounted && (
@@ -501,7 +501,7 @@ export default function AdminDashboard() {
                         ) : <p className="text-xs text-anthracite-400">Henüz duyuru yok.</p>}
                         <button onClick={() => setActiveTab('announcements')} type="button" className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-anthracite-900 py-2.5 text-xs font-medium text-white transition hover:bg-anthracite-800">Duyuruları aç</button>
                     </div>
-                    <div className="relative overflow-hidden rounded-3xl border border-emerald-600/30 bg-gradient-to-br from-emerald-600 to-emerald-700 p-5 text-white shadow-sm sm:p-6">
+                    <div className="relative overflow-hidden rounded-3xl border border-sky-600/30 bg-gradient-to-br from-sky-600 to-sky-700 p-5 text-white shadow-sm sm:p-6">
                         <Store className="absolute -bottom-2 -right-2 h-24 w-24 opacity-[0.12]" />
                         <h3 className="text-sm font-semibold">Toptancı alacakları</h3>
                         <p className="mt-1 text-xs text-white/75">Havuz toplamı</p>
@@ -531,7 +531,7 @@ export default function AdminDashboard() {
                             
                             {/* ÜRETİCİ / DURUM ETİKETİ */}
                             <div className="absolute top-6 right-8 flex gap-2">
-                                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${order.status === ORDER_STATUS.WAITING_PAYMENT ? 'border-amber-200 bg-amber-50 text-amber-700' : order.status === ORDER_STATUS.SHIPPED ? 'border-blue-200 bg-blue-50 text-blue-700' : order.status === ORDER_STATUS.DELIVERED ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : order.status === ORDER_STATUS.CANCELLED ? 'border-red-200 bg-red-50 text-red-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'}`}>
+                                <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${order.status === ORDER_STATUS.WAITING_PAYMENT ? 'border-amber-200 bg-amber-50 text-amber-700' : order.status === ORDER_STATUS.SHIPPED ? 'border-blue-200 bg-blue-50 text-blue-700' : order.status === ORDER_STATUS.DELIVERED ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : order.status === ORDER_STATUS.CANCELLED ? 'border-red-200 bg-red-50 text-red-700' : 'border-sky-200 bg-sky-50 text-sky-700'}`}>
                                     {getOrderStatusLabel(order.status)}
                                 </span>
                                 {order.status === ORDER_STATUS.PREPARING && ((Date.now() - new Date(order.created_at).getTime()) / (1000 * 60 * 60)) >= 72 && (
@@ -553,7 +553,7 @@ export default function AdminDashboard() {
                                         <p className="mb-0.5 text-[10px] font-medium uppercase tracking-wide text-anthracite-400">Butik / toptancı</p>
                                         <h3 className="text-lg font-semibold text-anthracite-900 sm:text-xl">{order.buyer_name}</h3>
                                         <p className="flex items-center gap-1 text-xs text-anthracite-500">
-                                            <Store className="h-3 w-3 text-emerald-600" strokeWidth={2} /> {order.wholesaler?.business_name}
+                                            <Store className="h-3 w-3 text-sky-600" strokeWidth={2} /> {order.wholesaler?.business_name}
                                         </p>
                                     </div>
                                     <div className="text-right">
@@ -571,9 +571,9 @@ export default function AdminDashboard() {
                                         <p className="mb-0.5 text-[10px] font-medium text-anthracite-400">Beden dağılımı / toplam</p>
                                         <p className="text-xs font-medium text-anthracite-900">{order.selected_size} · {order.quantity}</p>
                                     </div>
-                                    <div className="rounded-xl bg-emerald-50/80 p-3 text-center ring-1 ring-emerald-100/80">
-                                        <p className="mb-0.5 text-[10px] font-medium text-emerald-700">Kâr</p>
-                                        <p className="text-xs font-semibold tabular-nums text-emerald-800">{order.commission_earned} ₺</p>
+                                    <div className="rounded-xl bg-sky-50/80 p-3 text-center ring-1 ring-sky-100/80">
+                                        <p className="mb-0.5 text-[10px] font-medium text-sky-700">Kâr</p>
+                                        <p className="text-xs font-semibold tabular-nums text-sky-800">{order.commission_earned} ₺</p>
                                     </div>
                                     <div className="rounded-xl bg-blue-50/80 p-3 text-center ring-1 ring-blue-100/80">
                                        <p className="mb-0.5 text-[10px] font-medium text-blue-700">Toptancı</p>
@@ -598,7 +598,7 @@ export default function AdminDashboard() {
                                         href={order.payment_receipt_url}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 transition hover:bg-emerald-100"
+                                        className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-900 transition hover:bg-sky-100"
                                       >
                                         <Receipt className="h-4 w-4" strokeWidth={2} />
                                         Ödeme dekontu
@@ -611,12 +611,12 @@ export default function AdminDashboard() {
                             {/* AKSİYONLAR */}
                             <div className="shrink-0 flex flex-row lg:flex-col gap-2 w-full lg:w-auto">
                                 {order.status === ORDER_STATUS.WAITING_PAYMENT ? (
-                                    <button onClick={()=>approveOrderPayment(order.id, order.wholesaler?.business_name)} className="flex-1 rounded-lg bg-emerald-600 py-3 text-xs font-medium text-white shadow-sm transition hover:bg-emerald-700 lg:w-40">Ödeme onayı</button>
+                                    <button onClick={()=>approveOrderPayment(order.id, order.wholesaler?.business_name)} className="flex-1 rounded-lg bg-sky-600 py-3 text-xs font-medium text-white shadow-sm transition hover:bg-sky-700 lg:w-40">Ödeme onayı</button>
                                 ) : (
                                     <>
                                        <button onClick={() => exportInvoicePDF(order)} className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-anthracite-200 bg-white px-4 py-2.5 text-xs font-medium text-anthracite-800 transition hover:bg-anthracite-50"><FileText className="h-4 w-4" strokeWidth={2}/> Fatura</button>
                                        {order.status === ORDER_STATUS.SHIPPED && (
-                                           <button onClick={() => markDelivered(order.id)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-emerald-700">Teslim edildi</button>
+                                           <button onClick={() => markDelivered(order.id)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-sky-700">Teslim edildi</button>
                                        )}
                                        {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && (
                                            <button onClick={() => archiveOrder(order.id)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-anthracite-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-black"><Archive className="h-4 w-4" strokeWidth={2}/> Arşivle</button>
@@ -643,7 +643,7 @@ export default function AdminDashboard() {
                         const closed = !isDisputeOpen(d.status);
                         const badgeClass =
                           d.status === DISPUTE_STATUS.RESOLVED
-                            ? 'bg-emerald-100 text-emerald-700'
+                            ? 'bg-sky-100 text-sky-700'
                             : d.status === DISPUTE_STATUS.REJECTED
                               ? 'bg-red-100 text-red-800'
                               : d.status === DISPUTE_STATUS.REVIEWING
@@ -695,7 +695,7 @@ export default function AdminDashboard() {
                                 <button
                                   type="button"
                                   onClick={() => finalizeDispute(d.id, DISPUTE_STATUS.RESOLVED)}
-                                  className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase bg-emerald-600 text-white hover:bg-emerald-700 transition-all"
+                                  className="px-4 py-2.5 rounded-xl text-[10px] font-black uppercase bg-sky-600 text-white hover:bg-sky-700 transition-all"
                                 >
                                   Çözüldü — bildir
                                 </button>
@@ -726,7 +726,7 @@ export default function AdminDashboard() {
         {activeTab === 'payments' && (
             <div className="premium-card overflow-hidden p-10 shadow-xl">
                 <h2 className="text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
-                   <Wallet className="w-8 h-8 text-emerald-500" /> Toptancı Hakediş Masası
+                   <Wallet className="w-8 h-8 text-sky-500" /> Toptancı Hakediş Masası
                 </h2>
                 <p className="text-sm font-medium text-anthracite-500 mb-10 text-left">Üreticilerin havuzdaki net alacaklarını buradan takip edin.</p>
                 
@@ -736,7 +736,7 @@ export default function AdminDashboard() {
                    ) : Object.entries(wholesalerSummary).map(([name, data]: [any, any]) => (
                      <div key={name} className="bg-anthracite-50 border border-anthracite-100 rounded-xl p-10 flex flex-col gap-6 shadow-sm hover:shadow-xl transition-all relative group h-full">
                         <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-md">
-                           <Store className="w-7 h-7 text-emerald-500" />
+                           <Store className="w-7 h-7 text-sky-500" />
                         </div>
                         <div className="text-left">
                            <h3 className="font-black text-2xl text-anthracite-900 leading-tight">{name}</h3>
@@ -760,8 +760,8 @@ export default function AdminDashboard() {
                            </p>
                         </div>
                         <div className="mt-auto pt-6 border-t border-anthracite-200">
-                           <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1 leading-none">Net Alacak</p>
-                           <span className="text-4xl font-black text-emerald-600 tracking-tighter">{data.total.toLocaleString('tr-TR')} ₺</span>
+                           <p className="text-[10px] font-black text-sky-600 uppercase tracking-widest mb-1 leading-none">Net Alacak</p>
+                           <span className="text-4xl font-black text-sky-600 tracking-tighter">{data.total.toLocaleString('tr-TR')} ₺</span>
                         </div>
                         <button
                           type="button"
@@ -802,7 +802,7 @@ export default function AdminDashboard() {
                     ) : profiles.map(profile => (
                         <div key={profile.id} className="flex flex-col sm:flex-row items-center justify-between p-8 bg-anthracite-50 rounded-xl border border-anthracite-100 gap-8">
                             <div className="flex flex-col sm:flex-row items-center gap-6 mr-auto text-left w-full">
-                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${profile.role === 'toptanci' ? 'bg-emerald-500 text-white' : 'bg-blue-500 text-white'}`}>
+                                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 shadow-lg ${profile.role === 'toptanci' ? 'bg-sky-500 text-white' : 'bg-blue-500 text-white'}`}>
                                     {profile.role === 'toptanci' ? <Store className="w-8 h-8"/> : <UserRound className="w-8 h-8"/>}
                                 </div>
                                 <div className="text-center sm:text-left w-full min-w-0">
@@ -818,7 +818,7 @@ export default function AdminDashboard() {
                                     <div className="grid gap-2 text-left text-xs font-medium text-anthracite-600 sm:grid-cols-2">
                                       {profile.phone_number ? (
                                         <a href={`tel:${String(profile.phone_number).replace(/\s/g, '')}`} className="inline-flex items-center gap-2 rounded-lg border border-anthracite-200 bg-white px-3 py-2 text-anthracite-800 hover:bg-anthracite-50">
-                                          <Phone className="h-3.5 w-3.5 shrink-0 text-emerald-600" strokeWidth={2} />
+                                          <Phone className="h-3.5 w-3.5 shrink-0 text-sky-600" strokeWidth={2} />
                                           {profile.phone_number}
                                         </a>
                                       ) : (
@@ -828,7 +828,7 @@ export default function AdminDashboard() {
                                         <span className="rounded-lg border border-anthracite-200 bg-white px-3 py-2">Vergi no: {profile.tax_id}</span>
                                       ) : null}
                                       {profile.role === 'toptanci' && profile.iban ? (
-                                        <span className="sm:col-span-2 rounded-lg border border-emerald-100 bg-emerald-50/80 px-3 py-2 font-mono text-[11px] text-emerald-950">IBAN: {profile.iban}</span>
+                                        <span className="sm:col-span-2 rounded-lg border border-sky-100 bg-sky-50/80 px-3 py-2 font-mono text-[11px] text-sky-950">IBAN: {profile.iban}</span>
                                       ) : null}
                                       <div className="sm:col-span-2 flex flex-wrap items-center gap-2">
                                         <span className="font-mono text-[10px] text-anthracite-400">ID: {profile.id}</span>
@@ -851,7 +851,7 @@ export default function AdminDashboard() {
             <div className="mb-6 flex flex-col gap-4 border-b border-anthracite-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="flex items-center gap-2 text-lg font-semibold text-anthracite-900 sm:text-xl">
-                  <UserSearch className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+                  <UserSearch className="h-5 w-5 text-sky-600" strokeWidth={2} />
                   Üye rehberi
                 </h2>
                 <p className="mt-1 text-sm text-anthracite-500">
@@ -886,7 +886,7 @@ export default function AdminDashboard() {
                 value={memberQuery}
                 onChange={(e) => setMemberQuery(e.target.value)}
                 placeholder="İşletme adı, telefon, vergi no, IBAN veya kullanıcı ID ile ara…"
-                className="w-full rounded-xl border border-anthracite-200 bg-anthracite-50/50 px-4 py-3 text-sm text-anthracite-900 outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+                className="w-full rounded-xl border border-anthracite-200 bg-anthracite-50/50 px-4 py-3 text-sm text-anthracite-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
               />
             </div>
 
@@ -921,7 +921,7 @@ export default function AdminDashboard() {
                         <td className="px-3 py-3 sm:px-4">
                           <span
                             className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
-                              m.role === 'toptanci' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'
+                              m.role === 'toptanci' ? 'bg-sky-100 text-sky-800' : 'bg-blue-100 text-blue-800'
                             }`}
                           >
                             {m.role === 'toptanci' ? 'Toptancı' : 'Butik'}
@@ -934,7 +934,7 @@ export default function AdminDashboard() {
                           {m.phone_number ? (
                             <a
                               href={`tel:${String(m.phone_number).replace(/\s/g, '')}`}
-                              className="inline-flex items-center gap-1 font-medium text-emerald-700 hover:underline"
+                              className="inline-flex items-center gap-1 font-medium text-sky-700 hover:underline"
                             >
                               <Phone className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
                               {m.phone_number}
@@ -953,7 +953,7 @@ export default function AdminDashboard() {
                         </td>
                         <td className="px-3 py-3 sm:px-4">
                           {m.is_approved ? (
-                            <span className="text-xs font-semibold text-emerald-700">Onaylı</span>
+                            <span className="text-xs font-semibold text-sky-700">Onaylı</span>
                           ) : (
                             <span className="text-xs font-semibold text-amber-700">Bekliyor</span>
                           )}
@@ -991,7 +991,7 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 <div className="premium-card h-max p-10 text-left lg:col-span-5 shadow-xl">
                     <h2 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3 pb-6 border-b border-anthracite-50">
-                        <Send className="w-6 h-6 text-emerald-500" /> Yeni Duyuru Yayınla
+                        <Send className="w-6 h-6 text-sky-500" /> Yeni Duyuru Yayınla
                     </h2>
                     <form onSubmit={handlePublishAnnouncement} className="space-y-6">
                         <div className="space-y-4 p-6 bg-anthracite-50 rounded-[2rem] border border-anthracite-100">
@@ -1042,14 +1042,14 @@ export default function AdminDashboard() {
                                     <Trash2 className="w-4 h-4" />
                                 </button>
                                 <div className="flex items-center gap-2 mb-3">
-                                    <span className={`w-3 h-3 rounded-full border-2 border-white shadow-sm ${ann.type === 'info' ? 'bg-blue-500' : ann.type === 'warning' ? 'bg-amber-500' : ann.type === 'success' ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                                    <span className={`w-3 h-3 rounded-full border-2 border-white shadow-sm ${ann.type === 'info' ? 'bg-blue-500' : ann.type === 'warning' ? 'bg-amber-500' : ann.type === 'success' ? 'bg-sky-500' : 'bg-red-500'}`}></span>
                                     <h3 className="font-black text-lg text-anthracite-900 leading-none">{ann.title}</h3>
                                     <span className="text-[8px] font-black uppercase bg-white border border-anthracite-200 px-3 py-1 rounded-full ml-auto shadow-sm tracking-widest">{ann.target_role}</span>
                                 </div>
                                 <p className="text-sm font-medium text-anthracite-600 pl-5 border-l-2 border-anthracite-200">{ann.content}</p>
                                 <div className="flex items-center justify-between mt-5 pt-4 border-t border-anthracite-200/50">
                                    <span className="text-[9px] font-bold text-anthracite-300 uppercase">{new Date(ann.created_at).toLocaleString('tr-TR')}</span>
-                                   <span className="text-[9px] font-black text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded uppercase">AKTİF</span>
+                                   <span className="text-[9px] font-black text-sky-500 bg-sky-50 px-2 py-0.5 rounded uppercase">AKTİF</span>
                                 </div>
                             </div>
                         ))}
@@ -1086,7 +1086,7 @@ export default function AdminDashboard() {
                 <div className="rounded-3xl border border-amber-200/80 bg-amber-50/50 p-5 shadow-sm backdrop-blur">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800">Ödeme bekliyor</p>
                   <p className="mt-2 text-2xl font-semibold tabular-nums text-anthracite-900">{waitingList.length}</p>
-                  <button type="button" onClick={() => setActiveTab('orders')} className="mt-2 text-xs font-semibold text-emerald-700 hover:underline">
+                  <button type="button" onClick={() => setActiveTab('orders')} className="mt-2 text-xs font-semibold text-sky-700 hover:underline">
                     Siparişler sekmesine git
                   </button>
                 </div>
@@ -1141,9 +1141,9 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-emerald-200/80 bg-emerald-50/30 p-6 shadow-sm backdrop-blur">
+              <div className="rounded-3xl border border-sky-200/80 bg-sky-50/30 p-6 shadow-sm backdrop-blur">
                 <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold text-anthracite-900">
-                  <Package className="h-4 w-4 text-emerald-600" strokeWidth={2} />
+                  <Package className="h-4 w-4 text-sky-600" strokeWidth={2} />
                   Düşük stok (ürün)
                 </h3>
                 <p className="mb-4 text-xs text-anthracite-600">
@@ -1155,7 +1155,7 @@ export default function AdminDashboard() {
                     <li className="text-anthracite-500">Düşük stoklu ürün yok veya veri çekilemedi.</li>
                   ) : (
                     lowStock.map((p) => (
-                      <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-emerald-100 bg-white px-3 py-2">
+                      <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-sky-100 bg-white px-3 py-2">
                         <span className="font-medium text-anthracite-900">{p.name}</span>
                         <span className="text-anthracite-500">{p._wholesalerLabel}</span>
                       </li>
@@ -1198,7 +1198,7 @@ export default function AdminDashboard() {
                                             href={order.payment_receipt_url}
                                             target="_blank"
                                             rel="noreferrer"
-                                            className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 underline underline-offset-2 hover:text-emerald-900"
+                                            className="inline-flex items-center gap-1.5 text-[11px] font-bold text-sky-700 underline underline-offset-2 hover:text-sky-900"
                                           >
                                             <Receipt className="h-3.5 w-3.5" strokeWidth={2} />
                                             Dekont
@@ -1211,7 +1211,7 @@ export default function AdminDashboard() {
                             <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-8 pt-4 sm:pt-0 border-t sm:border-0 border-anthracite-100">
                                 <div className="text-left sm:text-right">
                                     <span className="block font-black text-2xl text-anthracite-900 italic opacity-40">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
-                                    <span className="text-[9px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 uppercase tracking-widest">Başarılı</span>
+                                    <span className="text-[9px] font-black text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200 uppercase tracking-widest">Başarılı</span>
                                 </div>
                                 <button onClick={() => exportInvoicePDF(order)} className="p-4 bg-white border border-anthracite-200 rounded-2xl hover:bg-anthracite-900 hover:text-white transition-all shadow-sm" title="E-Fatura">
                                     <Printer className="w-6 h-6" />

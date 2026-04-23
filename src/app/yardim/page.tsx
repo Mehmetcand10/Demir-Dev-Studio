@@ -43,13 +43,13 @@ const stepsToptanci = [
 function LegalLink({ href, children }: { href: string; children: ReactNode }) {
   if (href.startsWith("http://") || href.startsWith("https://")) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="font-semibold text-sky-700 underline-offset-2 hover:underline">
         {children}
       </a>
     );
   }
   return (
-    <Link href={href} className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+    <Link href={href} className="font-semibold text-sky-700 underline-offset-2 hover:underline">
       {children}
     </Link>
   );
@@ -69,7 +69,7 @@ export default function YardimPage() {
       </Link>
 
       <div className="mb-10 flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 ring-1 ring-sky-100">
           <CircleHelp className="h-5 w-5" strokeWidth={2} />
         </div>
         <div>
@@ -85,7 +85,7 @@ export default function YardimPage() {
       <div className="space-y-10 text-left">
         <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
-            <UserCheck className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+            <UserCheck className="h-5 w-5 text-sky-600" strokeWidth={2} />
             Genel akış (tek cümle)
           </h2>
           <p className="text-sm leading-relaxed text-anthracite-700">
@@ -97,7 +97,7 @@ export default function YardimPage() {
 
         <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
-            <ShoppingBag className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+            <ShoppingBag className="h-5 w-5 text-sky-600" strokeWidth={2} />
             Butik için adımlar
           </h2>
           <ol className="list-decimal space-y-3 pl-5 text-sm leading-relaxed text-anthracite-700">
@@ -119,7 +119,7 @@ export default function YardimPage() {
 
         <section className="premium-card p-6 sm:p-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
-            <Package className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+            <Package className="h-5 w-5 text-sky-600" strokeWidth={2} />
             Toptancı için adımlar
           </h2>
           <ol className="list-decimal space-y-3 pl-5 text-sm leading-relaxed text-anthracite-700">
@@ -129,12 +129,12 @@ export default function YardimPage() {
           </ol>
           <p className="mt-4 text-xs font-medium text-anthracite-500">
             Sipariş listesi: <strong>Toptancı paneli</strong> içinde özet; detaylı kargo işlemi için{" "}
-            <Link href="/toptanci/siparisler" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+            <Link href="/toptanci/siparisler" className="font-semibold text-sky-700 underline-offset-2 hover:underline">
               Kargo
             </Link>{" "}
             sayfasını kullanın.
           </p>
-          <div className="mt-5 rounded-xl border border-emerald-200/80 bg-emerald-50/50 p-4 text-sm leading-relaxed text-anthracite-800">
+          <div className="mt-5 rounded-xl border border-sky-200/80 bg-sky-50/50 p-4 text-sm leading-relaxed text-anthracite-800">
             <p className="font-semibold text-anthracite-900">Toplu ürün (Excel / CSV)</p>
             <p className="mt-2 text-xs text-anthracite-700">
               <strong>Vitrin</strong> sekmesinde şablon indirip doldurursunuz: her satır bir ürün. Görsel için en az bir{" "}
@@ -160,7 +160,7 @@ export default function YardimPage() {
 
         <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
-            <Truck className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+            <Truck className="h-5 w-5 text-sky-600" strokeWidth={2} />
             Sipariş durumları (kısa)
           </h2>
           <ul className="space-y-2 text-sm text-anthracite-700">
@@ -221,22 +221,22 @@ export default function YardimPage() {
 
         <section
           id="iletisim"
-          className="rounded-2xl border border-emerald-200/80 bg-emerald-50/40 p-6 shadow-sm sm:p-8"
+          className="rounded-2xl border border-sky-200/80 bg-sky-50/40 p-6 shadow-sm sm:p-8"
         >
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
-            <Mail className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+            <Mail className="h-5 w-5 text-sky-600" strokeWidth={2} />
             İletişim ve yasal
           </h2>
           <ul className="space-y-3 text-sm leading-relaxed text-anthracite-700">
             <li className="flex gap-2">
-              <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+              <MessageCircle className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" strokeWidth={2} />
               <span>
                 <strong className="text-anthracite-900">Sipariş / dekont WhatsApp:</strong>{" "}
                 <a
                   href={contact.whatsappHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-semibold text-emerald-800 underline-offset-2 hover:underline"
+                  className="font-semibold text-sky-800 underline-offset-2 hover:underline"
                 >
                   {contact.whatsappDisplay}
                 </a>
@@ -244,10 +244,10 @@ export default function YardimPage() {
             </li>
             {contact.supportEmailHref ? (
               <li className="flex gap-2">
-                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" strokeWidth={2} />
                 <span>
                   <strong className="text-anthracite-900">Destek e-posta:</strong>{" "}
-                  <a href={contact.supportEmailHref} className="font-semibold text-emerald-800 underline-offset-2 hover:underline">
+                  <a href={contact.supportEmailHref} className="font-semibold text-sky-800 underline-offset-2 hover:underline">
                     {contact.supportEmail}
                   </a>
                 </span>
@@ -263,11 +263,11 @@ export default function YardimPage() {
             )}
             {contact.supportPhoneDisplay ? (
               <li className="flex gap-2">
-                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+                <Phone className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" strokeWidth={2} />
                 <span>
                   <strong className="text-anthracite-900">Telefon:</strong>{" "}
                   {contact.supportPhoneHref ? (
-                    <a href={contact.supportPhoneHref} className="font-semibold text-emerald-800 underline-offset-2 hover:underline">
+                    <a href={contact.supportPhoneHref} className="font-semibold text-sky-800 underline-offset-2 hover:underline">
                       {contact.supportPhoneDisplay}
                     </a>
                   ) : (
@@ -277,7 +277,7 @@ export default function YardimPage() {
               </li>
             ) : null}
             <li className="flex gap-2">
-              <Scale className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2} />
+              <Scale className="mt-0.5 h-4 w-4 shrink-0 text-sky-600" strokeWidth={2} />
               <span>
                 <strong className="text-anthracite-900">KVKK</strong> ve{" "}
                 <strong className="text-anthracite-900">mesafeli satış</strong> metinleri:{" "}
@@ -300,7 +300,7 @@ export default function YardimPage() {
             <li>• Footer ve sipariş akışındaki WhatsApp numarasının canlı sitede güncel ve doğru olduğunu kontrol edin.</li>
             <li>
               • Operasyon SLA metnini yayınlayın:{" "}
-              <Link href="/yardim#sla" className="font-semibold text-emerald-800 underline-offset-2 hover:underline">
+              <Link href="/yardim#sla" className="font-semibold text-sky-800 underline-offset-2 hover:underline">
                 Hizmet süreleri (SLA)
               </Link>
               .
@@ -312,7 +312,7 @@ export default function YardimPage() {
 
         <section className="rounded-2xl border border-anthracite-200/80 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-anthracite-900">
-            <Bell className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+            <Bell className="h-5 w-5 text-sky-600" strokeWidth={2} />
             Bildirimler
           </h2>
           <p className="text-sm leading-relaxed text-anthracite-700">
@@ -322,11 +322,11 @@ export default function YardimPage() {
         </section>
 
         <p className="text-center text-sm text-anthracite-500">
-          <Link href="/katalog" className="font-medium text-emerald-700 hover:underline">
+          <Link href="/katalog" className="font-medium text-sky-700 hover:underline">
             Kataloga git
           </Link>
           {" · "}
-          <Link href="/register" className="font-medium text-emerald-700 hover:underline">
+          <Link href="/register" className="font-medium text-sky-700 hover:underline">
             Başvuru
           </Link>
         </p>

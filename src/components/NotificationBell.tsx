@@ -86,7 +86,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'success': return <CheckCircle className="w-4 h-4 text-emerald-500" />;
+      case 'success': return <CheckCircle className="w-4 h-4 text-sky-500" />;
       case 'warning': return <AlertTriangle className="w-4 h-4 text-amber-500" />;
       case 'error': return <XCircle className="w-4 h-4 text-red-500" />;
       default: return <Info className="w-4 h-4 text-blue-500" />;
@@ -101,11 +101,11 @@ export default function NotificationBell({ userId }: { userId: string }) {
         className="group relative rounded-full p-2 transition-colors hover:bg-anthracite-100/80"
         aria-label="Bildirimler"
       >
-        <Bell className={`h-5 w-5 ${unreadCount > 0 ? 'text-emerald-600' : 'text-anthracite-500 group-hover:text-anthracite-800'}`} strokeWidth={2} />
+        <Bell className={`h-5 w-5 ${unreadCount > 0 ? 'text-sky-600' : 'text-anthracite-500 group-hover:text-anthracite-800'}`} strokeWidth={2} />
         {unreadCount > 0 && (
           <span className="absolute top-1 right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 text-[10px] items-center justify-center text-white font-bold">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-4 w-4 bg-sky-500 text-[10px] items-center justify-center text-white font-bold">
               {unreadCount}
             </span>
           </span>
@@ -117,7 +117,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
           <div className="flex items-center justify-between border-b border-anthracite-100/90 bg-anthracite-50/40 p-4">
             <h3 className="text-sm font-semibold text-anthracite-900">Bildirimler</h3>
             {unreadCount > 0 && (
-              <button type="button" onClick={markAllAsRead} className="text-xs font-medium text-emerald-700 hover:underline">
+              <button type="button" onClick={markAllAsRead} className="text-xs font-medium text-sky-700 hover:underline">
                 Tümünü okundu işaretle
               </button>
             )}
@@ -134,7 +134,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
                 {notifications.map((n) => (
                   <div 
                     key={n.id} 
-                    className={`p-4 rounded-2xl transition-all relative group/item border ${!n.is_read ? 'bg-emerald-50/30 border-emerald-100' : 'bg-white border-transparent hover:bg-anthracite-50'}`}
+                    className={`p-4 rounded-2xl transition-all relative group/item border ${!n.is_read ? 'bg-sky-50/30 border-sky-100' : 'bg-white border-transparent hover:bg-anthracite-50'}`}
                   >
                     <div className="flex gap-3">
                       <div className="mt-0.5">{getTypeIcon(n.type)}</div>
@@ -146,7 +146,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
                     </div>
                     <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover/item:opacity-100 transition-all">
                       {!n.is_read && (
-                        <button onClick={() => markAsRead(n.id)} className="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-200" title="Okundu">
+                        <button onClick={() => markAsRead(n.id)} className="p-1.5 bg-sky-100 text-sky-600 rounded-lg hover:bg-sky-200" title="Okundu">
                           <Check className="w-3 h-3" />
                         </button>
                       )}
@@ -173,7 +173,7 @@ export default function NotificationBell({ userId }: { userId: string }) {
                     alert("Bildirim izni verilmedi. Tarayıcı veya telefon ayarlarından siteye bildirim izni açabilirsiniz.");
                   }
                 }}
-                className="mt-2 w-full rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-[11px] font-semibold text-emerald-900 transition hover:bg-emerald-100"
+                className="mt-2 w-full rounded-lg border border-sky-200 bg-sky-50 py-2 text-[11px] font-semibold text-sky-900 transition hover:bg-sky-100"
               >
                 Cihazda bildirim izni ver
               </button>

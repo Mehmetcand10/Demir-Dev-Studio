@@ -178,7 +178,7 @@ export default function Siparislerim() {
           <p className="text-[10px] font-medium uppercase tracking-wider text-anthracite-500">Toplam alım</p>
           <p className="text-lg font-semibold tabular-nums text-anthracite-900">{totalSpent.toLocaleString("tr-TR")} ₺</p>
         </div>
-        <div className="min-w-[120px] flex-1 rounded-3xl border border-emerald-200/20 bg-gradient-to-br from-emerald-600 to-emerald-700 px-4 py-3 text-white shadow-sm">
+        <div className="min-w-[120px] flex-1 rounded-3xl border border-sky-200/20 bg-gradient-to-br from-sky-600 to-sky-700 px-4 py-3 text-white shadow-sm">
           <p className="text-[10px] font-medium uppercase tracking-wider text-white/75">Aktif kargo</p>
           <p className="text-lg font-semibold tabular-nums">{activeCount} paket</p>
         </div>
@@ -196,7 +196,7 @@ export default function Siparislerim() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-24 text-anthracite-400">
-            <Loader2 className="mb-3 h-9 w-9 animate-spin text-emerald-600/70" />
+            <Loader2 className="mb-3 h-9 w-9 animate-spin text-sky-600/70" />
             <p className="text-xs font-medium">Yükleniyor…</p>
         </div>
       ) : filteredOrders.length === 0 ? (
@@ -206,7 +206,7 @@ export default function Siparislerim() {
             <p className="mb-2 text-sm text-anthracite-500">Bu sekmede sipariş bulunmuyor.</p>
             <p className="mb-6 text-xs text-anthracite-400">
               Sipariş ve ödeme süreci için{" "}
-              <Link href="/yardim" className="font-medium text-emerald-700 hover:underline">
+              <Link href="/yardim" className="font-medium text-sky-700 hover:underline">
                 Yardım
               </Link>
               .
@@ -249,7 +249,7 @@ export default function Siparislerim() {
                             ) : null}
                          </div>
                          <div className="text-left sm:text-right">
-                             <p className="text-[10px] font-medium uppercase tracking-wider text-emerald-700/90">Tutar</p>
+                             <p className="text-[10px] font-medium uppercase tracking-wider text-sky-700/90">Tutar</p>
                              <span className="text-xl font-semibold tabular-nums text-anthracite-900 sm:text-2xl">{Number(order.total_price).toLocaleString('tr-TR')} ₺</span>
                          </div>
                       </div>
@@ -257,12 +257,12 @@ export default function Siparislerim() {
                       {/* Durum */}
                       <div className="relative w-full px-1 py-2 sm:px-6">
                           <div className="absolute top-1/2 left-8 right-8 hidden h-0.5 -translate-y-1/2 rounded-full bg-anthracite-100 sm:block">
-                              <div className={`h-full rounded-full bg-emerald-500 transition-all duration-700`} style={{ width: order.status === ORDER_STATUS.WAITING_PAYMENT ? '0%' : order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? '50%' : '100%' }}></div>
+                              <div className={`h-full rounded-full bg-sky-500 transition-all duration-700`} style={{ width: order.status === ORDER_STATUS.WAITING_PAYMENT ? '0%' : order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? '50%' : '100%' }}></div>
                           </div>
                           <div className="relative z-10 flex w-full justify-between">
                               {steps.map((step) => (
                                   <div key={step.id} className="flex flex-col items-center gap-2">
-                                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all sm:h-11 sm:w-11 ${step.active ? 'border-emerald-500 bg-emerald-500 text-white shadow-sm' : 'border-anthracite-100 bg-white text-anthracite-300'}`}>
+                                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl border-2 transition-all sm:h-11 sm:w-11 ${step.active ? 'border-sky-500 bg-sky-500 text-white shadow-sm' : 'border-anthracite-100 bg-white text-anthracite-300'}`}>
                                           <step.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                                       </div>
                                       <span className={`max-w-[4.5rem] text-center text-[9px] font-medium uppercase leading-tight sm:max-w-none sm:text-[10px] ${step.active ? 'text-anthracite-800' : 'text-anthracite-400'}`}>{step.label}</span>
@@ -277,7 +277,7 @@ export default function Siparislerim() {
                             isDisputeOpen(dispute.status)
                               ? 'border-amber-200/80 bg-amber-50/90 text-amber-950'
                               : dispute.status === 'resolved'
-                                ? 'border-emerald-200/80 bg-emerald-50/80 text-emerald-950'
+                                ? 'border-sky-200/80 bg-sky-50/80 text-sky-950'
                                 : 'border-anthracite-200/80 bg-anthracite-50/90 text-anthracite-900'
                           }`}
                         >
@@ -306,7 +306,7 @@ export default function Siparislerim() {
                                      href={order.payment_receipt_url}
                                      target="_blank"
                                      rel="noreferrer"
-                                     className="text-[11px] font-semibold text-emerald-800 underline underline-offset-2"
+                                     className="text-[11px] font-semibold text-sky-800 underline underline-offset-2"
                                    >
                                      Dekontu aç
                                    </a>
@@ -349,7 +349,7 @@ export default function Siparislerim() {
                             {order.product_id && order.selected_size && order.status !== ORDER_STATUS.CANCELLED && (
                                 <Link
                                   href={`/product/${order.product_id}?bedenler=${encodeURIComponent(String(order.selected_size))}`}
-                                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-xs font-medium text-emerald-900 transition hover:bg-emerald-100 sm:flex-none"
+                                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-sky-200 bg-sky-50 px-4 py-2.5 text-xs font-medium text-sky-900 transition hover:bg-sky-100 sm:flex-none"
                                 >
                                   <RotateCcw className="h-4 w-4 shrink-0" strokeWidth={2} />
                                   Tekrar sipariş
@@ -400,14 +400,14 @@ export default function Siparislerim() {
                 rows={5}
                 value={disputeReason}
                 onChange={(e) => setDisputeReason(e.target.value)}
-                className="w-full resize-none rounded-xl border border-anthracite-200 bg-anthracite-50/50 px-4 py-3 text-sm text-anthracite-900 outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+                className="w-full resize-none rounded-xl border border-anthracite-200 bg-anthracite-50/50 px-4 py-3 text-sm text-anthracite-900 outline-none transition focus:border-sky-300 focus:bg-white focus:ring-2 focus:ring-sky-100"
                 placeholder="Sorunu kısaca açıklayın (eksik ürün, beden, hasar vb.)"
               />
               <div className="flex gap-2">
                 <button type="button" onClick={() => { setShowDisputeModal(false); setDisputeReason(''); setDisputeOrder(null); }} className="flex-1 rounded-lg border border-anthracite-200 py-2.5 text-sm font-medium text-anthracite-600 transition hover:bg-anthracite-50">
                   Vazgeç
                 </button>
-                <button disabled={isSubmittingDispute} type="submit" className="flex-[1.3] rounded-lg bg-emerald-600 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:opacity-50">
+                <button disabled={isSubmittingDispute} type="submit" className="flex-[1.3] rounded-lg bg-sky-600 py-2.5 text-sm font-medium text-white transition hover:bg-sky-700 disabled:opacity-50">
                   {isSubmittingDispute ? 'Gönderiliyor…' : 'Gönder'}
                 </button>
               </div>

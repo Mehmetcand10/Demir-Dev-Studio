@@ -41,7 +41,7 @@ export default function AnnouncementBanner() {
   const getStyles = (type: string) => {
     switch (type) {
       case 'warning': return 'bg-amber-50/95 text-amber-950 border-b border-amber-200/80';
-      case 'success': return 'bg-emerald-50/95 text-emerald-950 border-b border-emerald-200/80';
+      case 'success': return 'bg-sky-50/95 text-sky-950 border-b border-sky-200/80';
       case 'error': return 'bg-red-50/95 text-red-950 border-b border-red-200/80';
       default: return 'bg-sky-50/95 text-sky-950 border-b border-sky-200/80';
     }

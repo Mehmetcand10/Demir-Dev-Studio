@@ -42,16 +42,16 @@ export default function ForgotPassword() {
           <ArrowLeft className="h-5 w-5" strokeWidth={2} />
         </Link>
 
-        <div className="mx-auto mb-5 mt-6 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-600">
+        <div className="mx-auto mb-5 mt-6 flex h-12 w-12 items-center justify-center rounded-xl border border-sky-100 bg-sky-50 text-sky-600">
            <KeyRound className="h-6 w-6" strokeWidth={2} />
         </div>
         
         <h1 className="mb-2 text-xl font-semibold text-anthracite-900">Sifre sifirlama</h1>
         
         {success ? (
-          <div className="mt-5 rounded-xl border border-emerald-100 bg-emerald-50/90 p-4 text-left text-sm text-emerald-900">
+          <div className="mt-5 rounded-xl border border-sky-100 bg-sky-50/90 p-4 text-left text-sm text-sky-900">
              <p className="font-medium">Baglanti gonderildi.</p>
-             <p className="mt-2 text-emerald-800/90"><strong>{email}</strong> gelen kutusunu kontrol edin.</p>
+             <p className="mt-2 text-sky-800/90"><strong>{email}</strong> gelen kutusunu kontrol edin.</p>
           </div>
         ) : (
           <>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 
-export default function SignOutButton() {
+export default function SignOutButton({ className = "" }: { className?: string }) {
   const [busy, setBusy] = useState(false);
 
   async function handleSignOut() {
@@ -21,7 +21,7 @@ export default function SignOutButton() {
       type="button"
       disabled={busy}
       onClick={handleSignOut}
-      className="rounded-xl border border-anthracite-200 bg-white px-3 py-2 text-sm font-medium text-anthracite-600 transition hover:border-anthracite-300 hover:bg-anthracite-50 disabled:opacity-60"
+      className={`rounded-md border border-slate-200 bg-white px-2.5 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-60 sm:text-sm ${className}`}
     >
       {busy ? "Cikis..." : "Cikis"}
     </button>

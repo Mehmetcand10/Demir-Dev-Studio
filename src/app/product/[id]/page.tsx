@@ -9,8 +9,9 @@ import { ORDER_STATUS } from '@/utils/orderStatus';
 import { notify } from '@/utils/notifications';
 import { getOrderableStocks, usesFallbackStocks } from '@/utils/productStocks';
 import { getWhatsAppOrderDigits } from '@/utils/whatsapp';
-import ProductImageGallery from '@/components/product/ProductImageGallery';
-import { pushRecentProductId } from '@/utils/recentProducts';
+import ProductImageGallery from "@/components/product/ProductImageGallery";
+import { pushRecentProductId } from "@/utils/recentProducts";
+import { Button, Card, CardContent, Badge } from "@/components/design-system";
 
 export default function ProductDetail({ params }: { params: { id: string } }) {
   const [product, setProduct] = useState<any>(null);
@@ -94,8 +95,8 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
     fetchData();
   }, [fetchData]);
 
-  if (loading) return <div className="py-24 text-center text-sm font-medium text-anthracite-400">Yükleniyor…</div>;
-  if (!product) return <div className="py-24 text-center text-sm font-medium text-red-600">Ürün bulunamadı.</div>;
+  if (loading) return <div className="bg-white py-24 text-center text-sm font-medium text-slate-400">Yükleniyor…</div>;
+  if (!product) return <div className="bg-white py-24 text-center text-sm font-medium text-red-600">Ürün bulunamadı.</div>;
 
   const totalItems = Object.values(sizeQuantities).reduce((acc, n) => acc + Number(n || 0), 0);
   const unitPrice = Number(product.base_wholesale_price) + Number(product.margin_price || 0);
@@ -232,44 +233,49 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-anthracite-600 transition hover:text-anthracite-900">
-          <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Katalog
+    <div className="bg-white">
+      <div className="mx-auto max-w-screen-2xl px-3 py-4 sm:px-4 lg:px-6 lg:py-8">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3 sm:mb-6">
+        <Link href="/katalog" className="inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-slate-600 transition hover:text-blue-600">
+          <ArrowLeft className="h-4 w-4" strokeWidth={2} /> Kataloga dön
         </Link>
         {currentUserProfile && <NotificationBell userId={currentUserProfile.id} />}
       </div>
 
-      <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-        {/* Sol: çoklu fotoğraf + sığdırma / sürekli yakınlaştırma */}
+      <div className="grid gap-8 lg:grid-cols-12 lg:gap-8 lg:items-start">
+        <div className="order-2 lg:order-1 lg:col-span-7">
         <ProductImageGallery
           images={Array.isArray(product.images) ? product.images : []}
           productName={product.name}
         />
+        </div>
 
-        {/* Sağ: Bilgiler ve Sipariş İşlemleri */}
-        <div className="premium-shell flex flex-col p-5 sm:sticky sm:top-24 sm:p-7">
+        <div className="order-1 lg:order-2 lg:col-span-5">
+        <Card className="sm:sticky sm:top-24">
+        <CardContent className="!p-4 sm:!p-6">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-emerald-100/80 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">{product.gender || "Unisex"}</span>
-            <span className="rounded-full bg-anthracite-100/60 px-2.5 py-0.5 text-xs font-medium text-anthracite-700">{product.category}</span>
-            <span className="rounded-full border border-sky-100/80 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800">{product.sizes || "Standart"}</span>
+            <Badge variant="primary">{product.gender || "Unisex"}</Badge>
+            <Badge>{product.category}</Badge>
+            <Badge variant="default">{product.sizes || "Standart"}</Badge>
           </div>
-          <h1 className="mb-4 text-2xl font-semibold tracking-tight text-anthracite-900 md:text-3xl lg:text-4xl">{product.name}</h1>
+          <h1 className="mb-4 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl lg:text-3xl">{product.name}</h1>
 
           {/* SADECE ONAYLI BUTİKLER GÖREBİLİR (GATEKEEPING) */}
           {isApproved ? (
             <>
-              <div className="mb-6 rounded-2xl border border-sky-100/90 bg-gradient-to-br from-sky-50/80 to-white p-5 dark:bg-blue-950/20">
-                <div className="mb-2 flex items-end gap-3">
-                  <span className="text-3xl font-semibold tabular-nums tracking-tight text-anthracite-900 dark:text-white">{unitPrice.toLocaleString("tr-TR")} ₺</span>
-                  <span className="mb-0.5 text-sm text-anthracite-500">/ adet</span>
+              <div className="mb-6 rounded-lg border-2 border-blue-100 bg-gradient-to-b from-white to-slate-50 p-4 sm:p-5">
+                <div className="mb-1 flex items-end gap-2">
+                  <span className="text-3xl font-black tabular-nums tracking-tight text-slate-900 sm:text-4xl">
+                    {unitPrice.toLocaleString("tr-TR")} <span className="text-2xl font-bold">₺</span>
+                  </span>
+                  <span className="mb-1 text-sm font-semibold text-slate-500">/ adet</span>
                 </div>
-                <p className="text-xs text-anthracite-500 line-through">
-                  Referans perakende: {Math.round(unitPrice * 1.22).toLocaleString("tr-TR")} ₺ / adet
+                <p className="text-xs text-slate-400 line-through">
+                  Perakende ref.: {Math.round(unitPrice * 1.22).toLocaleString("tr-TR")} ₺
                 </p>
-                <div className="flex items-center gap-2 text-sm text-sky-900/80 dark:text-blue-300">
-                  <Package className="h-4 w-4 shrink-0" strokeWidth={2} />
-                  <span className="font-medium">MOQ: {product.min_order_quantity} adet</span>
+                <div className="mt-3 flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-900">
+                  <Package className="h-4 w-4 shrink-0 text-blue-600" strokeWidth={2} />
+                  <span>MOQ: {product.min_order_quantity} adet (minimum sipariş)</span>
                 </div>
               </div>
 
@@ -286,7 +292,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
               <div className="space-y-6 mb-10">
                 <div>
-                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-anthracite-900 border-b border-anthracite-100 pb-2"><Package className="w-5 h-5 text-emerald-500"/> Ürün ve Stok Durumu</h3>
+                  <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-anthracite-900 border-b border-anthracite-100 pb-2"><Package className="w-5 h-5 text-sky-500"/> Ürün ve Stok Durumu</h3>
                   
                   {/* BEDEN SEÇİMİ VE STOK GÖRÜNÜMÜ */}
                   {stockIsFallback && (
@@ -341,7 +347,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                                 );
                                 setSizeQuantities((prev) => ({ ...prev, [size]: next }));
                               }}
-                              className="w-full rounded-md border border-anthracite-200 px-2 py-1.5 text-center text-sm font-medium text-anthracite-900 outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:bg-anthracite-50"
+                              className="w-full rounded-md border border-anthracite-200 px-2 py-1.5 text-center text-sm font-medium text-anthracite-900 outline-none focus:ring-2 focus:ring-sky-500/20 disabled:bg-anthracite-50"
                             />
                             <button
                               type="button"
@@ -394,8 +400,8 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                   <strong>{product.min_order_quantity} adet</strong> olarak uygulanır.
                 </div>
 
-                <div className="rounded-xl border border-emerald-100/90 bg-emerald-50/60 p-4 text-emerald-950 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-100">
-                  <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">Fiyat dagilimi</p>
+                <div className="rounded-xl border border-sky-100/90 bg-sky-50/60 p-4 text-sky-950 dark:border-sky-800/50 dark:bg-sky-950/30 dark:text-sky-100">
+                  <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-sky-700">Fiyat dagilimi</p>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center justify-between gap-2">
                       <span>Urun ara toplam ({totalItems} adet)</span>
@@ -405,7 +411,7 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                       <span>Platform komisyonu</span>
                       <span className="font-semibold tabular-nums">{(Number(product.margin_price || 0) * totalItems).toLocaleString("tr-TR")} ₺</span>
                     </div>
-                    <div className="mt-2 flex items-center justify-between gap-2 border-t border-emerald-200/80 pt-2">
+                    <div className="mt-2 flex items-center justify-between gap-2 border-t border-sky-200/80 pt-2">
                       <span className="text-sm font-semibold">Toplam ({totalItems} adet)</span>
                       <span className="text-lg font-semibold tabular-nums">{totalPrice.toLocaleString("tr-TR")} ₺</span>
                     </div>
@@ -432,44 +438,46 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
 
                 {currentUserProfile?.role === "butik" && (
                   <div className="flex flex-col gap-2 sm:flex-row">
-                    <button
+                    <Button
                       type="button"
+                      variant="secondary"
+                      size="lg"
+                      className="flex-1"
                       disabled={listBusy || selectedLineItems.length === 0}
                       onClick={() => void handleAddToShoppingList()}
-                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-anthracite-200 bg-white py-3 text-sm font-medium text-anthracite-800 transition hover:bg-anthracite-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <ListOrdered className="h-4 w-4 shrink-0" strokeWidth={2} />
                       {listBusy ? "Kaydediliyor…" : "Listeme ekle"}
-                    </button>
+                    </Button>
                     <Link
                       href="/sepet"
-                      className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/80 py-3 text-center text-sm font-medium text-emerald-900 transition hover:bg-emerald-100"
+                      className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-600 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700"
                     >
                       Sepeti aç
                     </Link>
                   </div>
                 )}
 
-                <button 
+                <Button
                   type="button"
+                  variant="success"
+                  size="xl"
+                  className="w-full"
                   disabled={selectedLineItems.length === 0 || floorBlocked || moqBlocked}
                   onClick={() => setShowAddressModal(true)}
-                  className={`flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-medium transition ${
-                    selectedLineItems.length === 0 || floorBlocked || moqBlocked
-                      ? 'cursor-not-allowed border border-anthracite-200 bg-anthracite-100 text-anthracite-400' 
-                      : 'bg-[#25D366] text-white shadow-sm hover:bg-[#20BE5C]'
-                  }`}
                 >
                   {selectedLineItems.length === 0 ? (
-                    "Beden-adet girin"
+                    "Beden / adet seçin"
                   ) : moqBlocked ? (
                     "MOQ adedine ulaşın"
                   ) : floorBlocked ? (
                     "Minimum adete ulaşın"
                   ) : (
-                    <><MessageCircle className="h-5 w-5" strokeWidth={2} /> Buy wholesale</>
+                    <>
+                      <MessageCircle className="h-5 w-5" strokeWidth={2} /> Toptan siparişi tamamla
+                    </>
                   )}
-                </button>
+                </Button>
               </div>
             </>
           ) : (
@@ -481,7 +489,10 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
             </div>
           )}
 
+        </CardContent>
+        </Card>
         </div>
+      </div>
       </div>
       
       {/* BAŞARIYLA YAZILAN TESLİMAT POP-UP MODÜLÜ */}
@@ -495,16 +506,16 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                  <div>
                    <label className="mb-1.5 block text-xs font-medium text-anthracite-600">İl</label>
-                   <input required value={il} onChange={e=>setIl(e.target.value)} type="text" className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15" placeholder="İstanbul" />
+                   <input required value={il} onChange={e=>setIl(e.target.value)} type="text" className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-sky-500/15" placeholder="İstanbul" />
                  </div>
                  <div>
                    <label className="mb-1.5 block text-xs font-medium text-anthracite-600">İlçe</label>
-                   <input required value={ilce} onChange={e=>setIlce(e.target.value)} type="text" className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15" placeholder="Kadıköy" />
+                   <input required value={ilce} onChange={e=>setIlce(e.target.value)} type="text" className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-sky-500/15" placeholder="Kadıköy" />
                  </div>
                </div>
                <div>
                   <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Açık adres</label>
-                  <textarea required value={adres} onChange={e=>setAdres(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15" placeholder="Mahalle, sokak, no…"></textarea>
+                  <textarea required value={adres} onChange={e=>setAdres(e.target.value)} rows={3} className="w-full resize-none rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-sky-500/15" placeholder="Mahalle, sokak, no…"></textarea>
                </div>
                <div>
                   <label className="mb-1.5 flex items-center gap-2 text-xs font-medium text-anthracite-600">
@@ -516,15 +527,15 @@ export default function ProductDetail({ params }: { params: { id: string } }) {
                     onChange={(e) => setBuyerNote(e.target.value)}
                     rows={2}
                     maxLength={500}
-                    className="w-full resize-none rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-emerald-500/15"
+                    className="w-full resize-none rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none transition focus:ring-2 focus:ring-sky-500/15"
                     placeholder="Paketleme, teslimat veya ürünle ilgili kısa not (tedarikçi / operasyon görür)"
                   />
                </div>
                <div className="mt-2 flex gap-3">
-                 <button type="button" onClick={()=>setShowAddressModal(false)} className="flex-1 rounded-xl border border-anthracite-200 py-2.5 text-sm font-medium text-anthracite-700 transition hover:bg-anthracite-50">Vazgeç</button>
-                 <button disabled={isOrdering} type="submit" className="flex-[2] flex items-center justify-center gap-2 rounded-xl bg-[#25D366] py-2.5 text-sm font-medium text-white transition hover:bg-[#20BE5C] disabled:opacity-50">
-                   {isOrdering ? 'Gönderiliyor…' : <><MessageCircle className="h-4 w-4" strokeWidth={2}/> Onayla</>}
-                 </button>
+                 <Button type="button" variant="secondary" className="flex-1" onClick={() => setShowAddressModal(false)}>Vazgeç</Button>
+                 <Button disabled={isOrdering} type="submit" variant="success" className="flex-[2]">
+                   {isOrdering ? "Gönderiliyor…" : <><MessageCircle className="h-4 w-4" strokeWidth={2} /> Onayla ve WhatsApp</>}
+                 </Button>
                </div>
             </form>
           </div>

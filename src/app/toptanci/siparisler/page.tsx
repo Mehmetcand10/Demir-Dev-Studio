@@ -111,7 +111,7 @@ export default function ToptanciSiparisler() {
         
         {loadingOrders ? (
           <div className="flex flex-col items-center justify-center py-16">
-             <Loader2 className="mb-3 h-9 w-9 animate-spin text-emerald-600" strokeWidth={2} />
+             <Loader2 className="mb-3 h-9 w-9 animate-spin text-sky-600" strokeWidth={2} />
              <p className="text-sm font-medium text-anthracite-500">Yükleniyor…</p>
           </div>
         ) : orders.length === 0 ? (
@@ -120,14 +120,14 @@ export default function ToptanciSiparisler() {
              <p className="mx-auto max-w-lg text-sm leading-relaxed text-anthracite-600">
                Butik siparişi oluşturduktan sonra yönetim ödemeyi teyit eder; onay sonrası işlemler burada listelenir.
                Ürünlerinizi{" "}
-               <Link href="/toptanci" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+               <Link href="/toptanci" className="font-semibold text-sky-700 underline-offset-2 hover:underline">
                  panelden
                </Link>{" "}
                ekleyip yayına aldığınızdan emin olun.
              </p>
              <p className="mx-auto mt-4 max-w-lg text-xs text-anthracite-500">
                Sürecin tamamı için{" "}
-               <Link href="/yardim" className="font-medium text-emerald-700 hover:underline">
+               <Link href="/yardim" className="font-medium text-sky-700 hover:underline">
                  Yardım
                </Link>{" "}
                sayfasına bakın.
@@ -146,7 +146,7 @@ export default function ToptanciSiparisler() {
                           isDisputeOpen(dispute.status)
                             ? 'bg-amber-50 border-amber-200 text-amber-900'
                             : dispute.status === 'resolved'
-                              ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                              ? 'bg-sky-50 border-sky-200 text-sky-900'
                               : 'bg-anthracite-50 border-anthracite-200 text-anthracite-800'
                         }`}
                       >
@@ -174,7 +174,7 @@ export default function ToptanciSiparisler() {
                               ? 'border-red-200 bg-red-50 text-red-800'
                               : order.status === ORDER_STATUS.DELIVERED
                                 ? 'border-indigo-200 bg-indigo-50 text-indigo-800'
-                                : 'border-emerald-200 bg-emerald-600 text-white'
+                                : 'border-sky-200 bg-sky-600 text-white'
                       }`}>
                         {order.status === ORDER_STATUS.SHIPPED
                           ? 'Kargoda'
@@ -186,18 +186,18 @@ export default function ToptanciSiparisler() {
                                 ? 'Teslim'
                                 : 'Hazırlanacak'}
                       </span>
-                      <span className="rounded-lg border border-emerald-100/90 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-900">
+                      <span className="rounded-lg border border-sky-100/90 bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-900">
                         {Number(order.quantity)} adet
                       </span>
                     </div>
                     <h3 className="mb-2 break-words text-lg font-semibold leading-tight text-anthracite-900">{order.product_name || "Silinmiş Ürün"}</h3>
-                    <p className="mb-5 text-sm font-medium text-emerald-700">Net: {Number(order.wholesaler_earning).toLocaleString('tr-TR')} ₺</p>
+                    <p className="mb-5 text-sm font-medium text-sky-700">Net: {Number(order.wholesaler_earning).toLocaleString('tr-TR')} ₺</p>
                     
                     <div className="mb-5 rounded-xl border border-anthracite-100/90 bg-white p-4">
                       <p className="mb-2 border-b border-anthracite-100/80 pb-2 text-[10px] font-medium text-anthracite-500">Teslimat</p>
                       <p className="mb-1 text-base font-semibold text-anthracite-900">{order.buyer_name}</p>
                       <p className="mt-1 text-sm leading-relaxed text-anthracite-600">{order.shipping_address}</p>
-                      <p className="mt-3 rounded-lg border border-emerald-100/90 bg-emerald-50/80 p-2.5 text-xs font-medium text-emerald-800">{order.buyer_phone}</p>
+                      <p className="mt-3 rounded-lg border border-sky-100/90 bg-sky-50/80 p-2.5 text-xs font-medium text-sky-800">{order.buyer_phone}</p>
                     </div>
 
                     {(order.buyer_note || order.payment_receipt_url) && (
@@ -216,7 +216,7 @@ export default function ToptanciSiparisler() {
                             href={order.payment_receipt_url}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 underline underline-offset-2 hover:text-emerald-950"
+                            className="inline-flex items-center gap-2 text-xs font-semibold text-sky-800 underline underline-offset-2 hover:text-sky-950"
                           >
                             <Receipt className="h-3.5 w-3.5" strokeWidth={2} />
                             Ödeme dekontu (butik yüklemesi)
@@ -228,7 +228,7 @@ export default function ToptanciSiparisler() {
 
                   {order.status === ORDER_STATUS.APPROVED || order.status === ORDER_STATUS.PREPARING ? (
                      <div className="flex flex-col gap-2">
-                        <button type="button" onClick={() => handleShipOrder(order.id)} className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-3 text-sm font-medium text-white transition hover:bg-emerald-700">
+                        <button type="button" onClick={() => handleShipOrder(order.id)} className="flex w-full items-center justify-center gap-2 rounded-lg bg-sky-600 py-3 text-sm font-medium text-white transition hover:bg-sky-700">
                            Takip no ile kargola
                         </button>
                         <button type="button" onClick={() => exportInvoicePDF(order)} className="flex w-full items-center justify-center gap-2 rounded-lg border border-anthracite-200 bg-white py-2.5 text-xs font-medium text-anthracite-800 transition hover:bg-anthracite-50">

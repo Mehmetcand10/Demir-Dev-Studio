@@ -124,7 +124,7 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
   );
 
   return (
-    <div className="rounded-2xl border border-dashed border-emerald-200/90 bg-emerald-50/40 p-5 sm:p-6">
+    <div className="rounded-2xl border border-dashed border-sky-200/90 bg-sky-50/40 p-5 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-semibold text-anthracite-900">Toplu ürün (Excel / CSV)</h3>
@@ -146,14 +146,14 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
           <button
             type="button"
             onClick={() => setShowCols((v) => !v)}
-            className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 hover:underline"
+            className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-sky-800 hover:underline"
           >
             {showCols ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
             Sütunların anlamı
           </button>
 
           {showCols && (
-            <div className="mt-3 overflow-x-auto rounded-xl border border-emerald-100/90 bg-white/90">
+            <div className="mt-3 overflow-x-auto rounded-xl border border-sky-100/90 bg-white/90">
               <table className="w-full min-w-[280px] text-left text-[11px]">
                 <thead>
                   <tr className="border-b border-anthracite-100 bg-anthracite-50/80">
@@ -165,7 +165,7 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
                 <tbody>
                   {BULK_COLUMN_HELP.map((row) => (
                     <tr key={row.key} className="border-b border-anthracite-50 last:border-0">
-                      <td className="px-3 py-2 font-mono font-medium text-emerald-900">{row.key}</td>
+                      <td className="px-3 py-2 font-mono font-medium text-sky-900">{row.key}</td>
                       <td className="px-3 py-2 text-anthracite-700">{row.tr}</td>
                       <td className="px-3 py-2 text-anthracite-500">{row.ornek}</td>
                     </tr>
@@ -180,7 +180,7 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
           <button
             type="button"
             onClick={downloadTr}
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300 bg-white px-4 py-2.5 text-xs font-semibold text-emerald-900 shadow-sm transition hover:bg-emerald-50"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-sky-300 bg-white px-4 py-2.5 text-xs font-semibold text-sky-900 shadow-sm transition hover:bg-sky-50"
           >
             <FileSpreadsheet className="h-4 w-4" strokeWidth={2} />
             Excel (Türkiye) şablonu
@@ -193,7 +193,7 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
             <Download className="h-4 w-4" strokeWidth={2} />
             Virgül + İngilizce başlık
           </button>
-          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-sky-700">
             {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" strokeWidth={2} />}
             Dosyayı yükle
             <input
@@ -216,7 +216,7 @@ export default function BulkProductCsvPanel({ userId, onImported }: Props) {
           {log.map((line, i) => (
             <li key={i} className="flex gap-2 text-anthracite-700">
               {line.startsWith("✓") ? (
-                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-sky-600" />
               ) : (
                 <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
               )}

@@ -212,7 +212,7 @@ export default function WholesalerStorefront({
                 sizes="(max-width: 640px) 96px, 112px"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-emerald-600 to-emerald-700 text-3xl font-semibold text-white sm:text-4xl">
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-600 to-sky-700 text-3xl font-semibold text-white sm:text-4xl">
                 {displayInitial}
               </div>
             )}
@@ -224,7 +224,7 @@ export default function WholesalerStorefront({
                 className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${
                   isOwnerPreview
                     ? "border-blue-200 bg-blue-50 text-blue-900"
-                    : "border-emerald-200/80 bg-emerald-50 text-emerald-800"
+                    : "border-sky-200/80 bg-sky-50 text-sky-800"
                 }`}
               >
                 {isOwnerPreview ? "Kendi vitrininiz" : "Onaylı üretici"}
@@ -242,7 +242,7 @@ export default function WholesalerStorefront({
                     onClick={() => void toggleFollow()}
                     className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-semibold transition ${
                       following
-                        ? "border-emerald-300 bg-emerald-600 text-white hover:bg-emerald-700"
+                        ? "border-sky-300 bg-sky-600 text-white hover:bg-sky-700"
                         : "border-anthracite-200 bg-white text-anthracite-800 hover:bg-anthracite-50"
                     } disabled:opacity-60`}
                   >
@@ -267,11 +267,11 @@ export default function WholesalerStorefront({
             ) : null}
               <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-anthracite-600 md:justify-start">
               <div className="flex items-center gap-1.5">
-                <MapPin className="h-4 w-4 text-emerald-600" strokeWidth={2} />{" "}
+                <MapPin className="h-4 w-4 text-sky-600" strokeWidth={2} />{" "}
                 Türkiye genelinde teslimat
               </div>
               <div className="flex items-center gap-1.5">
-                <Package className="h-4 w-4 text-emerald-600" strokeWidth={2} />{" "}
+                <Package className="h-4 w-4 text-sky-600" strokeWidth={2} />{" "}
                 {products.length} ürün
               </div>
             </div>
@@ -339,7 +339,7 @@ export default function WholesalerStorefront({
                       {p.name}
                     </h3>
                     <div className="mb-2 flex items-center justify-between gap-2">
-                      <span className="rounded border border-emerald-100 bg-emerald-50 px-1.5 py-0.5 text-[8px] font-bold uppercase text-emerald-700">
+                      <span className="rounded border border-sky-100 bg-sky-50 px-1.5 py-0.5 text-[8px] font-bold uppercase text-sky-700">
                         {p.gender}
                       </span>
                       <span className="text-[10px] font-medium text-anthracite-400">

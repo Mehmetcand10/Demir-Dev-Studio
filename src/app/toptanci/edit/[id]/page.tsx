@@ -180,7 +180,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   if (loading) return (
      <DashboardShell>
        <div className="flex flex-col items-center justify-center py-24">
-          <Loader2 className="mb-4 h-10 w-10 animate-spin text-emerald-600" strokeWidth={2} />
+          <Loader2 className="mb-4 h-10 w-10 animate-spin text-sky-600" strokeWidth={2} />
           <p className="text-sm font-medium text-anthracite-500">Yükleniyor…</p>
        </div>
      </DashboardShell>
@@ -202,7 +202,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
       <form onSubmit={handleUpdate} className="premium-card grid gap-8 rounded-2xl p-6 sm:gap-10 sm:p-8 md:grid-cols-2">
          
          <div className="flex flex-col md:col-span-1">
-            <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-anthracite-900"><ImageIcon className="h-4 w-4 text-emerald-600" strokeWidth={2}/> Görseller</h3>
+            <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-anthracite-900"><ImageIcon className="h-4 w-4 text-sky-600" strokeWidth={2}/> Görseller</h3>
             <p className="mb-3 text-xs text-anthracite-600">
               Fiyat, stok veya yanlış görsel için buradan güncelleyin. İstediğiniz kadar <strong>https://</strong> adresi ekleyebilirsiniz (üst sınır {MAX_PRODUCT_IMAGES}); her satır veya virgül ile ayırın.
             </p>
@@ -230,13 +230,13 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
               value={newImageUrlsText}
               onChange={(e) => setNewImageUrlsText(e.target.value)}
               rows={3}
-              className="mb-2 w-full resize-y rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-xs outline-none focus:ring-2 focus:ring-emerald-500/15"
+              className="mb-2 w-full resize-y rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-xs outline-none focus:ring-2 focus:ring-sky-500/15"
               placeholder={"https://ornek.com/1.jpg\nhttps://ornek.com/2.jpg"}
             />
             <button
               type="button"
               onClick={appendUrlsFromBox}
-              className="mb-4 w-full rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-xs font-semibold text-emerald-900 transition hover:bg-emerald-100"
+              className="mb-4 w-full rounded-lg border border-sky-200 bg-sky-50 py-2 text-xs font-semibold text-sky-900 transition hover:bg-sky-100"
             >
               Bu adresleri listeye ekle
             </button>
@@ -248,29 +248,29 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
          <div className="flex flex-col gap-6 md:col-span-1">
                <div>
                   <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Ürün adı</label>
-                  <input required type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm font-medium outline-none transition focus:ring-2 focus:ring-emerald-500/15" />
+                  <input required type="text" value={name} onChange={e=>setName(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm font-medium outline-none transition focus:ring-2 focus:ring-sky-500/15" />
                </div>
 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Cinsiyet</label>
-                    <select value={gender} onChange={e=>setGender(e.target.value)} className="w-full cursor-pointer rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15">
+                    <select value={gender} onChange={e=>setGender(e.target.value)} className="w-full cursor-pointer rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sky-500/15">
                       <option>Kadın</option><option>Erkek</option><option>Kız Çocuk</option><option>Erkek Çocuk</option><option>Unisex</option>
                     </select>
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Kategori</label>
-                    <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full cursor-pointer rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15">
+                    <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full cursor-pointer rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sky-500/15">
                       <option>Tişört</option><option>Sweatshirt</option><option>İç Çamaşırı / Pijama</option><option>Ayakkabı / Sneaker</option><option>Triko</option><option>Pantolon / Jean</option><option>Mont / Kaban</option><option>Elbise / Etek</option><option>Aksesuar</option>
                     </select>
                   </div>
                </div>
 
                <div>
-                  <label className="mb-2 block text-xs font-semibold text-emerald-800">Stok (beden başına adet)</label>
+                  <label className="mb-2 block text-xs font-semibold text-sky-800">Stok (beden başına adet)</label>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {stockEntries.map((entry, idx) => (
-                      <div key={idx} className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-2">
+                      <div key={idx} className="rounded-xl border border-sky-100 bg-sky-50/40 p-2">
                         <input
                           type="text"
                           placeholder="Beden"
@@ -280,7 +280,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                             n[idx] = { ...n[idx], size: e.target.value };
                             setStockEntries(n);
                           }}
-                          className="mb-1 w-full border-b border-emerald-100/80 bg-transparent text-center text-sm font-semibold uppercase outline-none"
+                          className="mb-1 w-full border-b border-sky-100/80 bg-transparent text-center text-sm font-semibold uppercase outline-none"
                         />
                         <input
                           type="number"
@@ -291,7 +291,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                             n[idx] = { ...n[idx], quantity: Math.max(0, Number(e.target.value) || 0) };
                             setStockEntries(n);
                           }}
-                          className="w-full text-center text-sm tabular-nums text-emerald-800 outline-none"
+                          className="w-full text-center text-sm tabular-nums text-sky-800 outline-none"
                         />
                       </div>
                     ))}
@@ -299,7 +299,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                   <button
                     type="button"
                     onClick={() => setStockEntries([...stockEntries, { size: '', quantity: 0 }])}
-                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:underline"
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-sky-700 hover:underline"
                   >
                     <Plus className="h-3.5 w-3.5" /> Beden satırı ekle
                   </button>
@@ -308,11 +308,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Materyal</label>
-                    <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" />
+                    <input required type="text" value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sky-500/15" />
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Gramaj (isteğe bağlı)</label>
-                    <input type="text" value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-emerald-500/15" placeholder="240 gsm" />
+                    <input type="text" value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-anthracite-50/50 px-3.5 py-2.5 text-sm outline-none focus:ring-2 focus:ring-sky-500/15" placeholder="240 gsm" />
                   </div>
                </div>
 
@@ -321,11 +321,11 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-anthracite-600">MOQ (seri adedi)</label>
-                    <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-white px-3.5 py-2.5 text-sm tabular-nums outline-none focus:ring-2 focus:ring-emerald-500/15" />
+                    <input required type="number" min="1" value={minOrder} onChange={e=>setMinOrder(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-white px-3.5 py-2.5 text-sm tabular-nums outline-none focus:ring-2 focus:ring-sky-500/15" />
                   </div>
                   <div>
                     <label className="mb-1.5 block text-xs font-medium text-anthracite-600">Toptan fiyat (₺)</label>
-                    <input required type="number" min="1" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-white px-3.5 py-2.5 text-sm tabular-nums outline-none focus:ring-2 focus:ring-emerald-500/15" />
+                    <input required type="number" min="1" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full rounded-xl border border-anthracite-200/90 bg-white px-3.5 py-2.5 text-sm tabular-nums outline-none focus:ring-2 focus:ring-sky-500/15" />
                   </div>
                </div>
 

@@ -19,7 +19,7 @@ export default function MesafeliSatisPage() {
       </Link>
 
       <div className="mb-8 flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 ring-1 ring-sky-100">
           <FileText className="h-5 w-5" strokeWidth={2} />
         </div>
         <div>
@@ -41,7 +41,7 @@ export default function MesafeliSatisPage() {
           </p>
           <p>
             Ödeme, yönetim tarafından teyit edilene kadar üretim / sevkiyat yükümlülüğü başlamaz; süreç özeti için{" "}
-            <Link href="/yardim" className="font-semibold text-emerald-700 hover:underline">
+            <Link href="/yardim" className="font-semibold text-sky-700 hover:underline">
               Yardım
             </Link>{" "}
             sayfasına bakın.
@@ -64,7 +64,7 @@ export default function MesafeliSatisPage() {
           <h2 className="mb-3 text-base font-semibold text-anthracite-900">Uyuşmazlık</h2>
           <p>
             İade ve uyuşmazlık talepleri panel üzerinden iletilebilir; iletişim için{" "}
-            <Link href="/yardim#iletisim" className="font-semibold text-emerald-700 hover:underline">
+            <Link href="/yardim#iletisim" className="font-semibold text-sky-700 hover:underline">
               İletişim ve yasal
             </Link>{" "}
             bölümündeki kanalları kullanın.

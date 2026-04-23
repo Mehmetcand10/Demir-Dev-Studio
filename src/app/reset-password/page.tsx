@@ -152,7 +152,7 @@ export default function ResetPassword() {
     return (
       <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
         <AuthCard className="max-w-md text-center">
-          <Loader2 className="mx-auto h-10 w-10 animate-spin text-emerald-600" />
+          <Loader2 className="mx-auto h-10 w-10 animate-spin text-sky-600" />
           <p className="mt-4 text-sm font-medium text-anthracite-600">
             Baglanti dogrulaniyor...
           </p>
@@ -195,7 +195,7 @@ export default function ResetPassword() {
     return (
       <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
         <AuthCard className="max-w-md text-center">
-          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-sky-600 text-white shadow-sm">
             <LockKeyhole className="h-7 w-7" strokeWidth={2} />
           </div>
           <h2 className="mb-2 text-xl font-semibold text-anthracite-900">
@@ -267,7 +267,7 @@ export default function ResetPassword() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-premium-emerald w-full"
+            className="btn-premium-sky w-full"
           >
             {loading ? "Kaydediliyor..." : "Sifreyi kaydet"}
           </button>

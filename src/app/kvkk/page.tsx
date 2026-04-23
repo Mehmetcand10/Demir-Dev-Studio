@@ -19,7 +19,7 @@ export default function KvkkPage() {
       </Link>
 
       <div className="mb-8 flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700 ring-1 ring-sky-100">
           <Shield className="h-5 w-5" strokeWidth={2} />
         </div>
         <div>
@@ -59,7 +59,7 @@ export default function KvkkPage() {
           <p>
             KVKK md. 11 kapsamında verilerinizin işlenip işlenmediğini öğrenme, düzeltme, silme, itiraz ve şikâyet hakkına
             sahipsiniz. Başvurularınız için footer ve{" "}
-            <Link href="/yardim#iletisim" className="font-semibold text-emerald-700 hover:underline">
+            <Link href="/yardim#iletisim" className="font-semibold text-sky-700 hover:underline">
               Yardım — İletişim
             </Link>{" "}
             bölümündeki kanalları kullanabilirsiniz.

@@ -55,7 +55,7 @@ export default function Register() {
   if (success) {
     return (
       <div className="flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center px-4 py-12 text-center">
-        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-emerald-600">
+        <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-sky-100 bg-sky-50 text-sky-600">
            <ShieldCheck className="h-8 w-8" strokeWidth={2} />
         </div>
         <h1 className="mb-3 text-2xl font-semibold tracking-tight text-anthracite-900">E-postanizi dogrulayin</h1>
@@ -69,7 +69,7 @@ export default function Register() {
            Girise don
         </Link>
         <p className="mt-6 text-xs text-anthracite-500">
-          <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">
+          <Link href="/yardim" className="font-medium text-sky-700 underline-offset-2 hover:underline">
             Süreçler için Yardım
           </Link>
         </p>
@@ -81,7 +81,7 @@ export default function Register() {
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
       <AuthCard className="max-w-lg">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100/80">
+          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-sky-50 text-sky-700 ring-1 ring-sky-100/80">
             <Package className="h-5 w-5" strokeWidth={2} />
           </div>
           <h1 className="text-xl font-semibold tracking-tight text-anthracite-900">Ticari uyelik basvurusu</h1>
@@ -111,7 +111,7 @@ export default function Register() {
               <button 
                 type="button"
                 onClick={() => setRole('toptanci')}
-                className={`rounded-xl border py-2.5 text-sm font-medium transition ${role === 'toptanci' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-anthracite-200 bg-white text-anthracite-600 hover:border-anthracite-300'}`}
+                className={`rounded-xl border py-2.5 text-sm font-medium transition ${role === 'toptanci' ? 'border-sky-600 bg-sky-600 text-white' : 'border-anthracite-200 bg-white text-anthracite-600 hover:border-anthracite-300'}`}
               >
                 Toptanci
               </button>
@@ -170,7 +170,7 @@ export default function Register() {
           <button 
             type="submit" 
             disabled={isLoading}
-            className={`mt-1 w-full rounded-xl py-3 text-sm font-medium text-white transition disabled:opacity-50 ${role === 'toptanci' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-anthracite-900 hover:bg-anthracite-800'}`}
+            className={`mt-1 w-full rounded-xl py-3 text-sm font-medium text-white transition disabled:opacity-50 ${role === 'toptanci' ? 'bg-sky-600 hover:bg-sky-700' : 'bg-anthracite-900 hover:bg-anthracite-800'}`}
           >
             {isLoading ? "Gonderiliyor..." : "Basvuruyu gonder"}
           </button>
@@ -179,10 +179,10 @@ export default function Register() {
         <div className="mt-8 border-t border-anthracite-100 pt-6 text-center">
           <p className="text-sm text-anthracite-600">
             Zaten uye misiniz?{' '}
-            <Link href="/login" className="font-medium text-emerald-700 hover:underline">Giris</Link>
+            <Link href="/login" className="font-medium text-sky-700 hover:underline">Giris</Link>
           </p>
           <p className="mt-3 text-xs text-anthracite-500">
-            <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">
+            <Link href="/yardim" className="font-medium text-sky-700 underline-offset-2 hover:underline">
               Süreçler için Yardım
             </Link>
           </p>

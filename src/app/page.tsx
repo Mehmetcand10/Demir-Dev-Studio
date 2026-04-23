@@ -1,15 +1,13 @@
+import { createClient } from "@/utils/supabase/server";
 import HomeLandingExperience from "@/components/home/HomeLandingExperience";
 
-export default function Home() {
-  const city = process.env.NEXT_PUBLIC_TRUST_CITY || "Ankara";
-  const approvedBoutiques = process.env.NEXT_PUBLIC_TRUST_APPROVED_BOUTIQUES || null;
-  const approvedWholesalers = process.env.NEXT_PUBLIC_TRUST_APPROVED_WHOLESALERS || null;
+export default async function Home() {
+  const supabase = createClient();
+  const { data: prods } = await supabase
+    .from("products")
+    .select("id, name, images, base_wholesale_price, margin_price, min_order_quantity")
+    .order("created_at", { ascending: false })
+    .limit(7);
 
-  return (
-    <HomeLandingExperience
-      city={city}
-      approvedBoutiques={approvedBoutiques}
-      approvedWholesalers={approvedWholesalers}
-    />
-  );
+  return <HomeLandingExperience spotlightProducts={prods ?? []} spotlightTitle="Fırsat ürünleri" />;
 }

@@ -134,9 +134,9 @@ export default function ToptanciGorListe() {
               <li key={r.id}>
                 <Link
                   href={`/toptanci-gor/${r.id}`}
-                  className="premium-card group flex items-center gap-4 rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-emerald-200/90 hover:shadow-lg sm:p-5"
+                  className="premium-card group flex items-center gap-4 rounded-2xl p-4 transition hover:-translate-y-0.5 hover:border-sky-200/90 hover:shadow-lg sm:p-5"
                 >
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-xl font-semibold text-white shadow-sm sm:h-16 sm:w-16 sm:text-2xl">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-sky-600 to-sky-700 text-xl font-semibold text-white shadow-sm sm:h-16 sm:w-16 sm:text-2xl">
                     {initial}
                   </div>
                   <div className="min-w-0 flex-1 text-left">
@@ -148,7 +148,7 @@ export default function ToptanciGorListe() {
                       {r.productCount} urun
                     </p>
                   </div>
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-anthracite-900 px-3 py-2 text-xs font-medium text-white transition group-hover:bg-emerald-700 sm:text-sm">
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-anthracite-900 px-3 py-2 text-xs font-medium text-white transition group-hover:bg-sky-700 sm:text-sm">
                     Vitrine gir
                     <ChevronRight className="h-4 w-4" strokeWidth={2} />
                   </span>

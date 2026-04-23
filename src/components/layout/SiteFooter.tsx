@@ -3,8 +3,7 @@ import type { ReactNode } from "react";
 import { MessageCircle } from "lucide-react";
 import { getSitePublicContact } from "@/utils/siteContact";
 
-const legalClass =
-  "font-medium text-anthracite-500 hover:text-emerald-700 hover:underline";
+const legalClass = "text-sm text-slate-500 transition hover:text-blue-600 hover:underline";
 
 function FooterLegalLink({ href, children }: { href: string; children: ReactNode }) {
   if (href.startsWith("http://") || href.startsWith("https://")) {
@@ -25,63 +24,84 @@ export default function SiteFooter() {
   const c = getSitePublicContact();
 
   return (
-    <footer className="mt-auto border-t border-anthracite-200/70 bg-white/88 backdrop-blur-md">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="premium-soft flex flex-col items-center gap-4 px-4 py-5 text-center shadow-sm sm:gap-5 sm:px-5">
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-anthracite-600 sm:text-sm">
-            <a
-              href={c.whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 font-medium text-emerald-800 transition hover:text-emerald-900 hover:underline"
-            >
-              <MessageCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
-              Siparis WhatsApp {c.whatsappDisplay}
-            </a>
-            {c.supportEmailHref ? (
-              <>
-                <span className="hidden text-anthracite-300 sm:inline" aria-hidden>
-                  |
-                </span>
-                <a href={c.supportEmailHref} className="font-medium hover:text-anthracite-900 hover:underline">
-                  {c.supportEmail}
+    <footer className="mt-auto border-t border-slate-200 bg-slate-50">
+      <div className="mx-auto max-w-screen-2xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">Demir Dev Studio</p>
+            <p className="mt-1 max-w-sm text-sm leading-relaxed text-slate-600">
+              Toptancı ve butikler için açık, izlenebilir B2B sipariş ağı. Ödeme ve operasyon adımları yönetim
+              denetiminde ilerler.
+            </p>
+          </div>
+            <div className="text-sm">
+              <p className="font-medium text-slate-900">Hızlı linkler</p>
+              <ul className="mt-2 space-y-1.5">
+                <li>
+                  <Link href="/katalog" className="text-slate-600 hover:text-blue-600">
+                    Katalog
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/toptanci-gor" className="text-slate-600 hover:text-blue-600">
+                    Toptancılar
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/yardim" className="text-slate-600 hover:text-blue-600">
+                    Yardım
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div className="text-sm">
+              <p className="font-medium text-slate-900">İletişim</p>
+              <div className="mt-2 space-y-1.5 text-slate-600">
+                <a
+                  href={c.whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-slate-700 transition hover:text-blue-600"
+                >
+                  <MessageCircle className="h-4 w-4 shrink-0" strokeWidth={2} />
+                  WhatsApp: {c.whatsappDisplay}
                 </a>
-              </>
-            ) : null}
-            {c.supportPhoneDisplay ? (
-              <>
-                <span className="hidden text-anthracite-300 sm:inline" aria-hidden>
-                  |
-                </span>
-                {c.supportPhoneHref ? (
-                  <a href={c.supportPhoneHref} className="font-medium hover:text-anthracite-900 hover:underline">
-                    {c.supportPhoneDisplay}
+                {c.supportEmailHref ? (
+                  <a href={c.supportEmailHref} className="block transition hover:text-blue-600 hover:underline">
+                    {c.supportEmail}
                   </a>
-                ) : (
-                  <span className="font-medium">{c.supportPhoneDisplay}</span>
-                )}
-              </>
-            ) : null}
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs">
-            <FooterLegalLink href={c.kvkkHref}>KVKK</FooterLegalLink>
-            <span className="text-anthracite-300" aria-hidden>
-              ·
-            </span>
-            <FooterLegalLink href={c.mesafeliHref}>Mesafeli satis</FooterLegalLink>
-            <span className="text-anthracite-300" aria-hidden>
-              ·
-            </span>
-            <Link href="/yardim" className={legalClass}>
-              Yardim ve surecler
-            </Link>
-          </div>
-
-          <p className="text-xs font-medium text-anthracite-500 sm:text-sm">
-            Demir Dev Studio © {new Date().getFullYear()} · Verified B2B Commerce Network
-          </p>
+                ) : null}
+                {c.supportPhoneDisplay ? (
+                  c.supportPhoneHref ? (
+                    <a href={c.supportPhoneHref} className="block transition hover:text-blue-600 hover:underline">
+                      {c.supportPhoneDisplay}
+                    </a>
+                  ) : (
+                    <span>{c.supportPhoneDisplay}</span>
+                  )
+                ) : null}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900">Yasal</p>
+              <ul className="mt-2 space-y-1.5">
+                <li>
+                  <FooterLegalLink href={c.kvkkHref}>KVKK</FooterLegalLink>
+                </li>
+                <li>
+                  <FooterLegalLink href={c.mesafeliHref}>Mesafeli satış</FooterLegalLink>
+                </li>
+                <li>
+                  <Link href="/yardim" className={legalClass}>
+                    Yardım ve süreçler
+                  </Link>
+                </li>
+              </ul>
+            </div>
         </div>
+        <p className="mt-8 border-t border-slate-200 pt-6 text-center text-xs text-slate-500 sm:text-left">
+          © {new Date().getFullYear()} Demir Dev Studio. B2B ticaret ağı.
+        </p>
       </div>
     </footer>
   );

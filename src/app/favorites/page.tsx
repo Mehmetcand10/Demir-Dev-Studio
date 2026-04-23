@@ -63,7 +63,7 @@ export default function Favoriler() {
             <Heart className="mx-auto mb-3 h-14 w-14 text-anthracite-300" strokeWidth={1.5} />
             <h3 className="mb-2 text-sm font-medium text-anthracite-700">Henuz urun kaydetmediniz</h3>
             <p className="mb-6 text-sm text-anthracite-500">Katalogdan urunleri listeye ekleyin.</p>
-            <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-emerald-700 hover:underline">
+            <Link href="/katalog" className="inline-flex items-center gap-2 text-sm font-medium text-sky-700 hover:underline">
                <Search className="h-4 w-4" strokeWidth={2} /> Kataloga git
             </Link>
         </div>

@@ -43,7 +43,7 @@ export default function SiparisOzetPage() {
   if (loading || !order) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3 text-anthracite-500">
-        <Loader2 className="h-8 w-8 animate-spin text-emerald-600" strokeWidth={2} />
+        <Loader2 className="h-8 w-8 animate-spin text-sky-600" strokeWidth={2} />
         <p className="text-sm font-medium">Yükleniyor…</p>
       </div>
     );
@@ -78,7 +78,7 @@ export default function SiparisOzetPage() {
 
       <article className="premium-card rounded-2xl p-6 print:border-0 print:shadow-none sm:p-8">
         <header className="border-b border-anthracite-100 pb-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700">Demir Dev Studio</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-700">Demir Dev Studio</p>
           <h1 className="mt-1 text-xl font-bold text-anthracite-900">Siparis ozeti</h1>
           <p className="mt-2 font-mono text-xs text-anthracite-500">No: {order.id}</p>
           <p className="text-xs text-anthracite-600">Olusturulma: {created}</p>
@@ -136,7 +136,7 @@ export default function SiparisOzetPage() {
                   href={order.payment_receipt_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-xs font-semibold text-emerald-700 underline underline-offset-2 hover:text-emerald-900"
+                  className="text-xs font-semibold text-sky-700 underline underline-offset-2 hover:text-sky-900"
                 >
                   Dosyayi ac
                 </a>
@@ -145,7 +145,7 @@ export default function SiparisOzetPage() {
           ) : null}
           <div className="flex justify-between gap-4 pt-2">
             <dt className="text-anthracite-500">Toplam</dt>
-            <dd className="text-right text-lg font-bold tabular-nums text-emerald-700">
+            <dd className="text-right text-lg font-bold tabular-nums text-sky-700">
               {Number(order.total_price).toLocaleString("tr-TR")} ₺
             </dd>
           </div>

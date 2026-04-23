@@ -252,14 +252,14 @@ export default function ToptanciDashboard() {
 
       {loading ? (
           <div className="flex flex-col items-center justify-center py-24 text-anthracite-400">
-            <Loader2 className="mb-3 h-9 w-9 animate-spin text-emerald-600/70" />
+            <Loader2 className="mb-3 h-9 w-9 animate-spin text-sky-600/70" />
             <p className="text-xs font-medium">Yükleniyor…</p>
           </div>
       ) : (
           <div className="transition-all duration-500">
             {followerCount !== null && (
-              <div className="mb-5 flex gap-3 rounded-3xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50/90 to-white/90 px-4 py-3 text-sm text-emerald-950 shadow-sm backdrop-blur">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white">
+              <div className="mb-5 flex gap-3 rounded-3xl border border-sky-200/80 bg-gradient-to-r from-sky-50/90 to-white/90 px-4 py-3 text-sm text-sky-950 shadow-sm backdrop-blur">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sky-600 text-white">
                   <BellRing className="h-4 w-4" strokeWidth={2} />
                 </div>
                 <p className="min-w-0 leading-relaxed">
@@ -284,12 +284,12 @@ export default function ToptanciDashboard() {
                           >
                             Vitrinimi gör
                           </Link>
-                          <button type="button" onClick={() => setActiveTab('studio')} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-xs font-medium text-white shadow-sm transition hover:bg-emerald-700">Yeni ürün ekle</button>
+                          <button type="button" onClick={() => setActiveTab('studio')} className="rounded-lg bg-sky-600 px-5 py-2.5 text-xs font-medium text-white shadow-sm transition hover:bg-sky-700">Yeni ürün ekle</button>
                         </div>
                     </div>
 
                     <div className="mb-8 rounded-3xl border border-amber-200/90 bg-gradient-to-br from-amber-50/90 to-white/90 p-5 shadow-sm backdrop-blur sm:p-6">
-                      <div className="mb-5 rounded-xl border border-emerald-200/80 bg-emerald-50/60 p-4">
+                      <div className="mb-5 rounded-xl border border-sky-200/80 bg-sky-50/60 p-4">
                         <h3 className="mb-2 text-sm font-semibold text-anthracite-900">
                           Profil görseli (mağaza vitrini)
                         </h3>
@@ -352,7 +352,7 @@ export default function ToptanciDashboard() {
                             placeholder="Örn. 500 — boş bırakırsanız sınır yok"
                             value={minOrderFloor}
                             onChange={(e) => setMinOrderFloor(e.target.value)}
-                            className="w-full rounded-xl border border-anthracite-200/90 bg-white px-4 py-3 text-sm outline-none ring-emerald-500/0 transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
+                            className="w-full rounded-xl border border-anthracite-200/90 bg-white px-4 py-3 text-sm outline-none ring-sky-500/0 transition focus:border-sky-300 focus:ring-2 focus:ring-sky-500/20"
                           />
                         </div>
                         <button
@@ -390,7 +390,7 @@ export default function ToptanciDashboard() {
                                   <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                       <Link
                                         href={`/toptanci/edit/${p.id}`}
-                                        className="flex items-center justify-center rounded-lg bg-emerald-600 p-2 text-white shadow-md transition hover:bg-emerald-700"
+                                        className="flex items-center justify-center rounded-lg bg-sky-600 p-2 text-white shadow-md transition hover:bg-sky-700"
                                         title="Düzenle"
                                       >
                                           <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
@@ -404,7 +404,7 @@ export default function ToptanciDashboard() {
                                    <h3 className="font-bold text-xs sm:text-sm text-anthracite-900 leading-snug line-clamp-2 mb-2">{p.name}</h3>
                                    <div className="flex flex-wrap gap-1 mb-2 max-h-14 overflow-y-auto">
                                       {Object.entries(p.stocks || {}).map(([size, qty]: [string, any]) => (
-                                          <span key={size} className={`text-[7px] sm:text-[8px] font-bold px-1.5 py-0.5 rounded border ${Number(qty) > 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 'bg-red-50 border-red-100 text-red-600'}`}>
+                                          <span key={size} className={`text-[7px] sm:text-[8px] font-bold px-1.5 py-0.5 rounded border ${Number(qty) > 0 ? 'bg-sky-50 border-sky-100 text-sky-700' : 'bg-red-50 border-red-100 text-red-600'}`}>
                                               {size}:{qty}
                                           </span>
                                       ))}
@@ -412,7 +412,7 @@ export default function ToptanciDashboard() {
                                    <div className="pt-2 border-t border-anthracite-100/80 flex items-end justify-between gap-1">
                                        <div className="flex flex-col min-w-0">
                                            <span className="text-[8px] font-bold text-anthracite-400 uppercase">Net</span>
-                                           <span className="font-black text-sm sm:text-base text-emerald-600 tabular-nums">{p.base_wholesale_price.toLocaleString('tr-TR')} ₺</span>
+                                           <span className="font-black text-sm sm:text-base text-sky-600 tabular-nums">{p.base_wholesale_price.toLocaleString('tr-TR')} ₺</span>
                                        </div>
                                        <div className="bg-anthracite-900 text-white px-2 py-1 rounded-md text-[8px] font-black uppercase shrink-0">MOQ {p.min_order_quantity}</div>
                                    </div>
@@ -431,7 +431,7 @@ export default function ToptanciDashboard() {
                     <div className="lg:col-span-8 flex flex-col gap-8">
                         <div className="premium-card p-6 sm:p-8">
                             <div className="mb-2 flex items-center gap-2">
-                               <PlusCircle className="h-5 w-5 text-emerald-600" strokeWidth={2} />
+                               <PlusCircle className="h-5 w-5 text-sky-600" strokeWidth={2} />
                                <h2 className="text-xl font-semibold text-anthracite-900 sm:text-2xl">Yeni ürün</h2>
                             </div>
                             <p className="mb-8 text-sm text-anthracite-500">Model bilgilerini ve stokları girin.</p>
@@ -440,7 +440,7 @@ export default function ToptanciDashboard() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="md:col-span-2">
                                         <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Model Adı / Koleksiyon Başlığı</label>
-                                        <input required value={name} onChange={e=>setName(e.target.value)} className="w-full px-6 py-5 bg-anthracite-50 rounded-2xl font-black text-xl shadow-inner focus:ring-4 focus:ring-emerald-500/10 focus:bg-white transition-all outline-none border-2 border-transparent focus:border-emerald-500" placeholder="Örn: 24 S/S Double-Face Polo" />
+                                        <input required value={name} onChange={e=>setName(e.target.value)} className="w-full px-6 py-5 bg-anthracite-50 rounded-2xl font-black text-xl shadow-inner focus:ring-4 focus:ring-sky-500/10 focus:bg-white transition-all outline-none border-2 border-transparent focus:border-sky-500" placeholder="Örn: 24 S/S Double-Face Polo" />
                                     </div>
 
                                     <div className="space-y-6">
@@ -448,13 +448,13 @@ export default function ToptanciDashboard() {
                                             <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Hedef Cinsiyet</label>
                                             <div className="flex flex-wrap gap-2">
                                                 {['Erkek', 'Kadın', 'Çocuk', 'Unisex'].map((g) => (
-                                                    <button key={g} type="button" onClick={() => setGender(g)} className={`px-4 py-2 rounded-xl text-xs font-black transition-all border-2 ${gender === g ? 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20' : 'bg-white text-anthracite-400 border-anthracite-100 hover:border-emerald-200'}`}>{g.toUpperCase()}</button>
+                                                    <button key={g} type="button" onClick={() => setGender(g)} className={`px-4 py-2 rounded-xl text-xs font-black transition-all border-2 ${gender === g ? 'bg-sky-500 text-white border-sky-500 shadow-lg shadow-sky-500/20' : 'bg-white text-anthracite-400 border-anthracite-100 hover:border-sky-200'}`}>{g.toUpperCase()}</button>
                                                 ))}
                                             </div>
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Ürün Kategorisi</label>
-                                            <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full bg-anthracite-50 px-6 py-4 rounded-2xl font-black text-sm outline-none border-2 border-transparent focus:border-emerald-500 shadow-inner">
+                                            <select value={category} onChange={e=>setCategory(e.target.value)} className="w-full bg-anthracite-50 px-6 py-4 rounded-2xl font-black text-sm outline-none border-2 border-transparent focus:border-sky-500 shadow-inner">
                                                 <option>Tişört</option><option>Sweatshirt</option><option>İç Çamaşırı / Pijama</option><option>Ayakkabı / Sneaker</option><option>Triko</option><option>Pantolon / Jean</option><option>Mont / Kaban</option><option>Elbise / Etek</option><option>Aksesuar</option>
                                             </select>
                                         </div>
@@ -463,28 +463,28 @@ export default function ToptanciDashboard() {
                                     <div className="space-y-6">
                                         <div>
                                             <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Kumaş / Materyal</label>
-                                            <input required value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-6 py-4 bg-anthracite-50 rounded-2xl font-black text-sm shadow-inner outline-none border-2 border-transparent focus:border-emerald-500" placeholder="%100 Pamuk" />
+                                            <input required value={fabricType} onChange={e=>setFabricType(e.target.value)} className="w-full px-6 py-4 bg-anthracite-50 rounded-2xl font-black text-sm shadow-inner outline-none border-2 border-transparent focus:border-sky-500" placeholder="%100 Pamuk" />
                                         </div>
                                         <div>
                                             <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Gramaj / Ağırlık (Opsiyonel)</label>
-                                            <input value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full px-6 py-4 bg-anthracite-50 rounded-2xl font-black text-sm shadow-inner outline-none border-2 border-transparent focus:border-emerald-500" placeholder="280 GSM" />
+                                            <input value={gsm} onChange={e=>setGsm(e.target.value)} className="w-full px-6 py-4 bg-anthracite-50 rounded-2xl font-black text-sm shadow-inner outline-none border-2 border-transparent focus:border-sky-500" placeholder="280 GSM" />
                                         </div>
                                     </div>
 
                                     {/* STOK TABLOSU (PREMIUM TABLE V2) */}
-                                    <div className="md:col-span-2 bg-emerald-50/50 rounded-xl p-8 border border-emerald-100/50">
+                                    <div className="md:col-span-2 bg-sky-50/50 rounded-xl p-8 border border-sky-100/50">
                                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                                            <div>
-                                              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest border-l-4 border-emerald-500 pl-3">Asorti Stok Yönetimi (Expert View)</p>
-                                              <p className="text-xs font-medium text-emerald-600/70 mt-1">Her beden için mevcut stok miktarını girin.</p>
+                                              <p className="text-[10px] font-black text-sky-600 uppercase tracking-widest border-l-4 border-sky-500 pl-3">Asorti Stok Yönetimi (Expert View)</p>
+                                              <p className="text-xs font-medium text-sky-600/70 mt-1">Her beden için mevcut stok miktarını girin.</p>
                                            </div>
-                                           <button type="button" onClick={() => setStockEntries([...stockEntries, { size: '', quantity: 0 }])} className="px-5 py-2.5 bg-emerald-600 text-white text-[10px] font-black rounded-xl uppercase shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 transition-all">+ YENİ BEDEN EKLE</button>
+                                           <button type="button" onClick={() => setStockEntries([...stockEntries, { size: '', quantity: 0 }])} className="px-5 py-2.5 bg-sky-600 text-white text-[10px] font-black rounded-xl uppercase shadow-lg shadow-sky-600/20 hover:bg-sky-700 transition-all">+ YENİ BEDEN EKLE</button>
                                         </div>
                                         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
                                             {stockEntries.map((entry, idx) => (
-                                                <div key={idx} className="bg-white p-4 rounded-2xl shadow-sm border border-emerald-100 group relative">
-                                                    <input placeholder="Beden" value={entry.size} onChange={e=> {let n=[...stockEntries]; n[idx].size=e.target.value.toUpperCase(); setStockEntries(n);}} className="w-full text-center font-black text-base outline-none mb-1 border-b border-anthracite-50 focus:border-emerald-500 uppercase pb-1" />
-                                                    <input type="number" min="0" value={entry.quantity} onChange={e=> {let n=[...stockEntries]; n[idx].quantity=Number(e.target.value); setStockEntries(n);}} className="w-full text-center text-xs font-black text-emerald-600 outline-none" />
+                                                <div key={idx} className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100 group relative">
+                                                    <input placeholder="Beden" value={entry.size} onChange={e=> {let n=[...stockEntries]; n[idx].size=e.target.value.toUpperCase(); setStockEntries(n);}} className="w-full text-center font-black text-base outline-none mb-1 border-b border-anthracite-50 focus:border-sky-500 uppercase pb-1" />
+                                                    <input type="number" min="0" value={entry.quantity} onChange={e=> {let n=[...stockEntries]; n[idx].quantity=Number(e.target.value); setStockEntries(n);}} className="w-full text-center text-xs font-black text-sky-600 outline-none" />
                                                     <button type="button" onClick={()=>setStockEntries(stockEntries.filter((_,i)=>i!==idx))} className="absolute -top-2 -right-2 p-1.5 bg-red-100 text-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-all border border-red-200"><Trash2 className="w-3 h-3"/></button>
                                                 </div>
                                             ))}
@@ -495,9 +495,9 @@ export default function ToptanciDashboard() {
                                     <div className="md:col-span-1 bg-anthracite-900 rounded-xl p-8 text-white shadow-xl shadow-anthracite-900/20">
                                         <label className="text-[10px] font-black text-white/50 uppercase tracking-widest block mb-4">Sizin Kazancınız (Birim ₺)</label>
                                         <div className="flex items-center gap-4">
-                                            <Wallet className="w-8 h-8 text-emerald-400" />
-                                            <input required type="number" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full bg-transparent font-black text-4xl outline-none border-b-2 border-white/10 focus:border-emerald-500 transition-all pb-2" placeholder="0" />
-                                            <span className="text-2xl font-black text-emerald-400">₺</span>
+                                            <Wallet className="w-8 h-8 text-sky-400" />
+                                            <input required type="number" value={wholesalePrice} onChange={e=>setWholesalePrice(e.target.value)} className="w-full bg-transparent font-black text-4xl outline-none border-b-2 border-white/10 focus:border-sky-500 transition-all pb-2" placeholder="0" />
+                                            <span className="text-2xl font-black text-sky-400">₺</span>
                                         </div>
                                     </div>
                                     <div className="md:col-span-1 bg-white border border-anthracite-100 rounded-xl p-8 shadow-sm">
@@ -512,10 +512,10 @@ export default function ToptanciDashboard() {
                                     {/* MEDYA ALANI */}
                                     <div className="md:col-span-2">
                                         <label className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest block mb-2 px-1">Ürün Fotoğrafları</label>
-                                        <div className="relative border-4 border-dashed border-anthracite-100 rounded-2xl p-10 text-center hover:bg-anthracite-50 hover:border-emerald-500/30 transition-all group cursor-pointer">
+                                        <div className="relative border-4 border-dashed border-anthracite-100 rounded-2xl p-10 text-center hover:bg-anthracite-50 hover:border-sky-500/30 transition-all group cursor-pointer">
                                             <input required type="file" multiple accept="image/*" onChange={(e)=> {let fs=Array.from(e.target.files||[]); setSelectedFiles(fs); setPreviewUrls(fs.map(f=>URL.createObjectURL(f)));}} className="absolute inset-0 opacity-0 cursor-pointer z-20" />
                                             <div className="flex flex-col items-center gap-3 relative z-10">
-                                                <div className="w-20 h-20 bg-white shadow-xl rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                                <div className="w-20 h-20 bg-white shadow-xl rounded-3xl flex items-center justify-center group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all">
                                                     <ImageIcon className="w-10 h-10" />
                                                 </div>
                                                 <h4 className="font-black text-xl text-anthracite-900">Fotoğrafları Sürükleyin</h4>
@@ -524,7 +524,7 @@ export default function ToptanciDashboard() {
                                             {previewUrls.length > 0 && (
                                                 <div className="mt-8 flex flex-wrap gap-3 justify-center relative z-20">
                                                     {previewUrls.map((u, i) => (
-                                                        <div key={i} className="w-24 h-32 relative rounded-2xl overflow-hidden border-2 border-emerald-200 shadow-xl transform rotate-2 hover:rotate-0 transition-transform"><Image src={u} alt="p" fill className="object-cover" /></div>
+                                                        <div key={i} className="w-24 h-32 relative rounded-2xl overflow-hidden border-2 border-sky-200 shadow-xl transform rotate-2 hover:rotate-0 transition-transform"><Image src={u} alt="p" fill className="object-cover" /></div>
                                                     ))}
                                                 </div>
                                             )}
@@ -550,7 +550,7 @@ export default function ToptanciDashboard() {
                             {/* iPhone Speaker / Notch */}
                             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-7 bg-[#222] rounded-b-3xl z-30"></div>
                             
-                            <h3 className="text-xs font-black text-emerald-500 uppercase tracking-widest text-center mt-2 mb-6">Müşteri Uygulaması Önizleme</h3>
+                            <h3 className="text-xs font-black text-sky-500 uppercase tracking-widest text-center mt-2 mb-6">Müşteri Uygulaması Önizleme</h3>
                             
                             <div className="space-y-6">
                                 <div className="aspect-[4/5] bg-[#1a1a1a] rounded-xl overflow-hidden border border-white/5 relative shadow-inner">
@@ -566,7 +566,7 @@ export default function ToptanciDashboard() {
 
                                 <div className="space-y-4 px-2">
                                     <div className="flex items-center gap-2">
-                                       <span className="bg-emerald-500 text-white text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest">{gender}</span>
+                                       <span className="bg-sky-500 text-white text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest">{gender}</span>
                                        <span className="bg-white/10 text-white/40 text-[9px] font-black px-2 py-1 rounded uppercase tracking-widest">{category}</span>
                                     </div>
                                     <h4 className="text-2xl font-black text-white leading-tight break-words">{name || "Model Adı"}</h4>
@@ -613,7 +613,7 @@ export default function ToptanciDashboard() {
                                              ? 'border-amber-200 bg-amber-50 text-amber-900'
                                              : ord.status === ORDER_STATUS.CANCELLED
                                                ? 'border-red-200 bg-red-50 text-red-800'
-                                               : 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                                               : 'border-sky-200 bg-sky-50 text-sky-700'
                                      }`}>
                                          {getOrderStatusLabel(ord.status)}
                                      </span>
@@ -637,9 +637,9 @@ export default function ToptanciDashboard() {
                                                 <p className="mb-0.5 text-[10px] font-medium text-anthracite-400">Beden dağılımı / toplam</p>
                                                 <p className="text-xs font-medium text-anthracite-900">{ord.selected_size} · {ord.quantity}</p>
                                             </div>
-                                            <div className="rounded-lg bg-emerald-50/90 px-3 py-2 ring-1 ring-emerald-100/80">
-                                                <p className="mb-0.5 text-[10px] font-medium text-emerald-700">Net</p>
-                                                <p className="text-xs font-semibold tabular-nums text-emerald-800">{ord.wholesaler_earning.toLocaleString('tr-TR')} ₺</p>
+                                            <div className="rounded-lg bg-sky-50/90 px-3 py-2 ring-1 ring-sky-100/80">
+                                                <p className="mb-0.5 text-[10px] font-medium text-sky-700">Net</p>
+                                                <p className="text-xs font-semibold tabular-nums text-sky-800">{ord.wholesaler_earning.toLocaleString('tr-TR')} ₺</p>
                                             </div>
                                         </div>
                                         {(ord.buyer_note || ord.payment_receipt_url) && (
@@ -658,7 +658,7 @@ export default function ToptanciDashboard() {
                                                 href={ord.payment_receipt_url}
                                                 target="_blank"
                                                 rel="noreferrer"
-                                                className={`inline-flex items-center gap-2 text-xs font-semibold text-emerald-800 underline underline-offset-2 hover:text-emerald-950 ${ord.buyer_note ? 'mt-2' : ''}`}
+                                                className={`inline-flex items-center gap-2 text-xs font-semibold text-sky-800 underline underline-offset-2 hover:text-sky-950 ${ord.buyer_note ? 'mt-2' : ''}`}
                                               >
                                                 <Receipt className="h-3.5 w-3.5" strokeWidth={2} />
                                                 Ödeme dekontu
@@ -693,7 +693,7 @@ export default function ToptanciDashboard() {
                             type="text"
                             value={profileIban}
                             onChange={(e) => setProfileIban(e.target.value)}
-                            className="flex-1 px-5 py-4 rounded-2xl border border-anthracite-200 bg-anthracite-50 font-mono text-sm outline-none focus:ring-2 focus:ring-emerald-200"
+                            className="flex-1 px-5 py-4 rounded-2xl border border-anthracite-200 bg-anthracite-50 font-mono text-sm outline-none focus:ring-2 focus:ring-sky-200"
                             placeholder="TR00 0000 0000 0000 0000 0000 00"
                           />
                           <button
@@ -706,7 +706,7 @@ export default function ToptanciDashboard() {
                           </button>
                         </div>
                     </div>
-                    <div className="lg:col-span-4 bg-emerald-500 p-10 rounded-2xl text-white shadow-2xl shadow-emerald-500/20 group relative overflow-hidden h-max">
+                    <div className="lg:col-span-4 bg-sky-500 p-10 rounded-2xl text-white shadow-2xl shadow-sky-500/20 group relative overflow-hidden h-max">
                         <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform">
                             <ChartIcon className="w-48 h-48" />
                         </div>
@@ -726,13 +726,13 @@ export default function ToptanciDashboard() {
                     <div className="lg:col-span-8 space-y-6">
                         <div className="bg-white border border-anthracite-100 rounded-2xl p-10 shadow-xl">
                             <h3 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3">
-                                <HistoryIcon className="w-6 h-6 text-emerald-500" /> Son Kazanç Kayıtları
+                                <HistoryIcon className="w-6 h-6 text-sky-500" /> Son Kazanç Kayıtları
                             </h3>
                             <div className="space-y-4">
                                 {orders.slice(0, 5).map(o => (
                                     <div key={o.id} className="p-5 bg-anthracite-50 border border-anthracite-100 rounded-2xl flex items-center justify-between group hover:bg-white transition-all shadow-sm">
                                         <div className="flex items-center gap-4 text-left">
-                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-emerald-500 font-black text-xs">
+                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-sky-500 font-black text-xs">
                                                 <CheckCircle2 className="w-6 h-6" />
                                             </div>
                                             <div>
@@ -740,7 +740,7 @@ export default function ToptanciDashboard() {
                                                 <p className="text-[10px] font-bold text-anthracite-400 uppercase">{new Date(o.created_at).toLocaleDateString('tr-TR')}</p>
                                             </div>
                                         </div>
-                                        <span className="font-black text-lg text-emerald-600">+{o.wholesaler_earning.toLocaleString('tr-TR')} ₺</span>
+                                        <span className="font-black text-lg text-sky-600">+{o.wholesaler_earning.toLocaleString('tr-TR')} ₺</span>
                                     </div>
                                 ))}
                             </div>

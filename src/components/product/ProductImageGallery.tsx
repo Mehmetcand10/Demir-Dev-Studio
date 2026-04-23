@@ -63,7 +63,7 @@ export default function ProductImageGallery({ images, productName }: Props) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:text-sm">
-        <span className="rounded-lg bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200">
+        <span className="rounded-lg bg-sky-50 px-2 py-1 text-xs font-medium text-sky-800 dark:bg-sky-900/40 dark:text-sky-200">
           Görsel otomatik tam sığdırılır
         </span>
         <span className="font-medium text-anthracite-500 dark:text-anthracite-400">
@@ -118,8 +118,8 @@ export default function ProductImageGallery({ images, productName }: Props) {
 
       <div
         ref={scrollRef}
-        className="relative w-full overflow-auto rounded-2xl border border-anthracite-200/70 bg-zinc-100 dark:bg-anthracite-900/90"
-        style={{ height: "min(72vh, 680px)", touchAction: "pan-x pan-y" }}
+        className="relative w-full h-[min(50vh,420px)] overflow-auto rounded-2xl border border-anthracite-200/70 bg-zinc-100 sm:h-[min(64vh,560px)] dark:bg-anthracite-900/90"
+        style={{ touchAction: "pan-x pan-y" }}
         onTouchStart={(e) => {
           if (e.touches.length < 2) return;
           pinchStateRef.current = {

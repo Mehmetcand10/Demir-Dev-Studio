@@ -78,7 +78,7 @@ export default function HesapSifreDegistir() {
   if (checking) {
     return (
       <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
-        <Loader2 className="h-10 w-10 animate-spin text-emerald-600" />
+        <Loader2 className="h-10 w-10 animate-spin text-sky-600" />
       </div>
     );
   }
@@ -105,7 +105,7 @@ export default function HesapSifreDegistir() {
     return (
       <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
         <AuthCard className="max-w-md text-center">
-          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-700">
+          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-sky-100 bg-sky-50 text-sky-700">
             <KeyRound className="h-6 w-6" strokeWidth={2} />
           </div>
           <h1 className="mb-2 text-xl font-semibold text-anthracite-900">
@@ -136,7 +136,7 @@ export default function HesapSifreDegistir() {
           <ArrowLeft className="h-5 w-5" strokeWidth={2} />
         </Link>
 
-        <div className="mx-auto mb-5 mt-6 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-600">
+        <div className="mx-auto mb-5 mt-6 flex h-12 w-12 items-center justify-center rounded-xl border border-sky-100 bg-sky-50 text-sky-600">
           <KeyRound className="h-6 w-6" strokeWidth={2} />
         </div>
 
@@ -204,7 +204,7 @@ export default function HesapSifreDegistir() {
         </form>
 
         <p className="mt-5 text-center text-xs text-anthracite-500">
-          <Link href="/forgot-password" className="font-medium text-emerald-700 hover:underline">
+          <Link href="/forgot-password" className="font-medium text-sky-700 hover:underline">
             Sifremi unuttum
           </Link>{" "}
           (e-posta ile sifirlama)

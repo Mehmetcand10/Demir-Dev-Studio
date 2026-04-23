@@ -40,7 +40,7 @@ export default function Login() {
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-4 py-12">
       <AuthCard>
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100/80">
+          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-sky-50 text-sky-700 ring-1 ring-sky-100/80">
             <Package className="h-5 w-5" strokeWidth={2} />
           </div>
           <h1 className="text-xl font-semibold tracking-tight text-anthracite-900">Ticari giris</h1>
@@ -84,7 +84,7 @@ export default function Login() {
               <span className="max-w-[18rem] text-right text-[11px] leading-snug text-anthracite-400">
                 Sifreyi biliyorsaniz ve degistirmek istiyorsaniz once giris yapin; sonra ust menuden{" "}
                 <strong className="font-medium text-anthracite-600">Sifre</strong> (veya{" "}
-                <Link href="/hesap/sifre" className="font-medium text-emerald-700 hover:underline">
+                <Link href="/hesap/sifre" className="font-medium text-sky-700 hover:underline">
                   /hesap/sifre
                 </Link>
                 ).
@@ -104,10 +104,10 @@ export default function Login() {
         <div className="mt-8 border-t border-anthracite-100 pt-6 text-center">
           <p className="text-sm text-anthracite-600">
             Hesabiniz yok mu?{' '}
-            <Link href="/register" className="font-medium text-emerald-700 hover:underline">Basvuru</Link>
+            <Link href="/register" className="font-medium text-sky-700 hover:underline">Basvuru</Link>
           </p>
           <p className="mt-3 text-xs text-anthracite-500">
-            <Link href="/yardim" className="font-medium text-emerald-700 underline-offset-2 hover:underline">
+            <Link href="/yardim" className="font-medium text-sky-700 underline-offset-2 hover:underline">
               Süreçler için Yardım
             </Link>
           </p>
