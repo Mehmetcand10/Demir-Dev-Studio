@@ -30,13 +30,13 @@ export function TrustBar() {
           </div>
         </div>
       </div>
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-300/70 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-300/50 to-transparent" />
       <div
-        className="pointer-events-none absolute inset-x-0 -bottom-6 h-16"
+        className="pointer-events-none absolute inset-x-0 -bottom-5 h-12"
         aria-hidden
         style={{
           background:
-            "radial-gradient(60% 70% at 50% 0%, rgba(59,130,246,0.24) 0%, rgba(59,130,246,0.09) 42%, rgba(59,130,246,0) 100%)",
+            "radial-gradient(60% 70% at 50% 0%, rgba(59,130,246,0.14) 0%, rgba(59,130,246,0.05) 42%, rgba(59,130,246,0) 100%)",
         }}
       />
     </section>

@@ -25,13 +25,13 @@ export default function SiteFooter() {
   const c = getSitePublicContact();
 
   return (
-    <footer className="relative mt-auto border-t border-slate-900/80 bg-slate-900 text-slate-100">
+    <footer className="relative mt-auto overflow-hidden border-t border-slate-900/80 bg-slate-900 text-slate-100">
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-24"
+        className="pointer-events-none absolute inset-x-0 top-0 h-20"
         aria-hidden
         style={{
           background:
-            "radial-gradient(70% 90% at 50% 0%, rgba(59,130,246,0.2) 0%, rgba(59,130,246,0.06) 42%, rgba(15,23,42,0) 100%)",
+            "radial-gradient(70% 90% at 50% 0%, rgba(59,130,246,0.14) 0%, rgba(59,130,246,0.04) 42%, rgba(15,23,42,0) 100%)",
         }}
       />
       <div className="mx-auto max-w-screen-2xl px-3 pb-6 pt-7 sm:px-4 sm:pt-8 lg:px-6">
