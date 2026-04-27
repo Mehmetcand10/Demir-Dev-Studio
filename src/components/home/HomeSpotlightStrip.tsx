@@ -16,19 +16,24 @@ type ProductRow = {
 type Props = {
   products: ProductRow[];
   title: string;
+  canSeePrices: boolean;
 };
 
 function unit(p: ProductRow) {
   return Number(p.base_wholesale_price || 0) + Number(p.margin_price || 0);
 }
 
-export function HomeSpotlightStrip({ products, title }: Props) {
+export function HomeSpotlightStrip({ products, title, canSeePrices }: Props) {
   if (products.length === 0) return null;
 
   return (
     <section className="w-full border-t border-slate-200 bg-white">
       <h2 className="p-8 pb-0 text-2xl font-bold text-slate-900 sm:pb-0">{title}</h2>
-      <div className="px-8 pb-2 text-sm text-slate-500">Toptan fiyat (komisyon dahil) · hızlı vitrin</div>
+      <div className="px-8 pb-2 text-sm text-slate-500">
+        {canSeePrices
+          ? "Toptan fiyat (komisyon dahil) · hızlı vitrin"
+          : "Fiyatlar sadece giris yapmis ve onayli uyelere aciktir"}
+      </div>
       <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-8 pt-2 [scrollbar-width:thin] sm:gap-5 sm:px-6 lg:px-8">
         {products.map((p) => {
           const price = unit(p);
@@ -54,10 +59,19 @@ export function HomeSpotlightStrip({ products, title }: Props) {
               <div className="border-t border-slate-100 p-3">
                 <p className="line-clamp-2 min-h-10 text-sm font-bold leading-snug text-slate-900">{p.name}</p>
                 <p className="mt-1 text-[11px] font-semibold text-slate-500">MOQ {p.min_order_quantity ?? 0} adet</p>
-                <p className="mt-1.5 text-lg font-extrabold tabular-nums text-slate-900">
-                  {price.toLocaleString("tr-TR")} <span className="text-sm">₺</span>
-                </p>
-                <p className="text-xs text-slate-400">/ adet</p>
+                {canSeePrices ? (
+                  <>
+                    <p className="mt-1.5 text-lg font-extrabold tabular-nums text-slate-900">
+                      {price.toLocaleString("tr-TR")} <span className="text-sm">₺</span>
+                    </p>
+                    <p className="text-xs text-slate-400">/ adet</p>
+                  </>
+                ) : (
+                  <div className="mt-2 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-2 text-center">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Fiyat gizli</p>
+                    <p className="mt-1 text-[11px] text-slate-600">Giris yapip uyelik onayi alin</p>
+                  </div>
+                )}
               </div>
             </Link>
           );

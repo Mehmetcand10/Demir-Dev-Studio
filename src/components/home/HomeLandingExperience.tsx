@@ -15,9 +15,10 @@ type Props = {
   spotlightProducts: SpotlightProduct[];
   /** "Fırsat Ürünleri" | "Yeni Gelen Toptancılar" vb. */
   spotlightTitle: string;
+  canSeePrices: boolean;
 };
 
-export default function HomeLandingExperience({ spotlightProducts, spotlightTitle }: Props) {
+export default function HomeLandingExperience({ spotlightProducts, spotlightTitle, canSeePrices }: Props) {
   return (
     <div className="w-full bg-white">
       <main className="flex w-full flex-col">
@@ -35,7 +36,7 @@ export default function HomeLandingExperience({ spotlightProducts, spotlightTitl
           </div>
         </section>
 
-        <HomeSpotlightStrip products={spotlightProducts} title={spotlightTitle} />
+        <HomeSpotlightStrip products={spotlightProducts} title={spotlightTitle} canSeePrices={canSeePrices} />
       </main>
     </div>
   );
