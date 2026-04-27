@@ -3,8 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import AnnouncementBanner from "@/components/AnnouncementBanner";
 import { SiteBackground } from "@/components/layout/SiteBackground";
-import SiteFooter from "@/components/layout/SiteFooter";
-import { TrustBar } from "@/components/layout/TrustBar";
+import { ConditionalBottomSection } from "@/components/layout/ConditionalBottomSection";
 import { MarketplaceHeaderWrapper } from "@/components/layout/MarketplaceHeaderWrapper";
 import { createClient } from "@/utils/supabase/server";
 const inter = Inter({ subsets: ["latin"] });
@@ -84,10 +83,7 @@ export default async function RootLayout({
           <SiteBackground>{children}</SiteBackground>
         </main>
 
-        <div className="no-print">
-        <TrustBar />
-        <SiteFooter />
-        </div>
+        <ConditionalBottomSection />
       </body>
     </html>
   );
