@@ -353,15 +353,43 @@ export default function AdminDashboard() {
   };
 
   const wholesalerSummary = useMemo(() => orders
-    .filter(o => !o.is_archived)
     .reduce((acc: any, order) => {
       const name = order.wholesaler?.business_name || 'Bilinmeyen Toptancı';
-      if (!acc[name]) acc[name] = { total: 0, count: 0, iban: order.wholesaler?.iban || null };
-      acc[name].total += Number(order.wholesaler_earning);
+      if (!acc[name]) {
+        acc[name] = {
+          pendingCustomerPayment: 0,
+          pendingPayout: 0,
+          paidOut: 0,
+          count: 0,
+          iban: order.wholesaler?.iban || null,
+        };
+      }
+      const earning = Number(order.wholesaler_earning || 0);
       acc[name].count += 1;
       if (!acc[name].iban && order.wholesaler?.iban) acc[name].iban = order.wholesaler.iban;
+
+      if (order.status === ORDER_STATUS.WAITING_PAYMENT) {
+        acc[name].pendingCustomerPayment += earning;
+      } else if (order.is_archived) {
+        acc[name].paidOut += earning;
+      } else {
+        // Admin ödeme onayı sonrası havuza düşen ve toptancıya ödenmeyi bekleyen tutar
+        acc[name].pendingPayout += earning;
+      }
       return acc;
     }, {}), [orders]);
+
+  const paymentPoolTotals = useMemo(() => {
+    return Object.values(wholesalerSummary).reduce(
+      (acc: { pendingCustomerPayment: number; pendingPayout: number; paidOut: number }, row: any) => {
+        acc.pendingCustomerPayment += Number(row.pendingCustomerPayment || 0);
+        acc.pendingPayout += Number(row.pendingPayout || 0);
+        acc.paidOut += Number(row.paidOut || 0);
+        return acc;
+      },
+      { pendingCustomerPayment: 0, pendingPayout: 0, paidOut: 0 }
+    );
+  }, [wholesalerSummary]);
 
   const activeOrders = useMemo(() => orders.filter(o => !o.is_archived), [orders]);
 
@@ -534,7 +562,7 @@ export default function AdminDashboard() {
                         <h3 className="text-sm font-semibold">Toptancı alacakları</h3>
                         <p className="mt-1 text-xs text-white/75">Havuz toplamı</p>
                         <p className="mt-4 text-2xl font-semibold tabular-nums sm:text-3xl">
-                             {Object.values(wholesalerSummary).reduce((a: number, b: any) => a + (b.total || 0), 0).toLocaleString('tr-TR')} ₺
+                             {paymentPoolTotals.pendingPayout.toLocaleString('tr-TR')} ₺
                         </p>
                     </div>
                 </div>
@@ -561,6 +589,25 @@ export default function AdminDashboard() {
                             <div className="absolute top-6 right-8 flex gap-2">
                                 <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${order.status === ORDER_STATUS.WAITING_PAYMENT ? 'border-amber-200 bg-amber-50 text-amber-700' : order.status === ORDER_STATUS.SHIPPED ? 'border-blue-200 bg-blue-50 text-blue-700' : order.status === ORDER_STATUS.DELIVERED ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : order.status === ORDER_STATUS.CANCELLED ? 'border-red-200 bg-red-50 text-red-700' : 'border-sky-200 bg-sky-50 text-sky-700'}`}>
                                     {getOrderStatusLabel(order.status)}
+                                </span>
+                                <span
+                                  className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${
+                                    order.status === ORDER_STATUS.WAITING_PAYMENT
+                                      ? 'border-amber-200 bg-amber-50 text-amber-800'
+                                      : order.is_archived
+                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                                        : order.status === ORDER_STATUS.CANCELLED
+                                          ? 'border-red-200 bg-red-50 text-red-800'
+                                          : 'border-sky-200 bg-sky-50 text-sky-800'
+                                  }`}
+                                >
+                                  {order.status === ORDER_STATUS.WAITING_PAYMENT
+                                    ? 'Tahsilat bekliyor'
+                                    : order.is_archived
+                                      ? 'Odeme kapatildi'
+                                      : order.status === ORDER_STATUS.CANCELLED
+                                        ? 'Iptal'
+                                        : 'Odeme hazir'}
                                 </span>
                                 {order.status === ORDER_STATUS.PREPARING && ((Date.now() - new Date(order.created_at).getTime()) / (1000 * 60 * 60)) >= 72 && (
                                   <span className="rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[10px] font-medium text-red-700">
@@ -647,7 +694,7 @@ export default function AdminDashboard() {
                                            <button onClick={() => markDelivered(order.id)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-sky-700">Teslim edildi</button>
                                        )}
                                        {(order.status === ORDER_STATUS.SHIPPED || order.status === ORDER_STATUS.DELIVERED) && (
-                                           <button onClick={() => archiveOrder(order.id)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-anthracite-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-black"><Archive className="h-4 w-4" strokeWidth={2}/> Arşivle</button>
+                                           <button onClick={() => archiveOrder(order.id)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-anthracite-900 px-4 py-2.5 text-xs font-medium text-white transition hover:bg-black"><Archive className="h-4 w-4" strokeWidth={2}/> Ödeme kapatıldı</button>
                                        )}
                                     </>
                                 )}
@@ -756,7 +803,22 @@ export default function AdminDashboard() {
                 <h2 className="text-2xl font-black text-anthracite-900 mb-2 flex items-center gap-3">
                    <Wallet className="w-8 h-8 text-sky-500" /> Toptancı Hakediş Masası
                 </h2>
-                <p className="text-sm font-medium text-anthracite-500 mb-10 text-left">Üreticilerin havuzdaki net alacaklarını buradan takip edin.</p>
+                <p className="text-sm font-medium text-anthracite-500 mb-6 text-left">Tahsilat ve hakediş durumları ayrıştırılmış şekilde gösterilir: müşteri tahsilatı bekleyen, toptancıya ödenecek, ödenip kapatılmış.</p>
+
+                <div className="mb-10 grid grid-cols-1 gap-3 md:grid-cols-3">
+                  <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">Müşteri tahsilatı bekliyor</p>
+                    <p className="mt-1 text-xl font-semibold tabular-nums text-anthracite-900">{paymentPoolTotals.pendingCustomerPayment.toLocaleString('tr-TR')} ₺</p>
+                  </div>
+                  <div className="rounded-xl border border-sky-200 bg-sky-50/70 p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-sky-700">Toptancıya ödenecek net</p>
+                    <p className="mt-1 text-xl font-semibold tabular-nums text-anthracite-900">{paymentPoolTotals.pendingPayout.toLocaleString('tr-TR')} ₺</p>
+                  </div>
+                  <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Ödenmiş / kapatılmış</p>
+                    <p className="mt-1 text-xl font-semibold tabular-nums text-anthracite-900">{paymentPoolTotals.paidOut.toLocaleString('tr-TR')} ₺</p>
+                  </div>
+                </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                    {Object.entries(wholesalerSummary).length === 0 ? (
@@ -768,10 +830,10 @@ export default function AdminDashboard() {
                         </div>
                         <div className="text-left">
                            <h3 className="font-black text-2xl text-anthracite-900 leading-tight">{name}</h3>
-                           <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mt-2">{data.count} Aktif Sevkiyat İşlemi</p>
+                           <p className="text-[10px] font-black text-anthracite-400 uppercase tracking-widest mt-2">{data.count} Toplam Sipariş Kaydı</p>
                            <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mt-1">
                              Performans Skoru: {(() => {
-                               const list = orders.filter((o) => (o.wholesaler?.business_name || 'Bilinmeyen Toptancı') === name && !o.is_archived);
+                               const list = orders.filter((o) => (o.wholesaler?.business_name || 'Bilinmeyen Toptancı') === name);
                                if (list.length === 0) return 0;
                                const shippedOrDelivered = list.filter((o) => o.status === ORDER_STATUS.SHIPPED || o.status === ORDER_STATUS.DELIVERED).length;
                                const delivered = list.filter((o) => o.status === ORDER_STATUS.DELIVERED).length;
@@ -787,9 +849,19 @@ export default function AdminDashboard() {
                              })()} / 100
                            </p>
                         </div>
-                        <div className="mt-auto pt-6 border-t border-anthracite-200">
-                           <p className="text-[10px] font-black text-sky-600 uppercase tracking-widest mb-1 leading-none">Net Alacak</p>
-                           <span className="text-4xl font-black text-sky-600 tracking-tighter">{data.total.toLocaleString('tr-TR')} ₺</span>
+                        <div className="mt-auto space-y-2 border-t border-anthracite-200 pt-6">
+                           <div>
+                             <p className="text-[10px] font-black uppercase tracking-widest text-amber-700">Tahsilat bekliyor</p>
+                             <p className="text-lg font-black tabular-nums text-amber-800">{Number(data.pendingCustomerPayment || 0).toLocaleString('tr-TR')} ₺</p>
+                           </div>
+                           <div>
+                             <p className="text-[10px] font-black uppercase tracking-widest text-sky-700">Ödenecek net alacak</p>
+                             <p className="text-2xl font-black tabular-nums text-sky-700">{Number(data.pendingPayout || 0).toLocaleString('tr-TR')} ₺</p>
+                           </div>
+                           <div>
+                             <p className="text-[10px] font-black uppercase tracking-widest text-emerald-700">Ödenmiş / kapatılmış</p>
+                             <p className="text-base font-black tabular-nums text-emerald-700">{Number(data.paidOut || 0).toLocaleString('tr-TR')} ₺</p>
+                           </div>
                         </div>
                         <button
                           type="button"

@@ -92,6 +92,25 @@ export default function ToptanciDashboard() {
     init();
   }, [supabase.auth, fetchData, supabase]);
 
+  const paymentBuckets = useMemo(() => {
+    const waitingCustomerPayment = orders.filter((o) => o.status === ORDER_STATUS.WAITING_PAYMENT);
+    const paidToPool = orders.filter(
+      (o) => o.status !== ORDER_STATUS.WAITING_PAYMENT && o.status !== ORDER_STATUS.CANCELLED && !o.is_archived
+    );
+    const paidOut = orders.filter((o) => Boolean(o.is_archived));
+
+    const sum = (list: any[]) => list.reduce((acc, item) => acc + Number(item.wholesaler_earning || 0), 0);
+
+    return {
+      waitingCustomerPayment,
+      paidToPool,
+      paidOut,
+      waitingCustomerPaymentTotal: sum(waitingCustomerPayment),
+      paidToPoolTotal: sum(paidToPool),
+      paidOutTotal: sum(paidOut),
+    };
+  }, [orders]);
+
   const saveProfileIban = async () => {
     if (!user) return;
     setIbanSaving(true);
@@ -711,14 +730,18 @@ export default function ToptanciDashboard() {
                             <ChartIcon className="w-48 h-48" />
                         </div>
                         <h3 className="text-xl font-black mb-1">Mevcut Bakiyeniz</h3>
-                        <p className="text-xs font-medium text-white/70 mb-10">Admin havuzunda bekleyen net alacağınız:</p>
+                        <p className="text-xs font-medium text-white/70 mb-10">Yonetim tarafinda onaylanmis ve odemeye hazir net alacaginiz:</p>
                         <span className="text-5xl font-black tracking-tighter">
-                            {orders.reduce((acc, o) => acc + Number(o.wholesaler_earning), 0).toLocaleString('tr-TR')} ₺
+                            {paymentBuckets.paidToPoolTotal.toLocaleString('tr-TR')} ₺
                         </span>
                         <div className="mt-10 pt-10 border-t border-white/20">
                             <div className="flex items-center justify-between">
-                                <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Toplam Satışın</p>
-                                <span className="font-black text-sm">{orders.length} Sipariş</span>
+                                <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Müşteri tahsilatı bekleyen</p>
+                                <span className="font-black text-sm">{paymentBuckets.waitingCustomerPaymentTotal.toLocaleString('tr-TR')} ₺</span>
+                            </div>
+                            <div className="mt-2 flex items-center justify-between">
+                                <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Odendi/kapatildi</p>
+                                <span className="font-black text-sm">{paymentBuckets.paidOutTotal.toLocaleString('tr-TR')} ₺</span>
                             </div>
                         </div>
                     </div>
@@ -726,10 +749,10 @@ export default function ToptanciDashboard() {
                     <div className="lg:col-span-8 space-y-6">
                         <div className="bg-white border border-anthracite-100 rounded-2xl p-10 shadow-xl">
                             <h3 className="text-xl font-black text-anthracite-900 mb-8 flex items-center gap-3">
-                                <HistoryIcon className="w-6 h-6 text-sky-500" /> Son Kazanç Kayıtları
+                                <HistoryIcon className="w-6 h-6 text-sky-500" /> Odenmeye hazir hakedisler
                             </h3>
                             <div className="space-y-4">
-                                {orders.slice(0, 5).map(o => (
+                                {paymentBuckets.paidToPool.slice(0, 5).map(o => (
                                     <div key={o.id} className="p-5 bg-anthracite-50 border border-anthracite-100 rounded-2xl flex items-center justify-between group hover:bg-white transition-all shadow-sm">
                                         <div className="flex items-center gap-4 text-left">
                                             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-sky-500 font-black text-xs">
@@ -743,6 +766,11 @@ export default function ToptanciDashboard() {
                                         <span className="font-black text-lg text-sky-600">+{o.wholesaler_earning.toLocaleString('tr-TR')} ₺</span>
                                     </div>
                                 ))}
+                                {paymentBuckets.paidToPool.length === 0 ? (
+                                  <p className="rounded-xl border border-dashed border-anthracite-200 px-4 py-6 text-sm font-medium text-anthracite-500">
+                                    Su an odemeye hazir hakedis yok. Once odeme onayi gerekir.
+                                  </p>
+                                ) : null}
                             </div>
                         </div>
                     </div>
