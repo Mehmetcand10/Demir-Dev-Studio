@@ -93,9 +93,22 @@ const COLORS = [
   "Kahve",
 ];
 
+const IMAGE_POOL = [
+  "https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1464863979621-258859e62245?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1200&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=1200&q=80&auto=format&fit=crop",
+];
+
 function imageFor(idx) {
-  const seed = idx + 101;
-  return `https://source.unsplash.com/1200x1600/?women,dress,fashion,elegant&sig=${seed}`;
+  const base = IMAGE_POOL[idx % IMAGE_POOL.length];
+  return `${base}&sig=${1000 + idx}`;
 }
 
 function makeProduct(idx, wholesalerId) {
