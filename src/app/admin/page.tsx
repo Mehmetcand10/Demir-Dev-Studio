@@ -9,10 +9,6 @@ import {
   ArrowRight, BarChart3, Receipt, UserCheck, ShoppingBag, Loader2, ClipboardList, AlertTriangle,
   Phone, Copy, UserSearch, StickyNote
 } from 'lucide-react';
-import { 
-  ResponsiveContainer, LineChart, Line, XAxis, YAxis, 
-  CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, AreaChart, Area 
-} from 'recharts';
 import { createClient } from '@/utils/supabase/client';
 import { exportInvoicePDF } from '@/utils/exportInvoice';
 import { QRCodeSVG } from 'qrcode.react';
@@ -36,7 +32,6 @@ export default function AdminDashboard() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<TabType>('overview');
-  const [mounted, setMounted] = useState(false);
   
   // Duyuru State'leri
   const [announcements, setAnnouncements] = useState<any[]>([]);
@@ -163,7 +158,6 @@ export default function AdminDashboard() {
   }, [supabase, fetchPendingUsers, fetchMemberProfiles, fetchOrders, fetchAnnouncements, fetchDisputes, fetchProducts]);
 
   useEffect(() => {
-    setMounted(true);
     checkAdminAccess();
   }, [checkAdminAccess]);
 
@@ -358,16 +352,6 @@ export default function AdminDashboard() {
     fetchDisputes();
   };
 
-  const chartData = useMemo(() => orders
-    .filter(o => !o.is_archived)
-    .reduce((acc: any[], order) => {
-      const date = new Date(order.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
-      const existing = acc.find(item => item.name === date);
-      if (existing) { existing.sales += Number(order.total_price); existing.profit += Number(order.commission_earned); }
-      else { acc.push({ name: date, sales: Number(order.total_price), profit: Number(order.commission_earned) }); }
-      return acc;
-    }, []).slice(-10), [orders]);
-
   const wholesalerSummary = useMemo(() => orders
     .filter(o => !o.is_archived)
     .reduce((acc: any, order) => {
@@ -465,27 +449,71 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div className="premium-card relative overflow-hidden p-6 sm:p-8 lg:col-span-8">
                     <h3 className="mb-6 flex items-center gap-2 text-base font-semibold text-anthracite-900">
-                        <TrendingUp className="h-5 w-5 text-sky-600" strokeWidth={2} /> Ciro özeti
+                        <ClipboardList className="h-5 w-5 text-sky-600" strokeWidth={2} /> Operasyon özeti
                     </h3>
-                    <div className="h-[300px] sm:h-[340px]">
-                        {mounted && (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={chartData}>
-                                    <defs>
-                                        <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8', fontWeight: 'bold'}} />
-                                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8', fontWeight: 'bold'}} />
-                                    <Tooltip contentStyle={{borderRadius: '24px', border: 'none', boxShadow: '0 25px 50px -12px rgb(0 0 0 / 0.25)', fontWeight: 'bold'}} />
-                                    <Area type="monotone" dataKey="sales" name="Ciro (₺)" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorSales)" />
-                                    <Line type="monotone" dataKey="profit" name="Kâr (₺)" stroke="#3b82f6" strokeWidth={4} dot={{ r: 6, fill: "#fff", strokeWidth: 3 }} />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        )}
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-xl border border-anthracite-100 bg-anthracite-50/70 p-4">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-anthracite-500">Bugün sipariş</p>
+                        <p className="mt-1 text-2xl font-semibold tabular-nums text-anthracite-900">
+                          {
+                            activeOrders.filter((o) => {
+                              const d = new Date();
+                              d.setHours(0, 0, 0, 0);
+                              return new Date(o.created_at).getTime() >= d.getTime();
+                            }).length
+                          }
+                        </p>
+                      </div>
+                      <div className="rounded-xl border border-anthracite-100 bg-anthracite-50/70 p-4">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-anthracite-500">Açık sipariş</p>
+                        <p className="mt-1 text-2xl font-semibold tabular-nums text-anthracite-900">{activeOrders.length}</p>
+                      </div>
+                      <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">Bekleyen ödeme</p>
+                        <p className="mt-1 text-2xl font-semibold tabular-nums text-anthracite-900">{pendingOrdersCount}</p>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('orders')}
+                          className="mt-2 text-xs font-semibold text-amber-800 hover:underline"
+                        >
+                          Siparişlere git
+                        </button>
+                      </div>
+                      <div className="rounded-xl border border-red-200 bg-red-50/60 p-4">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-red-700">Riskli durum</p>
+                        <p className="mt-1 text-sm font-semibold text-anthracite-900">
+                          Hazırlık gecikme: {delayedPreparingCount}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-anthracite-900">
+                          Açık uyuşmazlık: {openDisputeCount}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4 rounded-xl border border-anthracite-100 bg-white p-4">
+                      <p className="mb-2 text-xs font-bold uppercase tracking-wider text-anthracite-500">Hızlı aksiyonlar</p>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('approvals')}
+                          className="rounded-lg border border-anthracite-200 bg-anthracite-50 px-3 py-2 text-xs font-semibold text-anthracite-700 hover:bg-anthracite-100"
+                        >
+                          Onay bekleyenler ({pendingApprovalsCount})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('orders')}
+                          className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-800 hover:bg-sky-100"
+                        >
+                          Ödeme & operasyon
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('reports')}
+                          className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-800 hover:bg-blue-100"
+                        >
+                          Detay raporlar
+                        </button>
+                      </div>
                     </div>
                 </div>
                 <div className="space-y-4 lg:col-span-4">
